@@ -1,0 +1,115 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "react", "react-hooks", "import-alias"],
+    "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "plugin:promise/recommended",
+        "plugin:import/typescript",
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "warnOnUnsupportedTypeScriptVersion": true,
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        },
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts", ".tsx", ".js", ".jsx"]
+        },
+        "import/resolver": {
+            "typescript": {
+                "alwaysTryTypes": true,
+                "project": "./tsconfig.json"
+            }
+        },
+        "import/ignore": ["node_modules", "e2e"]
+    },
+    "env": {
+        "browser": true,
+        "node": true
+    },
+    "rules": {
+        "import/no-unresolved": "error",
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "no-prototype-builtins": "off",
+        "no-console": "warn",
+        "no-underscore-dangle": "off",
+        "import/prefer-default-export": "off",
+        "import/no-default-export": "off",
+        "import/export": "off",
+        "import/no-cycle": "error",
+        "semi": "off",
+        "react/jsx-filename-extension": "off",
+        "react/react-in-jsx-scope": "off",
+        "react/jsx-props-no-spreading": "off",
+        "react/button-has-type": "off",
+        "jsx-a11y/anchor-is-valid": [
+            "error",
+            {
+                "components": ["Link"],
+                "specialLink": ["hrefLeft", "hrefRight"],
+                "aspects": ["invalidHref", "preferButton"]
+            }
+        ],
+        "jsx-a11y/label-has-associated-control": [
+            "error",
+            {
+                "assert": "either"
+            }
+        ],
+        "jsx-a11y/no-static-element-interactions": "off",
+        "jsx-a11y/click-events-have-key-events": "off",
+        "no-use-before-define": "off",
+        "react/require-default-props": "off",
+        "react/prop-types": "off",
+        "react/no-array-index-key": "off",
+        "react/destructuring-assignment": [
+            "warn",
+            "always",
+            {
+                "ignoreClassFields": true
+            }
+        ],
+        "react/jsx-no-bind": "off",
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "off",
+        "class-methods-use-this": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-use-before-define": [
+            "error",
+            {
+                "functions": false,
+                "classes": true,
+                "variables": true,
+                "typedefs": true
+            }
+        ],
+        "padding-line-between-statements": [
+            "error",
+            {
+                "blankLine": "always",
+                "prev": ["const", "let", "var"],
+                "next": "*"
+            },
+            {
+                "blankLine": "any",
+                "prev": ["const", "let", "var"],
+                "next": ["const", "let", "var"]
+            },
+            {
+                "blankLine": "always",
+                "prev": "*",
+                "next": ["class", "return", "export"]
+            }
+        ]
+    }
+}
