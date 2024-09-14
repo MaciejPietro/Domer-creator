@@ -24,11 +24,10 @@ export interface IHandleConfig {
 
 export class Handle extends Graphics {
     private type: HandleType;
-    private target: Furniture;
-    private color: number = 0x000;
-    private size: number = 10;
+    private target: Furniture | null;
+    private size = 10;
 
-    private active: boolean = false;
+    private active = false;
     private mouseStartPoint: Point;
     private targetStartPoint: Point;
     private mouseEndPoint: Point;
@@ -111,7 +110,8 @@ export class Handle extends Graphics {
         this.targetStartPoint = this.target.getGlobalPosition();
         this.targetStartCenterPoint.x = this.targetStartPoint.x + this.target.width / 2;
         this.targetStartCenterPoint.y = this.targetStartPoint.y + this.target.height / 2;
-        let localCoords = ev.data.getLocalPosition(this.target);
+        const localCoords = ev.data.getLocalPosition(this.target);
+
         this.startRotaton = this.target.rotation;
         this.startScale.x = this.target.scale.x;
         this.startScale.y = this.target.scale.y;
@@ -136,28 +136,30 @@ export class Handle extends Graphics {
         this.mouseEndPoint.x = ev.data.global.x;
         this.mouseEndPoint.y = ev.data.global.y;
         // distanta de la obiect la punctul de start (unde a dat click utilizatorul)
-        let startDistance = this.getDistance(this.mouseStartPoint, this.targetStartPoint);
+        const startDistance = this.getDistance(this.mouseStartPoint, this.targetStartPoint);
         // distanta de la obiect la pozitia noua a mouse-ului
-        let endDistance = this.getDistance(this.mouseEndPoint, this.targetStartPoint);
+        const endDistance = this.getDistance(this.mouseEndPoint, this.targetStartPoint);
         // raportul dintre cele doua distante:
         // raport > 1 -> se mareste obiectul
         // raport < 1 -> se micsoreaza obiectul
-        let sizeFactor = endDistance / startDistance;
-        let startCenterAngle = this.target.centerAngle;
+        const sizeFactor = endDistance / startDistance;
+        const startCenterAngle = this.target.centerAngle;
+
         switch (this.type) {
             case HandleType.Rotate:
-                let relativeStart = {
+                const relativeStart = {
                     x: this.mouseStartPoint.x - this.targetStartPoint.x,
                     y: this.mouseStartPoint.y - this.targetStartPoint.y,
                 };
-                let relativeEnd = {
+                const relativeEnd = {
                     x: this.mouseEndPoint.x - this.targetStartPoint.x,
                     y: this.mouseEndPoint.y - this.targetStartPoint.y,
                 };
 
-                let endAngle = Math.atan2(relativeEnd.y, relativeEnd.x);
-                let startAngle = Math.atan2(relativeStart.y, relativeStart.x);
-                let deltaAngle = endAngle - startAngle;
+                const endAngle = Math.atan2(relativeEnd.y, relativeEnd.x);
+                const startAngle = Math.atan2(relativeStart.y, relativeStart.x);
+                const deltaAngle = endAngle - startAngle;
+
                 this.target.rotation = this.startRotaton + deltaAngle;
                 break;
             case HandleType.Horizontal:
@@ -172,15 +174,16 @@ export class Handle extends Graphics {
                 break;
             case HandleType.Move:
                 // move delta: distanta intre click original si click in urma mutarii
-                let delta = {
+                const delta = {
                     x: this.mouseEndPoint.x - this.mouseStartPoint.x,
                     y: this.mouseEndPoint.y - this.mouseStartPoint.y,
                 };
+
                 if (!this.target.xLocked) {
                     this.target.position.x = viewportX(this.targetStartPoint.x + delta.x);
                     this.target.position.y = viewportY(this.targetStartPoint.y + delta.y);
                 } else {
-                    let amount = (delta.x + delta.y) * 0.8;
+                    const amount = (delta.x + delta.y) * 0.8;
 
                     //start of wall
                     if (this.localCoords.x + amount <= WALL_THICKNESS * 0.5) {

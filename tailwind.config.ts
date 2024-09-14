@@ -5,7 +5,7 @@ const config: Config = {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx,vue}'],
     theme: {
         extend: {
-            colors: appConfig.colors,
+            // colors: appConfig.colors,
         },
     },
     corePlugins: {

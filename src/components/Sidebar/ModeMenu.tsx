@@ -33,15 +33,15 @@ import {
 
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
-import { ChangeFloorAction } from '@/editor/editor/actions/ChangeFloorAction';
-import { LoadAction } from '@/editor/editor/actions/LoadAction';
-import { SaveAction } from '@/editor/editor/actions/SaveAction';
-import { Tool, ViewMode } from '@/editor/editor/constants';
-import { PrintAction } from '@/editor/editor/actions/PrintAction';
-import { ToggleLabelAction } from '@/editor/editor/actions/ToggleLabelAction';
+import { ChangeFloorAction } from '@/2d/editor/actions/ChangeFloorAction';
+import { LoadAction } from '@/2d/editor/actions/LoadAction';
+import { SaveAction } from '@/2d/editor/actions/SaveAction';
+import { Tool, ViewMode } from '@/2d/editor/constants';
+import { PrintAction } from '@/2d/editor/actions/PrintAction';
+import { ToggleLabelAction } from '@/2d/editor/actions/ToggleLabelAction';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { HelpDialog } from '@/ui/HelpDialog';
-import { DeleteFloorAction } from '@/editor/editor/actions/DeleteFloorAction';
+import { DeleteFloorAction } from '@/2d/editor/actions/DeleteFloorAction';
 import AddMenu from '@/components/Sidebar/AddMenu';
 import useTranslation from '@/hooks/useTranslation';
 
@@ -66,6 +66,7 @@ const ModeMenu = () => {
                 <Group className="flex justify-center py-2" align="center">
                     {modes.map((mode) => (
                         <NavbarLink
+                            key={mode.label}
                             icon={mode.icon}
                             active={activeMode === mode.mode}
                             label={mode.label}

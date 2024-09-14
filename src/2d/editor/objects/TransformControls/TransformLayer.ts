@@ -10,11 +10,12 @@ import { Label } from './Label';
 // handles moving, resizing and rotating of objects.
 // can only work if its state is active.
 export class TransformLayer extends Container {
-    private target: Furniture;
+    private target: Furniture | null;
     private points: Point[];
     private handles: Handle[];
     private labels: Label[];
     private border: Graphics;
+    private borderContainer: Container;
     private borderOffset: number;
     public static dragging: boolean;
     private static instance: TransformLayer;
@@ -28,11 +29,14 @@ export class TransformLayer extends Container {
         this.labels = [];
         this.visible = false;
         this.target = null;
+        this.borderContainer = new Container();
         this.border = new Graphics();
+        this.borderContainer.addChild(this.border);
+
         this.borderOffset = 2;
         // this.dragging = false;
 
-        this.addChild(this.border);
+        this.addChild(this.borderContainer);
 
         // handles for furnitures
         this.addHandle(HandleType.Rotate);
@@ -57,6 +61,8 @@ export class TransformLayer extends Container {
     }
 
     private computePoints() {
+        if (!this.target) return;
+
         [this.points[Coord.NE].x, this.points[Coord.NE].y] = [this.target.width + 5, 5];
         [this.points[Coord.E].x, this.points[Coord.E].y] = [this.target.width, this.target.height / 2];
         [this.points[Coord.SE].x, this.points[Coord.SE].y] = [this.target.width, this.target.height];
@@ -72,13 +78,14 @@ export class TransformLayer extends Container {
 
     private addHandle(type: HandleType) {
         let handle = new Handle({ type: type, target: null, pos: { x: 0, y: 0 } });
-        this.border.addChild(handle);
+
+        this.borderContainer.addChild(handle);
         this.handles.push(handle);
     }
 
     private addLabel(axis: LabelAxis) {
         this.labels[axis] = new Label();
-        this.border.addChild(this.labels[axis]);
+        this.borderContainer.addChild(this.labels[axis]);
     }
 
     public select(t: Furniture) {

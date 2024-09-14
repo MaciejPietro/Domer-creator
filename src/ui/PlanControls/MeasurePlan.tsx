@@ -4,13 +4,13 @@ import { Upload, Photo, X, Plus, FileUpload } from 'tabler-icons-react';
 import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { useStore } from '@/stores/EditorStore';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
-import { Main } from '@/editor/editor/Main';
+import { Main } from '@/2d/editor/Main';
 
 import backgroundPattern from '../../assets/pattern.svg';
 import { Application, FederatedPointerEvent, Sprite, Texture, TilingSprite } from 'pixi.js';
 
-import { Preview } from '@/editor/editor/actions/MeasureToolManager';
-import { METER } from '@/editor/editor/constants';
+import { Preview } from '@/2d/editor/actions/MeasureToolManager';
+import { METER } from '@/2d/editor/constants';
 import { IViewportOptions, PluginManager, Viewport } from 'pixi-viewport';
 
 export default function MeasurePlan({ fileUrl, lengths, setLengths }: any) {

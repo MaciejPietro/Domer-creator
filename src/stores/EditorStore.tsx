@@ -1,13 +1,15 @@
-/** handling current tool state, mainly */
-import create from 'zustand';
-import { AddWallManager } from '../editor/editor/actions/AddWallManager';
-import { Tool, ViewMode } from '../editor/editor/constants';
+import { create } from 'zustand';
+import { AddWallManager } from '../2d/editor/actions/AddWallManager';
+import { Tool, ViewMode } from '../2d/editor/constants';
+import { WallNode } from '@/2d/editor/objects/Walls/WallNode';
 
 export enum ToolMode {
     FurnitureMode,
     WallMode,
     ViewMode,
 }
+
+type FocusedElement = null | WallNode;
 
 export interface EditorStore {
     // mode: ToolMode;
@@ -17,12 +19,14 @@ export interface EditorStore {
     snap: boolean;
     plan: any;
     app: any;
+    focusedElement: FocusedElement;
     setActiveMode: (mode: ViewMode) => void;
     setTool: (tool: Tool) => void;
     setFloor: (floor: number) => void;
     setSnap: (snap: boolean) => void;
     setPlan: (snap: any) => void;
     setApp: (snap: any) => void;
+    setFocusedElement: (element: FocusedElement) => void;
 }
 
 export const useStore = create<EditorStore>((set, getState) => ({
@@ -33,20 +37,20 @@ export const useStore = create<EditorStore>((set, getState) => ({
     snap: false,
     plan: null,
     app: null,
-    setActiveMode: (mode: ViewMode) => {
-        const shouldResetTool = [ViewMode.View2d, ViewMode.View3d].includes(mode);
-
-        const { activeTool } = getState();
-
+    focusedElement: null,
+    setFocusedElement: (element: FocusedElement) => {
         set(() => ({
-            activeMode: mode,
-            // activeTool: shouldResetTool ? Tool.None : activeTool,
+            focusedElement: element,
         }));
     },
-
     setFloor: (floor: number) => {
         set(() => ({
-            floor: floor,
+            floor,
+        }));
+    },
+    setActiveMode: (mode: ViewMode) => {
+        set(() => ({
+            activeMode: mode,
         }));
     },
     setTool: (tool: Tool) => {

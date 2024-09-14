@@ -34,7 +34,7 @@ import {
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
 
-import { Tool } from '@/editor/editor/constants';
+import { Tool } from '@/2d/editor/constants';
 import { useFurnitureStore } from '@/stores/FurnitureStore';
 import AddPlan from '@/ui/PlanControls/AddPlan';
 import useTranslation from '@/hooks/useTranslation';

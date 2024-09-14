@@ -7,6 +7,7 @@ import { INodeSerializable } from '../../persistence/INodeSerializable';
 import { FloorPlan } from '../FloorPlan';
 import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { isMobile } from 'react-device-detect';
+
 export class WallNode extends Graphics {
     private dragging: boolean;
     private id: number;
@@ -72,8 +73,7 @@ export class WallNode extends Graphics {
                 this.dragging = true;
                 break;
             case Tool.Remove:
-                let action = new DeleteWallNodeAction(this.id);
-                action.execute();
+                // this.delete();
                 break;
             case Tool.WallAdd:
                 AddWallManager.Instance.step(this);
@@ -86,7 +86,7 @@ export class WallNode extends Graphics {
             return;
         }
 
-        let currentPoint = { x: ev.global.x, y: ev.global.y };
+        const currentPoint = { x: ev.global.x, y: ev.global.y };
 
         this.x = viewportX(currentPoint.x);
         this.y = viewportY(currentPoint.y);
@@ -108,13 +108,21 @@ export class WallNode extends Graphics {
         return useStore.getState().activeMode === ViewMode.Edit;
     }
 
+    public delete() {
+        const action = new DeleteWallNodeAction(this.id);
+
+        action.execute();
+    }
+
     public serialize() {
         let res: INodeSerializable;
+
         res = {
             id: this.id,
             x: this.x,
             y: this.y,
         };
+
         return res;
     }
 }

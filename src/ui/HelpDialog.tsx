@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react';
-import { Dialog, Group, Button, TextInput, Text } from '@mantine/core';
+import { Dialog, Group, Button, TextInput, Text, Image } from '@mantine/core';
 import { useStore } from '../stores/EditorStore';
 import { NavbarLink } from './NavbarLink';
 import {
@@ -18,8 +18,7 @@ import {
     Vector,
     ZoomIn,
 } from 'tabler-icons-react';
-import { Tool } from '../editor/editor/constants';
-import { Image } from '@mantine/core';
+import { Tool } from '../2d/editor/constants';
 import helpAddWall from '../res/add-wall.gif';
 import helpDelete from '../res/delete.gif';
 import helpEditFurniture from '../res/edit-furniture.gif';
@@ -36,7 +35,7 @@ export function HelpDialog() {
     const [opened, setOpened] = useState(false);
 
     const { activeTool } = useStore();
-    let helpBody: IHelpBody[] = [];
+    const helpBody: IHelpBody[] = [];
 
     //   helpBody[ViewMode.View2d] = {
     //     title: "View Mode",
@@ -133,6 +132,7 @@ export function HelpDialog() {
             </>
         ),
     };
+
     return (
         <>
             <Group position="center">

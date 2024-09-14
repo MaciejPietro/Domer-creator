@@ -22,20 +22,21 @@ export class Floor extends Container {
         this.wallNodeSequence.zIndex = 1002;
         this.sortableChildren = true;
         if (floorData) {
-            let nodeLinks = new Map<number, number[]>(floorData.wallNodeLinks);
+            const nodeLinks = new Map<number, number[]>(floorData.wallNodeLinks);
 
             this.wallNodeSequence.load(floorData.wallNodes, nodeLinks);
-            for (let fur of floorData.furnitureArray) {
-                let furnitureData: FurnitureData = {
+            for (const fur of floorData.furnitureArray) {
+                const furnitureData: FurnitureData = {
                     width: fur.width,
                     height: fur.height,
                     imagePath: fur.texturePath,
                 };
+
                 if (fur.zIndex) {
                     furnitureData.zIndex = fur.zIndex;
                 }
-                let attachedTo = this.wallNodeSequence.getWall(fur.attachedToLeft, fur.attachedToRight);
-                let object = new Furniture(
+                const attachedTo = this.wallNodeSequence.getWall(fur.attachedToLeft, fur.attachedToRight);
+                const object = new Furniture(
                     furnitureData,
                     fur.id,
                     attachedTo,
@@ -43,6 +44,7 @@ export class Floor extends Container {
                     fur.attachedToRight,
                     fur.orientation
                 );
+
                 this.furnitureArray.set(fur.id, object);
 
                 if (attachedTo != undefined) {
@@ -53,15 +55,18 @@ export class Floor extends Container {
                 object.position.set(fur.x, fur.y);
                 object.rotation = fur.rotation;
             }
+
             return;
         }
 
         if (previousFloor) {
-            let nodeCloneMap = new Map<number, number>();
+            const nodeCloneMap = new Map<number, number>();
+
             // first iteration, map previous node ids to new node ids as we're simply cloning them
-            for (let wall of previousFloor.getExteriorWalls()) {
+            for (const wall of previousFloor.getExteriorWalls()) {
                 [wall.leftNode, wall.rightNode].map((node) => {
-                    let oldId = node.getId();
+                    const oldId = node.getId();
+
                     if (!nodeCloneMap.has(oldId)) {
                         nodeCloneMap.set(oldId, this.wallNodeSequence.getNewNodeId());
                         this.addNode(node.x, node.y, nodeCloneMap.get(oldId));
@@ -71,17 +76,18 @@ export class Floor extends Container {
 
             // now copy walls with respect to the node mapping
             previousFloor.getExteriorWalls().map((wall) => {
-                let newLeftId = nodeCloneMap.get(wall.leftNode.getId());
-                let newRightId = nodeCloneMap.get(wall.rightNode.getId());
+                const newLeftId = nodeCloneMap.get(wall.leftNode.getId());
+                const newRightId = nodeCloneMap.get(wall.rightNode.getId());
 
-                let newWall = this.wallNodeSequence.addWall(newLeftId, newRightId);
+                const newWall = this.wallNodeSequence.addWall(newLeftId, newRightId);
+
                 newWall.setIsExterior(true);
             });
         }
     }
 
     public setLabelVisibility(value = true) {
-        for (let wall of this.wallNodeSequence.getWalls()) {
+        for (const wall of this.wallNodeSequence.getWalls()) {
             wall.label.visible = value;
         }
     }
@@ -94,7 +100,7 @@ export class Floor extends Container {
     }
 
     public reset() {
-        for (let id of this.furnitureArray.keys()) {
+        for (const id of this.furnitureArray.keys()) {
             this.removeFurniture(id);
         }
         this.wallNodeSequence.reset();
@@ -105,7 +111,7 @@ export class Floor extends Container {
     }
 
     public clearScreen() {
-        for (let child of this.children) {
+        for (const child of this.children) {
             child.visible = false;
         }
     }
@@ -118,7 +124,8 @@ export class Floor extends Container {
         attachedToLeft?: number,
         attachedToRight?: number
     ) {
-        let object = new Furniture(obj, id, attachedTo, attachedToLeft, attachedToRight);
+        const object = new Furniture(obj, id, attachedTo, attachedToLeft, attachedToRight);
+
         this.furnitureArray.set(id, object);
 
         if (attachedTo !== undefined) {
@@ -132,20 +139,95 @@ export class Floor extends Container {
         return id;
     }
 
+    private shiftCoordinatesToOrigin(lines: any) {
+        if (!lines[0]) return [];
+
+        const shiftX = lines[0].a.x;
+        const shiftY = lines[0].a.y;
+
+        // Shift all coordinates
+        lines.forEach((line: any) => {
+            line.a.x = line.a.x - shiftX;
+            line.a.y = line.a.y - shiftY;
+            line.b.x = line.b.x - shiftX;
+            line.b.y = line.b.y - shiftY;
+        });
+
+        // Check for negative values and apply a positive offset if needed
+        const minX = Math.min(...lines.map((line: any) => Math.min(line.a.x, line.b.x)));
+        const minY = Math.min(...lines.map((line: any) => Math.min(line.a.y, line.b.y)));
+
+        // If negative values exist, shift all coordinates again to avoid negatives
+        if (minX < 0 || minY < 0) {
+            const offsetX = Math.abs(minX);
+            const offsetY = Math.abs(minY);
+
+            lines.forEach((line: any) => {
+                line.a.x += offsetX;
+                line.a.y += offsetY;
+                line.b.x += offsetX;
+                line.b.y += offsetY;
+            });
+        }
+
+        return lines;
+    }
+
+    public getPlan() {
+        const plan = new FloorSerializable();
+        const wallNodes = this.wallNodeSequence.getWalls();
+
+        const planNodes = [];
+
+        // @ts-expect-error TODO
+        for (const node of wallNodes.values()) {
+            const leftNode = node.leftNode.position;
+            const rightNode = node.rightNode.position;
+
+            planNodes.push({
+                a: {
+                    x: node.x1 / 100,
+                    y: node.y1 / 100,
+                },
+                b: {
+                    x: node.x2 / 100,
+                    y: node.y2 / 100,
+                },
+            });
+        }
+        // wall node links
+        // plan.wallNodeLinks = Array.from(this.wallNodeSequence.getWallNodeLinks().entries());
+        // furniture
+        // const serializedFurniture = [];
+
+        // for (const furniture of this.furnitureArray.values()) {
+        //     serializedFurniture.push(furniture.serialize());
+        // }
+        // plan.furnitureArray = serializedFurniture;
+
+        return {
+            // ...plan,
+            wallNodes: this.shiftCoordinatesToOrigin(planNodes),
+        };
+    }
+
     public serialize(): FloorSerializable {
-        let plan = new FloorSerializable();
-        let wallNodes = this.wallNodeSequence.getWallNodes();
-        for (let node of wallNodes.values()) {
+        const plan = new FloorSerializable();
+        const wallNodes = this.wallNodeSequence.getWallNodes();
+
+        for (const node of wallNodes.values()) {
             plan.wallNodes.push(node.serialize());
         }
         // wall node links
         plan.wallNodeLinks = Array.from(this.wallNodeSequence.getWallNodeLinks().entries());
         // furniture
-        let serializedFurniture = [];
-        for (let furniture of this.furnitureArray.values()) {
+        const serializedFurniture = [];
+
+        for (const furniture of this.furnitureArray.values()) {
             serializedFurniture.push(furniture.serialize());
         }
         plan.furnitureArray = serializedFurniture;
+
         return plan;
     }
     public setFurniturePosition(id: number, x: number, y: number, angle?: number) {
@@ -184,8 +266,8 @@ export class Floor extends Container {
     }
 
     public removeWall(wall: Wall) {
-        let leftNode = wall.leftNode.getId();
-        let rightNode = wall.rightNode.getId();
+        const leftNode = wall.leftNode.getId();
+        const rightNode = wall.rightNode.getId();
 
         if (this.wallNodeSequence.contains(leftNode)) {
             this.wallNodeSequence.removeWall(leftNode, rightNode);
@@ -197,8 +279,9 @@ export class Floor extends Container {
     }
 
     public addNodeToWall(wall: Wall, coords: Point) {
-        let leftNode = wall.leftNode.getId();
-        let rightNode = wall.rightNode.getId();
+        const leftNode = wall.leftNode.getId();
+        const rightNode = wall.rightNode.getId();
+
         // ecuatia dreptei, obtine y echivalent lui x
         if (wall.angle != 90) {
             coords.y = getCorrespondingY(coords.x, wall.leftNode.position, wall.rightNode.position);
@@ -216,8 +299,9 @@ export class Floor extends Container {
         this.removeWall(wall);
         // add node and connect walls to it
 
-        let newNode = this.wallNodeSequence.addNode(coords.x, coords.y);
-        let newNodeId = newNode.getId();
+        const newNode = this.wallNodeSequence.addNode(coords.x, coords.y);
+        const newNodeId = newNode.getId();
+
         this.wallNodeSequence.addWall(leftNode, newNodeId);
         this.wallNodeSequence.addWall(newNodeId, rightNode);
 

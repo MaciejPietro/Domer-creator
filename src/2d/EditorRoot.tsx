@@ -3,12 +3,12 @@ import { Application, Container } from 'pixi.js';
 
 import { IViewportOptions, Viewport } from 'pixi-viewport';
 import { useStore } from '../stores/EditorStore';
-import { METER } from './editor/constants';
+import { METER } from '@/2d/editor/constants';
 // import { InteractionManager } from '@pixi/interaction';
 import { extensions } from '@pixi/core';
 import { EventSystem } from '@pixi/events';
-import { Main } from './editor/Main';
 import { InteractionManager } from '@pixi/interaction';
+import { Main } from './editor/Main';
 
 extensions.remove(InteractionManager);
 
@@ -17,6 +17,7 @@ export let main: Main;
 export function EditorRoot() {
     const ref = useRef<HTMLDivElement>(null);
     const { setApp } = useStore();
+
     useEffect(() => {
         const app = new Application();
 
@@ -42,6 +43,7 @@ export function EditorRoot() {
                 events: app.renderer.events,
                 eventMode: 'static',
             };
+
             main = new Main(viewportSettings);
 
             ref.current!.appendChild(app.canvas);
@@ -51,11 +53,6 @@ export function EditorRoot() {
 
             setApp(app);
         })();
-
-        return () => {
-            // On unload completely destroy the application and all of its children
-            app.destroy(true, true);
-        };
     }, []);
 
     return <div ref={ref} />;

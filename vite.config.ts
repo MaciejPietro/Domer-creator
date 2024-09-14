@@ -18,14 +18,14 @@ export default defineConfig(({ mode }) => {
 
     return {
         base: '/',
-        plugins: [
-            react(),
-            svgr(),
-        ],
+        plugins: [react(), svgr()],
         resolve: {
             alias: {
                 '@': path.resolve(__dirname, './src'),
             },
+        },
+        esbuild: {
+            drop: ['console', 'debugger'],
         },
         // define: processEnvValues,
     };

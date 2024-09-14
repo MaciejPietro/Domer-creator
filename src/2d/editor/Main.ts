@@ -87,6 +87,7 @@ export class Main extends Viewport {
 
         this.addWallManager = AddWallManager.Instance;
         const wallManagerReference = this.addWallManager.preview.getReference();
+
         this.addChild(wallManagerReference);
 
         this.pointer = new Pointer();
@@ -111,6 +112,7 @@ export class Main extends Viewport {
     private onPointerUp(ev: FederatedPointerEvent) {
         if (ev.button === 2) {
             this.pointer.setCursor('default');
+
             return;
         }
 
@@ -141,7 +143,8 @@ export class Main extends Viewport {
     private checkTools(ev: FederatedPointerEvent) {
         if (ev.button === 2) return;
 
-        let point = { x: 0, y: 0 };
+        const point = { x: 0, y: 0 };
+
         switch (useStore.getState().activeTool) {
             case Tool.WallAdd:
                 // const activeMode = useStore.getState().activeMode;
@@ -150,7 +153,7 @@ export class Main extends Viewport {
                 // this.pause = true;
                 point.x = viewportX(ev.global.x);
                 point.y = viewportY(ev.global.y);
-                let action = new AddNodeAction(undefined, point);
+                const action = new AddNodeAction(undefined, point);
 
                 action.execute();
                 break;
@@ -170,9 +173,9 @@ export class Main extends Viewport {
     }
 }
 
-let save = () => {
-    let data = FloorPlan.Instance.save();
-    localStorage.setItem('autosave', data);
+const save = () => {
+    // let data = FloorPlan.Instance.save();
+    // localStorage.setItem('autosave', data);
 };
 // setInterval(autosave, 60000)
 

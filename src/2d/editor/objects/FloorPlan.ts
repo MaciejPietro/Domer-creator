@@ -1,22 +1,21 @@
-import { autoDetectRenderer, Container, IRendererOptionsAuto } from "pixi.js";
-import { FurnitureData } from "../../../stores/FurnitureStore";
-import { Wall } from "./Walls/Wall";
-import { Floor } from "./Floor";
-import { Serializer } from "../persistence/Serializer";
-import { FloorPlanSerializable } from "../persistence/FloorPlanSerializable";
-import { Action } from "../actions/Action";
-import { useStore } from "../../../stores/EditorStore";
-import { Point } from "../../../helpers/Point";
-import { showNotification } from "@mantine/notifications";
+import { autoDetectRenderer, Container, IRendererOptionsAuto } from 'pixi.js';
+import { FurnitureData } from '../../../stores/FurnitureStore';
+import { Wall } from './Walls/Wall';
+import { Floor } from './Floor';
+import { Serializer } from '../persistence/Serializer';
+import { FloorPlanSerializable } from '../persistence/FloorPlanSerializable';
+import { Action } from '../actions/Action';
+import { useStore } from '../../../stores/EditorStore';
+import { Point } from '../../../helpers/Point';
+import { showNotification } from '@mantine/notifications';
 
 export class FloorPlan extends Container {
-
     private static instance: FloorPlan;
 
     private floors: Floor[];
-    private visibleLabels: boolean = true;
+    private visibleLabels = true;
     private serializer: Serializer;
-    public furnitureId = 0;   // TODO uuid?
+    public furnitureId = 0; // TODO uuid?
     public windowFurniture: FurnitureData;
     public actions: Action[];
 
@@ -39,7 +38,7 @@ export class FloorPlan extends Container {
 
     public set CurrentFloor(floor: number) {
         this.currentFloor = floor;
-        useStore.setState({ floor: this.currentFloor })
+        useStore.setState({ floor: this.currentFloor });
     }
 
     public toggleLabels() {
@@ -48,61 +47,72 @@ export class FloorPlan extends Container {
     }
 
     public changeFloor(by: number) {
-
         this.removeChild(this.floors[this.currentFloor]);
-        let previousFloor = this.currentFloor;
+        const previousFloor = this.currentFloor;
+
         this.CurrentFloor += by;
         if (this.floors[this.currentFloor] == null) {
             this.floors[this.currentFloor] = new Floor(null, this.floors[previousFloor]);
         }
         this.floors[this.currentFloor].setLabelVisibility(this.visibleLabels);
-        this.addChild(this.floors[this.currentFloor])
+        this.addChild(this.floors[this.currentFloor]);
     }
 
     public print() {
-
-        let opts: IRendererOptionsAuto = {
-            preserveDrawingBuffer: true
+        const opts: IRendererOptionsAuto = {
+            preserveDrawingBuffer: true,
         };
 
-        let renderer = autoDetectRenderer(opts);
-        const image = renderer.plugins.extract.image(this)
-        let popup = window.open();
+        const renderer = autoDetectRenderer(opts);
+        const image = renderer.plugins.extract.image(this);
+        const popup = window.open();
+
         popup.document.body.appendChild(image);
         popup.focus();
         popup.print();
     }
 
     public save() {
+        const floorPlan = this.serializer.serialize(this.floors, this.furnitureId);
 
-        let floorPlan = this.serializer.serialize(this.floors, this.furnitureId);
+        return floorPlan;
+    }
+
+    public getPlan() {
+        const floorPlan = this.serializer.serializePlan(this.floors);
+
         return floorPlan;
     }
 
     public load(planText: string) {
-        let plan: FloorPlanSerializable = JSON.parse(planText)
+        const plan: FloorPlanSerializable = JSON.parse(planText);
+
         this.reset();
-        for (let floorData of plan.floors) {
-            let floor = new Floor(floorData);
+        for (const floorData of plan.floors) {
+            const floor = new Floor(floorData);
+
             this.floors.push(floor);
         }
 
         this.furnitureId = plan.furnitureId;
         this.floors[0].getWallNodeSequence().setId(plan.wallNodeId);
-        this.addChild(this.floors[this.currentFloor])
+        this.addChild(this.floors[this.currentFloor]);
     }
 
     // removes current floor
     public removeFloor() {
         if (this.floors.length < 2) {
             showNotification({
-                title:"Floor removal not permitted",
-                message:"This floor is the only floor in the plan. You cannot have a plan with no floors. Create a new floor before deleting.",
-                color:'red'
-            })
+                title: 'Floor removal not permitted',
+                message:
+                    'This floor is the only floor in the plan. You cannot have a plan with no floors. Create a new floor before deleting.',
+                color: 'red',
+            });
+
             return;
         }
-        let oldCurrentFloor = this.currentFloor;
+        const oldCurrentFloor = this.currentFloor;
+
         this.changeFloor(-1);
         this.floors[oldCurrentFloor].reset();
         this.floors.splice(oldCurrentFloor, 1);
@@ -111,9 +121,8 @@ export class FloorPlan extends Container {
 
     // cleans up everything. prepare for new load. TODO Feature multiple floors
     private reset() {
-
         // remove furniture
-        for (let floor of this.floors) {
+        for (const floor of this.floors) {
             floor.reset();
         }
 
@@ -121,38 +130,44 @@ export class FloorPlan extends Container {
         this.floors = [];
         this.currentFloor = 0;
         this.furnitureId = 0;
-
     }
 
-    public addFurniture(obj: FurnitureData, attachedTo?: Wall, coords?: Point, attachedToLeft?: number, attachedToRight?: number) {
-
-
+    public addFurniture(
+        obj: FurnitureData,
+        attachedTo?: Wall,
+        coords?: Point,
+        attachedToLeft?: number,
+        attachedToRight?: number
+    ) {
         this.furnitureId += 1;
-        this.floors[this.currentFloor].addFurniture(obj, this.furnitureId, attachedTo, coords, attachedToLeft, attachedToRight);
+        this.floors[this.currentFloor].addFurniture(
+            obj,
+            this.furnitureId,
+            attachedTo,
+            coords,
+            attachedToLeft,
+            attachedToRight
+        );
     }
-
-
 
     public setFurniturePosition(id: number, x: number, y: number, angle?: number) {
         this.floors[this.currentFloor].setFurniturePosition(id, x, y, angle);
     }
 
     public removeFurniture(id: number) {
-
         this.floors[this.currentFloor].removeFurniture(id);
     }
 
     public getObject(id: number) {
-        return this.floors[this.currentFloor].getObject(id)
+        return this.floors[this.currentFloor].getObject(id);
     }
 
     public redrawWalls() {
         this.floors[this.currentFloor].redrawWalls();
     }
-    
-    public removeWallNode(nodeId: number) {
 
-        this.floors[this.currentFloor].removeWallNode(nodeId)
+    public removeWallNode(nodeId: number) {
+        this.floors[this.currentFloor].removeWallNode(nodeId);
     }
 
     public removeWall(wall: Wall) {
@@ -167,7 +182,7 @@ export class FloorPlan extends Container {
     }
 
     public getWallNodeSeq() {
-        return this.floors[this.currentFloor].getWallNodeSequence()
+        return this.floors[this.currentFloor].getWallNodeSequence();
     }
 
     public getFurniture() {

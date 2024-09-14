@@ -8,7 +8,7 @@ export class WallNodeSequence extends Container {
     private wallNodes: Map<number, WallNode>;
     private wallNodeLinks: Map<number, number[]>;
     private walls: Wall[];
-    private static wallNodeId: number = 0;
+    private static wallNodeId = 0;
     constructor() {
         super();
         this.sortableChildren = true;
@@ -48,10 +48,10 @@ export class WallNodeSequence extends Container {
     }
 
     public load(nodes: INodeSerializable[], nodeLinks: Map<number, number[]>) {
-        for (let node of nodes) {
+        for (const node of nodes) {
             this.addNode(node.x, node.y, node.id);
         }
-        for (let [src, dests] of Array.from(nodeLinks)) {
+        for (const [src, dests] of Array.from(nodeLinks)) {
             for (const dest of dests) {
                 this.addWall(src, dest);
             }
@@ -60,26 +60,27 @@ export class WallNodeSequence extends Container {
 
     // drop everything
     public reset() {
-        for (let key of Array.from(this.wallNodes.keys())) {
-            this.wallNodes.get(key)?.destroy(true);
-        }
-        this.wallNodes.clear();
-        for (let wall of this.walls) {
-            wall.destroy(true);
-        }
-        this.walls = [];
-        this.wallNodeLinks.clear();
-        WallNodeSequence.wallNodeId = 0;
+        // for (const key of Array.from(this.wallNodes.keys())) {
+        //     this.wallNodes.get(key)?.destroy(true);
+        // }
+        // this.wallNodes.clear();
+        // for (const wall of this.walls) {
+        //     wall.destroy(true);
+        // }
+        // this.walls = [];
+        // this.wallNodeLinks.clear();
+        // WallNodeSequence.wallNodeId = 0;
     }
 
     public remove(id: number) {
         // TODO only remove if connected to 2 points.
         let isolated = true;
         const links = this.wallNodeLinks.get(id);
+
         if (links && links.length > 0) {
             isolated = false;
         } else {
-            for (let src of Array.from(this.wallNodeLinks.keys())) {
+            for (const src of Array.from(this.wallNodeLinks.keys())) {
                 for (const dest of this.wallNodeLinks.get(src)!) {
                     if (dest == id) {
                         isolated = false;
@@ -104,6 +105,7 @@ export class WallNodeSequence extends Container {
 
     public getNewNodeId() {
         WallNodeSequence.wallNodeId += 1;
+
         return WallNodeSequence.wallNodeId;
     }
 
@@ -121,7 +123,8 @@ export class WallNodeSequence extends Container {
         if (leftNodeId === rightNodeId) return;
 
         if (leftNodeId > rightNodeId) {
-            let aux = leftNodeId;
+            const aux = leftNodeId;
+
             leftNodeId = rightNodeId;
             rightNodeId = aux;
         }
@@ -132,7 +135,8 @@ export class WallNodeSequence extends Container {
         this.wallNodeLinks.get(leftNodeId)?.push(rightNodeId);
         const leftNode = this.wallNodes.get(leftNodeId);
         const rightNode = this.wallNodes.get(rightNodeId);
-        let wall = new Wall(leftNode!, rightNode!);
+        const wall = new Wall(leftNode!, rightNode!);
+
         this.walls.push(wall);
 
         // const wallContainer = new Container();
@@ -141,18 +145,22 @@ export class WallNodeSequence extends Container {
 
         this.addChild(wall as unknown as Container);
         this.drawWalls();
+
         return wall;
     }
 
     public removeWall(leftNode: number, rightNode: number) {
         const index = this.wallNodeLinks.get(leftNode).indexOf(rightNode);
+
         if (index != -1) {
             this.wallNodeLinks.get(leftNode).splice(index, 1);
             this.drawWalls();
         }
         let toBeRemoved = -1;
+
         for (let i = 0; i < this.walls.length; i++) {
-            let wall = this.walls[i];
+            const wall = this.walls[i];
+
             if (wall.leftNode.getId() == leftNode && wall.rightNode.getId() == rightNode) {
                 toBeRemoved = i;
                 break;
@@ -165,13 +173,11 @@ export class WallNodeSequence extends Container {
     }
 
     public getWall(leftNodeId: number, rightNodeId: number) {
-        console.log('xdxd getWall', leftNodeId, rightNodeId);
-
         if (!this.wallNodeLinks.get(leftNodeId) || !this.wallNodeLinks.get(leftNodeId)!.includes(rightNodeId)) {
             return null;
         }
 
-        for (let wall of this.walls) {
+        for (const wall of this.walls) {
             if (wall.leftNode.getId() === leftNodeId && wall.rightNode.getId() === rightNodeId) {
                 return wall;
             }

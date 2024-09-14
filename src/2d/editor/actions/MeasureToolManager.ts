@@ -1,4 +1,4 @@
-import { Graphics, FederatedPointerEvent, Texture } from 'pixi.js';
+import { Graphics, FederatedPointerEvent, Texture, Container } from 'pixi.js';
 import { euclideanDistance } from '../../../helpers/EuclideanDistance';
 import { Point } from '../../../helpers/Point';
 import { viewportX, viewportY } from '../../../helpers/ViewportCoordinates';
@@ -14,16 +14,24 @@ export class Preview {
     private static instance: Preview;
     private showSizeLabel: boolean;
     public isActive = false;
-    public preview: Graphics;
+    public preview: Container;
+
     public startPoint: Point | undefined;
     public endPoint: Point | undefined;
+
+    private sizeGraphic: Graphics;
     private sizeLabel: Label;
+
     private color: number | string;
     public length: number;
 
     public constructor({ color = 0x1f1f1f, showSizeLabel = true }: PreviewProps) {
         this.startPoint = undefined;
-        this.preview = new Graphics();
+        this.preview = new Container();
+        this.sizeGraphic = new Graphics();
+
+        this.preview.addChild(this.sizeGraphic);
+
         this.color = color;
         this.showSizeLabel = showSizeLabel;
         this.sizeLabel = new Label();
@@ -35,7 +43,7 @@ export class Preview {
         this.isActive = true;
         this.startPoint = value;
 
-        this.preview.clear();
+        this.sizeGraphic.clear();
         this.sizeLabel.visible = false;
     }
 
@@ -48,15 +56,17 @@ export class Preview {
         if (this.startPoint === undefined) {
             return;
         }
-        let newX = viewportX(ev.global.x);
-        let newY = viewportY(ev.global.y);
-        this.preview
+        const newX = viewportX(ev.global.x);
+        const newY = viewportY(ev.global.y);
+
+        this.sizeGraphic
             .clear()
             .stroke({ texture: Texture.WHITE, width: 2, color: this.color })
             .moveTo(this.startPoint.x, this.startPoint.y)
             .lineTo(newX, newY);
 
-        let length = euclideanDistance(this.startPoint.x, newX, this.startPoint.y, newY);
+        const length = euclideanDistance(this.startPoint.x, newX, this.startPoint.y, newY);
+
         if (isWall) {
             // length += WALL_THICKNESS / 2;
         }
@@ -76,15 +86,16 @@ export class Preview {
             return;
         }
 
-        let newX = point.x;
-        let newY = point.y;
-        this.preview
+        const newX = point.x;
+        const newY = point.y;
+
+        this.sizeGraphic
             .clear()
             .stroke({ texture: Texture.WHITE, width: 2, color: this.color })
             .moveTo(this.startPoint.x, this.startPoint.y)
             .lineTo(newX, newY);
 
-        let length = euclideanDistance(this.startPoint.x, newX, this.startPoint.y, newY);
+        const length = euclideanDistance(this.startPoint.x, newX, this.startPoint.y, newY);
 
         this.length = length;
 

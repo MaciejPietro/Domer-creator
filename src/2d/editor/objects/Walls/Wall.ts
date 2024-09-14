@@ -1,4 +1,4 @@
-import { Graphics, FederatedPointerEvent, Texture } from 'pixi.js';
+import { Graphics, FederatedPointerEvent, Texture, Container } from 'pixi.js';
 import { getDoor, getWindow } from '../../../../api/api-client';
 import { euclideanDistance } from '../../../../helpers/EuclideanDistance';
 import { Point } from '../../../../helpers/Point';
@@ -13,13 +13,16 @@ import { INTERIOR_WALL_THICKNESS, Tool, ToolMode, ViewMode, WALL_THICKNESS } fro
 import { Label } from '../TransformControls/Label';
 import { WallNode } from './WallNode';
 import { AddWallManager } from '../../actions/AddWallManager';
-import { main } from '@/editor/EditorRoot';
+import { main } from '@/2d/EditorRoot';
+import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 
 export class Wall extends Graphics {
     leftNode: WallNode;
     rightNode: WallNode;
     length: number;
     label: Label;
+
+    clickStartTime: number;
 
     x1: number;
     x2: number;
@@ -32,6 +35,8 @@ export class Wall extends Graphics {
     mouseStartPoint: Point;
     startLeftNode: Point;
     startRightNode: Point;
+
+    color = '#ffffff';
 
     constructor(leftNode: WallNode, rightNode: WallNode) {
         super();
@@ -50,18 +55,49 @@ export class Wall extends Graphics {
         this.addChild(this.label);
         this.thickness = WALL_THICKNESS;
         this.pivot.set(0, WALL_THICKNESS / 2);
-        // this.zIndex = 999;
         this.isExteriorWall = true;
         this.drawLine();
 
+        this.watchStoreChanges();
+
         this.on('pointerdown', this.onMouseDown);
-        this.on('rightdown', this.onRightDown);
         this.on('globalpointermove', this.onMouseMove);
         this.on('pointerup', this.onMouseUp);
         this.on('pointerupoutside', this.onMouseUp);
+        this.on('pointerover', this.onPointerOver);
+        this.on('pointerout', this.onPointerOut);
+
+        this.clickStartTime = 0;
 
         // TODO remove listener
         document.addEventListener('keydown', this.onKeyDown.bind(this));
+    }
+
+    private watchStoreChanges() {
+        useStore.subscribe(() => {
+            this.setStyles();
+        });
+    }
+
+    public setStyles() {
+        const strokeColor = this.isFocused() ? '#1C7ED6' : '#1a1a1a';
+
+        this.fill({ color: this.color }).stroke({ width: 2, color: strokeColor });
+    }
+
+    private onPointerOver() {
+        this.color = '#f0f0ff';
+
+        if (this.isEditMode()) {
+            this.setStyles();
+        }
+    }
+
+    private onPointerOut() {
+        if (this.dragging) return;
+        this.color = '#fff';
+
+        this.setStyles();
     }
 
     public setIsExterior(value: boolean) {
@@ -99,13 +135,14 @@ export class Wall extends Graphics {
         [this.x1, this.y1, this.x2, this.y2] = this.setLineCoords();
 
         let theta = Math.atan2(this.y2 - this.y1, this.x2 - this.x1); // aflu unghiul sa pot roti
+
         theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
         if (theta < 0) theta = 360 + theta; // range [0, 360)
         this.length = euclideanDistance(this.x1, this.x2, this.y1, this.y2);
 
-        this.rect(0, 0, this.length, this.thickness - 2)
-            .fill({ color: '#ffffff' })
-            .stroke({ width: 2, color: 0x1a1a1a });
+        this.rect(0, 0, this.length, this.thickness - 2);
+
+        this.setStyles();
 
         this.position.set(this.x1, this.y1);
         this.angle = theta;
@@ -121,19 +158,13 @@ export class Wall extends Graphics {
         this.label.zIndex = 998;
     }
 
-    private onRightDown(ev: FederatedPointerEvent) {
-        // ev.stopPropagation();
-        // this.setIsExterior(!this.isExteriorWall);
-        // return;
-    }
-
     private onMouseMove(ev: FederatedPointerEvent) {
         if (!this.dragging) {
             return;
         }
 
-        let currentPoint = ev.global;
-        let delta = {
+        const currentPoint = ev.global;
+        const delta = {
             x: (currentPoint.x - this.mouseStartPoint.x) / main.scale.x,
             y: (currentPoint.y - this.mouseStartPoint.y) / main.scale.y,
         };
@@ -142,8 +173,19 @@ export class Wall extends Graphics {
         this.rightNode.setPosition(this.startRightNode.x + delta.x, this.startRightNode.y + delta.y);
     }
 
-    private onMouseUp(ev: FederatedPointerEvent) {
+    private onMouseUp() {
+        const clickDuration = Date.now() - this.clickStartTime;
+
+        if (clickDuration < 200) {
+            const state = useStore.getState();
+
+            state.setFocusedElement(this as unknown as WallNode);
+
+            // this.setStyles(); // Update the styles to apply the color change
+        }
+
         this.dragging = false;
+
         return;
     }
 
@@ -152,46 +194,58 @@ export class Wall extends Graphics {
 
         if (!this.isEditMode()) return;
 
-        let coords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
+        this.clickStartTime = Date.now();
 
-        let localCoords = ev.getLocalPosition(this);
+        const coords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
+
+        const localCoords = ev.getLocalPosition(this as unknown as Container);
 
         const state = useStore.getState();
 
         if (state.activeTool == Tool.Remove) {
-            let action = new DeleteWallAction(this);
-            action.execute();
+            // this.delete();
         }
 
         if (state.activeTool == Tool.WallAdd) {
             const addNode = new AddNodeAction(this, coords);
+
             addNode.execute();
         }
 
         if (state.activeTool == Tool.FurnitureAddWindow) {
-            getWindow().then((res) => {
-                let action = new AddFurnitureAction(
-                    res[0],
-                    this,
-                    { x: localCoords.x, y: 0 },
-                    this.leftNode.getId(),
-                    this.rightNode.getId()
-                );
-                action.execute();
-            });
+            getWindow()
+                .then((res) => {
+                    const action = new AddFurnitureAction(
+                        res[0],
+                        this,
+                        { x: localCoords.x, y: 0 },
+                        this.leftNode.getId(),
+                        this.rightNode.getId()
+                    );
+
+                    action.execute();
+
+                    return;
+                })
+                .catch((err) => console.error(err));
         }
 
         if (state.activeTool == Tool.FurnitureAddDoor) {
-            getDoor().then((res) => {
-                let action = new AddFurnitureAction(
-                    res[0],
-                    this,
-                    { x: localCoords.x, y: 0 },
-                    this.leftNode.getId(),
-                    this.rightNode.getId()
-                );
-                action.execute();
-            });
+            getDoor()
+                .then((res) => {
+                    const action = new AddFurnitureAction(
+                        res[0],
+                        this,
+                        { x: localCoords.x, y: 0 },
+                        this.leftNode.getId(),
+                        this.rightNode.getId()
+                    );
+
+                    action.execute();
+
+                    return;
+                })
+                .catch((err) => console.error(err));
         }
 
         if (state.activeTool == Tool.Edit && !this.dragging) {
@@ -207,6 +261,18 @@ export class Wall extends Graphics {
 
             return;
         }
+
+        if (state.activeTool == Tool.Edit) {
+        }
+    }
+
+    public delete() {
+        const action = new DeleteWallAction(this);
+
+        action.execute();
+
+        new DeleteWallNodeAction(this.leftNode.getId()).execute();
+        new DeleteWallNodeAction(this.rightNode.getId()).execute();
     }
 
     private onKeyDown(ev: KeyboardEvent) {
@@ -215,6 +281,35 @@ export class Wall extends Graphics {
         if (ev.key === 'Escape') {
             setTool(Tool.Edit);
         }
+    }
+
+    public setLength(newLength: number) {
+        // Get the current coordinates of the wall nodes
+        const [x1, y1, x2, y2] = this.setLineCoords();
+
+        // Find the direction of the wall (unit vector)
+        const deltaX = x2 - x1;
+        const deltaY = y2 - y1;
+        const currentLength = euclideanDistance(x1, x2, y1, y2);
+
+        // Normalize the direction
+        const directionX = deltaX / currentLength;
+        const directionY = deltaY / currentLength;
+
+        // Calculate the new position for the rightNode based on the new length
+        const newRightX = x1 + directionX * newLength;
+        const newRightY = y1 + directionY * newLength;
+
+        // Update the right node's position
+        this.rightNode.setPosition(newRightX, newRightY);
+
+        // Redraw the wall with the updated node positions
+        this.drawLine();
+    }
+
+    private isFocused() {
+        // @ts-expect-error TODO
+        return useStore.getState().focusedElement === this;
     }
 
     private isEditMode() {

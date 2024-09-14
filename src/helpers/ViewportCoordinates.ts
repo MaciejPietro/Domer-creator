@@ -1,4 +1,4 @@
-import { main } from '../editor/EditorRoot';
+import { main } from '../2d/EditorRoot';
 
 import { useStore } from '../stores/EditorStore';
 export function viewportX(x: number, customSnap?: any) {

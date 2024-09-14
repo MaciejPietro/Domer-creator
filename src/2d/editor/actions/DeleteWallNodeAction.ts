@@ -7,8 +7,6 @@ export class DeleteWallNodeAction implements Action {
     constructor(id: number) {
         this.id = id;
         this.receiver = FloorPlan.Instance;
-
-        console.log('xdxd DeleteWallNodeAction');
     }
 
     public execute(): void {
