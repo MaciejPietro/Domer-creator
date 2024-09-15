@@ -282,10 +282,11 @@ export class Floor extends Container {
         const leftNode = wall.leftNode.getId();
         const rightNode = wall.rightNode.getId();
 
-        // ecuatia dreptei, obtine y echivalent lui x
-        if (wall.angle != 90) {
-            coords.y = getCorrespondingY(coords.x, wall.leftNode.position, wall.rightNode.position);
-        }
+        // the equation of the line, get y equivalent to x
+        // TODO figure out why author need it, and why it brokes wall on wall behaviour
+        // if (wall.angle != 90) {
+        // coords.y = getCorrespondingY(coords.x, wall.leftNode.position, wall.rightNode.position);
+        // }
 
         // prevent misclicks
         if (Math.abs(euclideanDistance(coords.x, wall.leftNode.x, coords.y, wall.leftNode.y)) < 0.2 * METER) {
@@ -297,9 +298,12 @@ export class Floor extends Container {
 
         // delete wall between left and right node
         this.removeWall(wall);
-        // add node and connect walls to it
 
+        // add node and connect walls to it
         const newNode = this.wallNodeSequence.addNode(coords.x, coords.y);
+
+        if (!newNode) return newNode;
+
         const newNodeId = newNode.getId();
 
         this.wallNodeSequence.addWall(leftNode, newNodeId);

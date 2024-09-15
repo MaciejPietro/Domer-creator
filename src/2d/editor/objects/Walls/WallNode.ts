@@ -109,8 +109,6 @@ export class WallNode extends Graphics {
     }
 
     public delete() {
-        console.log('xdxd test', this.id);
-
         const action = new DeleteWallNodeAction(this.id);
 
         action.execute();

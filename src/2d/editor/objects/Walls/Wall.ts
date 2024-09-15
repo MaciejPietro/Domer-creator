@@ -176,8 +176,6 @@ export class Wall extends Graphics {
             const state = useStore.getState();
 
             state.setFocusedElement(this as unknown as WallNode);
-
-            // this.setStyles(); // Update the styles to apply the color change
         }
 
         this.dragging = false;
@@ -193,6 +191,8 @@ export class Wall extends Graphics {
         this.clickStartTime = Date.now();
 
         const coords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
+
+        console.log('xdxd coords', coords);
 
         const localCoords = ev.getLocalPosition(this as unknown as Container);
 
@@ -242,23 +242,6 @@ export class Wall extends Graphics {
                     return;
                 })
                 .catch((err) => console.error(err));
-        }
-
-        if (state.activeTool == Tool.Edit && !this.dragging) {
-            this.dragging = true;
-            this.mouseStartPoint.x = ev.global.x;
-            this.mouseStartPoint.y = ev.global.y;
-
-            this.startLeftNode.x = this.leftNode.position.x;
-            this.startLeftNode.y = this.leftNode.position.y;
-
-            this.startRightNode.x = this.rightNode.position.x;
-            this.startRightNode.y = this.rightNode.position.y;
-
-            return;
-        }
-
-        if (state.activeTool == Tool.Edit) {
         }
     }
 

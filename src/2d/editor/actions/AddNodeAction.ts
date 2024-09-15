@@ -26,13 +26,14 @@ export class AddNodeAction implements Action {
     public execute() {
         let node: WallNode;
 
-        console.trace();
-
         if (useStore.getState().snap == true) {
             this.coords.x = snap(this.coords.x);
             this.coords.y = snap(this.coords.y);
         }
+
         if (this.wall) {
+            console.log('xdxd wall on wall', this.coords);
+
             node = this.receiver.addNodeToWall(this.wall, this.coords)!;
 
             if (node == null) {
