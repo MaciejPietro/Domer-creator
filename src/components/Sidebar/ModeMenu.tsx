@@ -63,7 +63,7 @@ const ModeMenu = () => {
     return (
         <>
             <AppShellSection grow>
-                <Group className="flex justify-center py-2" align="center">
+                <Group className="flex flex-col justify-end h-full" align="center">
                     {modes.map((mode) => (
                         <NavbarLink
                             key={mode.label}
@@ -85,8 +85,6 @@ const ModeMenu = () => {
                             }}
                         />
                     ))}
-
-                    <Divider />
                 </Group>
             </AppShellSection>
         </>

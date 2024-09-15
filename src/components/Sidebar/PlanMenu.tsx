@@ -112,7 +112,7 @@ const PlanMenu = () => {
             <Menu position="right" trigger="hover">
                 <Menu.Target>
                     <UnstyledButton>
-                        <BuildingWarehouse size={20} />
+                        <BuildingWarehouse />
                     </UnstyledButton>
                 </Menu.Target>
 

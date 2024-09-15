@@ -17,7 +17,7 @@ import { useStore } from '../../stores/EditorStore';
 import { AddNodeAction } from './actions/AddNodeAction';
 import { AddWallManager } from './actions/AddWallManager';
 import { viewportX, viewportY } from '../../helpers/ViewportCoordinates';
-import { Tool, ViewMode } from './constants';
+import { Tool, ToolMode, ViewMode } from './constants';
 import { Pointer } from './Pointer';
 import { Preview } from './actions/MeasureToolManager';
 import { showNotification } from '@mantine/notifications';
@@ -110,11 +110,11 @@ export class Main extends Viewport {
         this.checkTools(ev);
     }
     private onPointerUp(ev: FederatedPointerEvent) {
-        if (ev.button === 2) {
-            this.pointer.setCursor('default');
+        // if (ev.button === 2) {
+        //     this.pointer.setCursor('default');
 
-            return;
-        }
+        //     return;
+        // }
 
         this.updateEnd(ev);
     }
@@ -143,7 +143,10 @@ export class Main extends Viewport {
     private checkTools(ev: FederatedPointerEvent) {
         if (ev.button === 2) return;
 
-        const point = { x: 0, y: 0 };
+        const point = {
+            x: viewportX(ev.global.x),
+            y: viewportY(ev.global.y),
+        };
 
         switch (useStore.getState().activeTool) {
             case Tool.WallAdd:
@@ -151,8 +154,7 @@ export class Main extends Viewport {
 
                 // if (activeMode !== ViewMode.Edit) return;
                 // this.pause = true;
-                point.x = viewportX(ev.global.x);
-                point.y = viewportY(ev.global.y);
+
                 const action = new AddNodeAction(undefined, point);
 
                 action.execute();
@@ -164,8 +166,6 @@ export class Main extends Viewport {
                 break;
             case Tool.Measure:
                 // this.pause = true;
-                point.x = viewportX(ev.global.x);
-                point.y = viewportY(ev.global.y);
 
                 this.preview.setA(point);
                 break;
@@ -182,18 +182,27 @@ const save = () => {
 const setSnap = useStore.getState().setSnap;
 
 document.onkeydown = (e) => {
-    if (e.code == 'KeyS' && e.ctrlKey) {
-        e.preventDefault();
-        save();
-        showNotification({
-            message: 'Saved to Local Storage!',
-            color: 'green',
-            icon: DeviceFloppy,
-        });
-    }
+    // if (e.code == 'KeyS' && e.ctrlKey) {
+    //     e.preventDefault();
+    //     save();
+    //     showNotification({
+    //         message: 'Saved to Local Storage!',
+    //         color: 'green',
+    //         icon: DeviceFloppy as any,
+    //     });
+    // }
 
     if (e.key === 'Control') {
         setSnap(false);
+    }
+
+    if (e.key === 'Escape') {
+        const { activeMode, setTool, activeTool } = useStore.getState();
+
+        if (activeMode === ViewMode.Edit) {
+            setTool(Tool.None);
+            setTool(activeTool);
+        }
     }
 };
 

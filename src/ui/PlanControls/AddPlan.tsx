@@ -43,10 +43,12 @@ export default function AddPlan({ onClose }: any) {
         });
 
         const reader = new FileReader();
+
         reader.onload = async (e: any) => {
             const imageSrc = e.target.result;
 
-            var image = new Image();
+            const image = new Image();
+
             image.src = imageSrc;
 
             // TODO take it from CanvasHTML div
@@ -126,11 +128,6 @@ export default function AddPlan({ onClose }: any) {
                     Możesz dodać maksymalnie 1 plik. Sprawdź rozmiar i typ pliku.
                 </Text>
             )}
-
-            <ul>
-                <li>{lengths.real}</li>
-                <li>{lengths.plan}</li>
-            </ul>
 
             <Button
                 // disabled={!acceptedFiles.length || !lengths.real || !lengths.plan}

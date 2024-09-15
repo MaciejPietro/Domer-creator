@@ -131,19 +131,13 @@ export class MeasureMain extends Viewport {
         }
     }
     private setPointA(ev: FederatedPointerEvent) {
-        let point = { x: 0, y: 0 };
-
-        point.x = ev.global.x;
-        point.y = ev.global.y;
+        const point = { x: ev.global.x, y: ev.global.y };
 
         this.preview.setA(point);
     }
 
     private setPointB(ev: FederatedPointerEvent) {
-        let point = { x: 0, y: 0 };
-
-        point.x = ev.global.x;
-        point.y = ev.global.y;
+        const point = { x: ev.global.x, y: ev.global.y };
 
         this.preview.setB(point);
 
@@ -151,10 +145,7 @@ export class MeasureMain extends Viewport {
     }
 
     private onPointerMove(ev: FederatedPointerEvent) {
-        let point = { x: 0, y: 0 };
-
-        point.x = ev.global.x;
-        point.y = ev.global.y;
+        const point = { x: ev.global.x, y: ev.global.y };
 
         this.preview.updateByPoint(point);
     }

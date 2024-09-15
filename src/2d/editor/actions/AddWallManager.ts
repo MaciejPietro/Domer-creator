@@ -23,17 +23,20 @@ export class AddWallManager {
 
     public checkStep(coords: Point) {
         if (this.previousNode == undefined) {
-            for (let [id, node] of FloorPlan.Instance.getWallNodeSeq().getWallNodes()) {
+            // @ts-expect-error TODO enable iteration in ts
+            for (const [id, node] of FloorPlan.Instance.getWallNodeSeq().getWallNodes()) {
                 if (euclideanDistance(coords.x, node.x, coords.y, node.y) < 0.3 * METER) {
                     return false;
                 }
             }
+
             return true;
         }
 
         if (euclideanDistance(coords.x, this.previousNode.x, coords.y, this.previousNode.y) < 0.3 * METER) {
             return false;
         }
+
         return true;
     }
 
@@ -42,18 +45,21 @@ export class AddWallManager {
         if (this.previousNode === undefined) {
             this.previousNode = node;
             this.preview.setA(this.previousNode.position);
+
             return;
         }
 
         // double click. end chain
-        if (this.previousNode.getId() === node.getId()) {
-            this.previousNode = undefined;
-            this.preview.setA(undefined);
-            return;
-        }
+        // if (this.previousNode.getId() === node.getId()) {
+        //     this.previousNode = undefined;
+        //     this.preview.setA(undefined);
+
+        //     return;
+        // }
 
         //new node on screen
-        let wallAction = new AddWallAction(this.previousNode, node);
+        const wallAction = new AddWallAction(this.previousNode, node);
+
         wallAction.execute();
         this.preview.setA(node.position);
 

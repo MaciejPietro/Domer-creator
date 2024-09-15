@@ -8,6 +8,7 @@ import AppNavbar from '@/components/App/AppNavbar';
 import { useStore } from '@/stores/EditorStore';
 import { ViewMode } from '@/2d/editor/constants';
 import SceneRoot from '@/3d/SceneRoot';
+import AppAside from '@/components/App/AppAside';
 
 export function PageLayout() {
     const { activeMode } = useStore();
@@ -32,6 +33,8 @@ export function PageLayout() {
             <AppNavbar></AppNavbar>
 
             <AppSidebar></AppSidebar>
+
+            <AppAside></AppAside>
 
             <div
                 className={

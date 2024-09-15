@@ -8,6 +8,9 @@ export class Label extends Container {
     textBkg: Sprite = new Sprite(Texture.WHITE);
     constructor(sizeInPixels?: number) {
         super();
+
+        this.eventMode = 'none';
+
         if (!sizeInPixels) {
             sizeInPixels = 0;
         }

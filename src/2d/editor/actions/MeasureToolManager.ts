@@ -3,7 +3,8 @@ import { euclideanDistance } from '../../../helpers/EuclideanDistance';
 import { Point } from '../../../helpers/Point';
 import { viewportX, viewportY } from '../../../helpers/ViewportCoordinates';
 import { Label } from '../objects/TransformControls/Label';
-import { WALL_THICKNESS } from '../constants';
+import { Tool, WALL_THICKNESS } from '../constants';
+import { useStore } from '@/stores/EditorStore';
 
 type PreviewProps = {
     color?: number | string;
@@ -16,7 +17,7 @@ export class Preview {
     public isActive = false;
     public preview: Container;
 
-    public startPoint: Point | undefined;
+    public pointA: Point | undefined;
     public endPoint: Point | undefined;
 
     private sizeGraphic: Graphics;
@@ -26,7 +27,7 @@ export class Preview {
     public length: number;
 
     public constructor({ color = 0x1f1f1f, showSizeLabel = true }: PreviewProps) {
-        this.startPoint = undefined;
+        this.pointA = undefined;
         this.preview = new Container();
         this.sizeGraphic = new Graphics();
 
@@ -37,11 +38,31 @@ export class Preview {
         this.sizeLabel = new Label();
         this.sizeLabel.visible = false;
         this.preview.addChild(this.sizeLabel);
+
+        this.preview.eventMode = 'none';
+
+        // TODO remove listener
+        // document.addEventListener('keydown', this.onKeyDown.bind(this));
     }
+
+    // private onKeyDown(ev: KeyboardEvent) {
+    //     const setTool = useStore.getState().setTool;
+
+    //     console.log('xdxd test');
+
+    //     if (ev.key === 'Escape') {
+    //         // setTool(Tool.Edit);
+    //         this.pointA;
+    //         this.sizeGraphic.clear();
+    //         this.sizeLabel.visible = false;
+
+    //         this.updatePreview();
+    //     }
+    // }
 
     public setA(value: Point | undefined) {
         this.isActive = true;
-        this.startPoint = value;
+        this.pointA = value;
 
         this.sizeGraphic.clear();
         this.sizeLabel.visible = false;
@@ -53,19 +74,21 @@ export class Preview {
     }
 
     public updatePreview(ev: FederatedPointerEvent, isWall = false) {
-        if (this.startPoint === undefined) {
+        this.sizeGraphic.clear();
+        if (this.pointA === undefined) {
             return;
         }
+
         const newX = viewportX(ev.global.x);
         const newY = viewportY(ev.global.y);
 
         this.sizeGraphic
             .clear()
-            .stroke({ texture: Texture.WHITE, width: 2, color: this.color })
-            .moveTo(this.startPoint.x, this.startPoint.y)
-            .lineTo(newX, newY);
+            .moveTo(this.pointA.x, this.pointA.y)
+            .lineTo(newX, newY)
+            .stroke({ width: 2, color: this.color });
 
-        const length = euclideanDistance(this.startPoint.x, newX, this.startPoint.y, newY);
+        const length = euclideanDistance(this.pointA.x, newX, this.pointA.y, newY);
 
         if (isWall) {
             // length += WALL_THICKNESS / 2;
@@ -75,14 +98,14 @@ export class Preview {
 
         if (this.showSizeLabel) {
             this.sizeLabel.update(length);
-            this.sizeLabel.position.x = Math.abs(newX + this.startPoint.x) / 2;
-            this.sizeLabel.position.y = Math.abs(newY + this.startPoint.y) / 2;
+            this.sizeLabel.position.x = Math.abs(newX + this.pointA.x) / 2;
+            this.sizeLabel.position.y = Math.abs(newY + this.pointA.y) / 2;
             this.sizeLabel.visible = true;
         }
     }
 
     public updateByPoint(point: Point) {
-        if (!this.isActive || !this.startPoint) {
+        if (!this.isActive || !this.pointA) {
             return;
         }
 
@@ -92,17 +115,17 @@ export class Preview {
         this.sizeGraphic
             .clear()
             .stroke({ texture: Texture.WHITE, width: 2, color: this.color })
-            .moveTo(this.startPoint.x, this.startPoint.y)
+            .moveTo(this.pointA.x, this.pointA.y)
             .lineTo(newX, newY);
 
-        const length = euclideanDistance(this.startPoint.x, newX, this.startPoint.y, newY);
+        const length = euclideanDistance(this.pointA.x, newX, this.pointA.y, newY);
 
         this.length = length;
 
         if (this.showSizeLabel) {
             this.sizeLabel.update(length);
-            this.sizeLabel.position.x = Math.abs(newX + this.startPoint.x) / 2;
-            this.sizeLabel.position.y = Math.abs(newY + this.startPoint.y) / 2;
+            this.sizeLabel.position.x = Math.abs(newX + this.pointA.x) / 2;
+            this.sizeLabel.position.y = Math.abs(newY + this.pointA.y) / 2;
             this.sizeLabel.visible = true;
         }
     }

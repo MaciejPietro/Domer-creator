@@ -107,63 +107,6 @@ const AddMenu = () => {
                     }}
                 />
             </Modal>
-
-            <div className="relative">
-                <Menu position="right" trigger="hover" disabled={!isEnabled}>
-                    <Menu.Target>
-                        <UnstyledButton className={isEnabled ? '' : 'opacity-25'}>
-                            <Plus />
-                            {activeToolIcon && (
-                                <div className="transform scale-75 origin-top-left text-blue-500 absolute -top-1 -left-1 pointer-events-none">
-                                    {activeToolIcon}
-                                </div>
-                            )}
-                        </UnstyledButton>
-                    </Menu.Target>
-
-                    <Menu.Dropdown>
-                        {/* <Menu.Item icon={<Armchair size={18} />} onClick={() => {
-          setDrawerOpened(true)
-          setter(-1)
-        }}>Add furniture</Menu.Item> */}
-                        {options.map((opt) => (
-                            <Menu.Item key={opt.title} leftSection={opt.icon} onClick={opt.onClick}>
-                                {t(opt.title)}
-                            </Menu.Item>
-                        ))}
-                        <Menu.Item
-                            leftSection={<Window size={18} />}
-                            onClick={() => {
-                                setTool(Tool.FurnitureAddWindow);
-                                cleanNotifications();
-
-                                showNotification({
-                                    title: '🪟 Add window',
-                                    message: 'Click on wall to add window',
-                                    color: 'blue',
-                                });
-                            }}
-                        >
-                            Add window
-                        </Menu.Item>
-                        <Menu.Item
-                            leftSection={<Door size={18} />}
-                            onClick={() => {
-                                setTool(Tool.FurnitureAddDoor);
-                                cleanNotifications();
-
-                                showNotification({
-                                    title: '🚪 Add door',
-                                    message: 'Click on wall to add door. Right click to change orientation',
-                                    color: 'blue',
-                                });
-                            }}
-                        >
-                            Add door
-                        </Menu.Item>
-                    </Menu.Dropdown>
-                </Menu>
-            </div>
         </>
     );
 };

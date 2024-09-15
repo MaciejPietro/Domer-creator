@@ -49,6 +49,11 @@ export function HelpDialog() {
     //     </>
     //   }
 
+    helpBody[Tool.None] = {
+        title: 'Pointer Mode',
+        body: <>...</>,
+    };
+
     helpBody[Tool.Remove] = {
         title: 'Erase Mode',
         body: (

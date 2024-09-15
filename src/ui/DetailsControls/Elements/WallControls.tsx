@@ -3,6 +3,7 @@ import { ActionIcon, NumberInput, Select } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
+import { WallConfig, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 
 const WallControls = ({}: any) => {
     const { focusedElement, setFocusedElement } = useStore();
@@ -46,6 +47,11 @@ const WallControls = ({}: any) => {
         }
     };
 
+    const wallTypeOptions = Object.values(wallTypeConfig).map((wall: WallConfig) => ({
+        label: wall.label,
+        value: wall.width.toString(),
+    }));
+
     return (
         <div>
             <h2 className="text-base font-medium my-0 -mt-2">Sciana</h2>
@@ -60,7 +66,7 @@ const WallControls = ({}: any) => {
             </div>
 
             <div className="mt-4">
-                <Select label="Typ" description="Typ ściany" data={['React', 'Angular', 'Vue', 'Svelte']} />
+                <Select label="Typ" description="Typ ściany" data={wallTypeOptions} />
             </div>
 
             <div className="mt-4">

@@ -46,9 +46,9 @@ export function DetailsControls() {
 
     return (
         <>
-            <Group>
+            {/* <Group>
                 <NavbarLink onClick={() => setOpened((o) => !o)} icon={Help} label="Help" />
-            </Group>
+            </Group> */}
 
             <Dialog
                 opened={opened}

@@ -41,8 +41,7 @@ export class Wall extends Graphics {
     constructor(leftNode: WallNode, rightNode: WallNode) {
         super();
         this.sortableChildren = true;
-        this.eventMode = 'static';
-        // this.interactive = true;
+        this.eventMode = 'dynamic';
         this.leftNode = leftNode;
         this.rightNode = rightNode;
         this.dragging = false;
@@ -68,9 +67,6 @@ export class Wall extends Graphics {
         this.on('pointerout', this.onPointerOut);
 
         this.clickStartTime = 0;
-
-        // TODO remove listener
-        document.addEventListener('keydown', this.onKeyDown.bind(this));
     }
 
     private watchStoreChanges() {
@@ -203,7 +199,7 @@ export class Wall extends Graphics {
         const state = useStore.getState();
 
         if (state.activeTool == Tool.Remove) {
-            // this.delete();
+            this.delete();
         }
 
         if (state.activeTool == Tool.WallAdd) {
@@ -273,14 +269,6 @@ export class Wall extends Graphics {
 
         new DeleteWallNodeAction(this.leftNode.getId()).execute();
         new DeleteWallNodeAction(this.rightNode.getId()).execute();
-    }
-
-    private onKeyDown(ev: KeyboardEvent) {
-        const setTool = useStore.getState().setTool;
-
-        if (ev.key === 'Escape') {
-            setTool(Tool.Edit);
-        }
     }
 
     public setLength(newLength: number) {

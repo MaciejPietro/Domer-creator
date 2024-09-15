@@ -52,36 +52,16 @@ const AppSidebar = () => {
     return (
         <div className="absolute">
             <AppShell.Navbar className="px-2 py-4 flex flex-col justify-between">
-                <AppShellSection grow>
+                <div></div>
+                <AppShellSection>
                     <Group className="flex flex-col" align="center">
                         {activeMode === ViewMode.Edit && (
                             <>
                                 <PlanMenu />
-                                <AddMenu />
                             </>
                         )}
-                    </Group>
-                </AppShellSection>
 
-                <AppShellSection>
-                    <Group className="flex flex-col" align="center">
-                        <NavbarLink
-                            icon={Ruler2}
-                            active={activeTool === Tool.Measure}
-                            label="Narzędzie miara"
-                            onClick={() => {
-                                if (activeTool === Tool.Measure) {
-                                    setTool(Tool.Edit);
-                                } else {
-                                    setTool(Tool.Measure);
-                                    cleanNotifications();
-                                    showNotification({
-                                        title: '📐 Measure tool',
-                                        message: 'Click and drag to measure areas',
-                                    });
-                                }
-                            }}
-                        />
+                        <div className="h-px w-full bg-black/15"></div>
 
                         <NavbarLink
                             icon={GridDots}
@@ -112,7 +92,7 @@ const AppSidebar = () => {
 
                         <div className="h-px w-full bg-black/15"></div>
 
-                        <Group className="flex flex-col" align="center">
+                        {/* <Group className="flex flex-col" align="center">
                             <Tooltip label={'Current floor'} position="right" withArrow>
                                 <div>{floor}</div>
                             </Tooltip>
@@ -142,19 +122,19 @@ const AppSidebar = () => {
                                 }}
                             />
                         </Group>
-                        <div className="h-px w-full bg-black/15"></div>
+                        <div className="h-px w-full bg-black/15"></div> */}
 
                         <HelpDialog />
 
                         <Group className="flex flex-col" align="center">
-                            <NavbarLink
+                            {/* <NavbarLink
                                 icon={Printer}
                                 label="Print"
                                 onClick={() => {
                                     let action = new PrintAction();
                                     action.execute();
                                 }}
-                            />
+                            /> */}
                             <NavbarLink
                                 icon={DeviceFloppy}
                                 label="Save plan"

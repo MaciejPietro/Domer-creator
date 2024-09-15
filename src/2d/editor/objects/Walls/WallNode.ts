@@ -66,14 +66,14 @@ export class WallNode extends Graphics {
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
 
-        if (!this.isEditMode()) return;
+        // if (!this.isEditMode()) return;
 
         switch (useStore.getState().activeTool) {
             case Tool.Edit:
                 this.dragging = true;
                 break;
             case Tool.Remove:
-                // this.delete();
+                this.delete();
                 break;
             case Tool.WallAdd:
                 AddWallManager.Instance.step(this);
@@ -109,6 +109,8 @@ export class WallNode extends Graphics {
     }
 
     public delete() {
+        console.log('xdxd test', this.id);
+
         const action = new DeleteWallNodeAction(this.id);
 
         action.execute();

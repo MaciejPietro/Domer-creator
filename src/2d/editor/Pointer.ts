@@ -13,7 +13,8 @@ export class Pointer extends Container {
 
         this.eventMode = 'none';
 
-        this.dot = new Graphics().circle(0, 0, 3).fill(0xf);
+        this.dot = new Graphics().circle(0, 0, 0).fill(0xf);
+        // this.dot = new Graphics().circle(0, 0, 3).fill(0xf);
         this.addChild(this.dot);
 
         this.hand = new Graphics();
