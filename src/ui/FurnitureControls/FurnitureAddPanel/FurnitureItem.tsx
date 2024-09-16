@@ -8,12 +8,14 @@ interface IFurnitureData {
 }
 
 function add(item: IFurnitureData) {
-    let action = new AddFurnitureAction(item.data);
+    const action = new AddFurnitureAction(item.data);
+
     action.execute();
 }
 
 export function FurnitureItem(item: IFurnitureData) {
-    let data = item.data;
+    const data = item.data;
+
     return (
         <Card onClick={() => add(item)} shadow="sm" p="lg">
             <Card.Section style={{ height: 120, padding: 5 }}>

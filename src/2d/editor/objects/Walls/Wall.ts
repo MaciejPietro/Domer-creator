@@ -17,6 +17,8 @@ import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { WallType, wallTypeConfig } from './config';
 
+import doorSvg from '@/assets/door.svg';
+
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
 export type WallSettings = {
@@ -272,22 +274,26 @@ export class Wall extends Graphics {
                     })
                     .catch((err) => console.error(err));
                 break;
-            case Tool.WallAdd:
-                getDoor()
-                    .then((res) => {
-                        const action = new AddFurnitureAction(
-                            res[0],
-                            this,
-                            { x: localCoords.x, y: 0 },
-                            this.leftNode.getId(),
-                            this.rightNode.getId()
-                        );
+            case Tool.FurnitureAddDoor:
+                console.log('xdxd getDoor');
 
-                        action.execute();
+                const action = new AddFurnitureAction(
+                    {
+                        _id: '66e7f088294f7393fb6ee24a',
+                        name: 'Door',
+                        width: 1,
+                        height: 1,
+                        imagePath: doorSvg,
+                        category: '66e7f088294f7393fb6ee246',
+                    },
+                    this,
+                    { x: localCoords.x, y: 0 },
+                    this.leftNode.getId(),
+                    this.rightNode.getId()
+                );
 
-                        return;
-                    })
-                    .catch((err) => console.error(err));
+                action.execute();
+
                 break;
         }
     }

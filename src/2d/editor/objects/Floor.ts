@@ -132,12 +132,16 @@ export class Floor extends Container {
 
         this.furnitureArray.set(id, object);
 
+        if (!coords) return;
+
+        console.log('xdxd object', attachedTo, object, coords);
+
         if (attachedTo !== undefined) {
-            attachedTo.addChild(object);
+            attachedTo?.addChild(object);
             object.position.set(coords.x, coords.y);
         } else {
-            this.addChild(object);
-            object.position.set(main.corner.x + 150, main.corner.y + 150);
+            // this.addChild(object);
+            // object.position.set(main.corner.x + 150, main.corner.y + 150);
         }
 
         return id;

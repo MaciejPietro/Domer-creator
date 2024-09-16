@@ -48,8 +48,6 @@ export class Preview {
     // private onKeyDown(ev: KeyboardEvent) {
     //     const setTool = useStore.getState().setTool;
 
-    //     console.log('xdxd test');
-
     //     if (ev.key === 'Escape') {
     //         // setTool(Tool.Edit);
     //         this.pointA;

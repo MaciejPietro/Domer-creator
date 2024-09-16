@@ -47,7 +47,7 @@ import useTranslation from '@/hooks/useTranslation';
 
 const modes = [
     { icon: Pencil, label: 'Tryb edycji', mode: ViewMode.Edit },
-    { icon: Eye, label: 'Tryb podglądu 2D', mode: ViewMode.View2d },
+    // { icon: Eye, label: 'Tryb podglądu 2D', mode: ViewMode.View2d },
     { icon: Badge3d, label: 'Tryb podglądu 3D', mode: ViewMode.View3d },
 ];
 

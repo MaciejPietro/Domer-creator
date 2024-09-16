@@ -141,6 +141,8 @@ export class WallNodeSequence extends Container {
 
         this.walls.push(wall);
 
+        console.log('xdxd', this.walls);
+
         // const wallContainer = new Container();
 
         // wallContainer.addChild(wall as unknown as Container);

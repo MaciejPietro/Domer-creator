@@ -114,6 +114,22 @@ const AddMenu = () => {
             ],
         },
         {
+            id: Tool.FurnitureAddDoor,
+            icon: Door, // Assuming Door is a valid component
+            title: 'Dodaj drzwi',
+            active: activeTool === Tool.FurnitureAddDoor,
+            position: 'bottom',
+            onClick: () => {
+                setTool(Tool.FurnitureAddDoor);
+                cleanNotifications();
+                showNotification({
+                    title: '🚪 Add door',
+                    message: 'Click on wall to add door. Right click to change orientation',
+                    color: 'blue',
+                });
+            },
+        },
+        {
             id: Tool.FurnitureAddWindow,
             icon: Window, // Assuming Window is a valid component
             title: 'Dodaj okno',
@@ -125,22 +141,6 @@ const AddMenu = () => {
                 // showNotification({
                 //     title: '🪟 Add window',
                 //     message: 'Click on wall to add window',
-                //     color: 'blue',
-                // });
-            },
-        },
-        {
-            id: Tool.FurnitureAddDoor,
-            icon: Door, // Assuming Door is a valid component
-            title: 'Dodaj drzwi',
-            active: activeTool === Tool.FurnitureAddDoor,
-            position: 'bottom',
-            onClick: () => {
-                setTool(Tool.FurnitureAddDoor);
-                // cleanNotifications();
-                // showNotification({
-                //     title: '🚪 Add door',
-                //     message: 'Click on wall to add door. Right click to change orientation',
                 //     color: 'blue',
                 // });
             },

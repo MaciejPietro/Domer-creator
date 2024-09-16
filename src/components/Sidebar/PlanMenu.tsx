@@ -127,31 +127,6 @@ const PlanMenu = () => {
                             {t(opt.title)}
                         </Menu.Item>
                     ))}
-
-                    {/* <Divider /> */}
-
-                    {/* <Menu.Item leftSection={<Window size={18} />} onClick={() => {
-          setTool(Tool.FurnitureAddWindow)
-          cleanNotifications();
-
-          showNotification({
-            title: '🪟 Add window',
-            message: 'Click on wall to add window',
-            color: 'blue',
-
-          })
-        }}>Add window</Menu.Item>
-        <Menu.Item leftSection={<Door size={18} />} onClick={() => {
-          setTool(Tool.FurnitureAddDoor)
-          cleanNotifications();
-
-          showNotification({
-            title: '🚪 Add door',
-            message: 'Click on wall to add door. Right click to change orientation',
-            color: 'blue',
-
-          })
-        }}>Add door</Menu.Item> */}
                 </Menu.Dropdown>
             </Menu>
         </>

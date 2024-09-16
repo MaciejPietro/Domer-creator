@@ -46,8 +46,23 @@ import ModeMenu from '../Sidebar/ModeMenu';
 import PlanMenu from '../Sidebar/PlanMenu';
 
 const AppSidebar = () => {
-    const { activeTool, setTool, activeMode, floor } = useStore();
-    const { setSnap, snap } = useStore();
+    const { activeTool, setTool, activeMode, floor, setSnap, snap } = useStore();
+
+    const [active, setActive] = useState(0);
+
+    const fileRef = useRef<HTMLInputElement>();
+
+    const handleChange = async (e: any) => {
+        const resultText = await e.target.files.item(0).text();
+
+        const action = new LoadAction(resultText);
+
+        action.execute();
+    };
+
+    const setterAction = (val) => {
+        setActive(val);
+    };
 
     return (
         <div className="absolute">
@@ -80,7 +95,8 @@ const AppSidebar = () => {
                             icon={Dimensions}
                             label="Toggle size labels"
                             onClick={() => {
-                                let action = new ToggleLabelAction();
+                                const action = new ToggleLabelAction();
+
                                 action.execute();
                                 cleanNotifications();
                                 showNotification({
@@ -124,26 +140,22 @@ const AppSidebar = () => {
                         </Group>
                         <div className="h-px w-full bg-black/15"></div> */}
 
-                        <HelpDialog />
-
                         <Group className="flex flex-col" align="center">
-                            {/* <NavbarLink
-                                icon={Printer}
-                                label="Print"
-                                onClick={() => {
-                                    let action = new PrintAction();
-                                    action.execute();
-                                }}
-                            /> */}
                             <NavbarLink
                                 icon={DeviceFloppy}
                                 label="Save plan"
                                 onClick={() => {
-                                    let action = new SaveAction();
+                                    const action = new SaveAction();
+
                                     action.execute();
                                 }}
                             />
+
+                            <NavbarLink onClick={() => fileRef.current?.click()} icon={Upload} label="Load plan" />
+                            <input ref={fileRef as any} onChange={handleChange} multiple={false} type="file" hidden />
                         </Group>
+
+                        <HelpDialog />
                     </Group>
                 </AppShellSection>
             </AppShell.Navbar>

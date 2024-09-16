@@ -1,4 +1,4 @@
-import { Graphics, InteractionEvent, Point, Sprite, Texture } from 'pixi.js';
+import { Assets, Graphics, InteractionEvent, Point, Sprite, Texture, TilingSprite } from 'pixi.js';
 import { endpoint } from '../../../api/api-client';
 import { FurnitureData } from '../../../stores/FurnitureStore';
 import { useStore } from '../../../stores/EditorStore';
@@ -26,35 +26,46 @@ export class Furniture extends Sprite {
         attachedToRight?: number,
         orientation = 0
     ) {
-        let texture = Texture.from(`${endpoint}2d/${data.imagePath}`);
-        super(texture);
+        super();
+
+        this.loadTexture(data.imagePath);
+
         this.resourcePath = data.imagePath;
         this.id = id;
         this.orientation = 0;
         this.cursor = 'pointer';
-        if (attachedTo) {
-            this.isAttached = true;
-            this.parent = attachedTo;
-            this.attachedToLeft = attachedToLeft;
-            this.attachedToRight = attachedToRight;
-            this.xLocked = true;
-        } else {
-            this.xLocked = false;
-            this.isAttached = false;
-        }
-        if (data.zIndex) {
-            this.zIndex = data.zIndex;
-        }
-        this.eventMode = 'static';
-        // this.dragging = false;
-        this.width = data.width * METER;
-        this.height = data.height * METER;
-        this.setOrientation(orientation);
-        this.centerAngle = Math.atan2(-this.height, this.width);
 
-        this.on('pointerdown', this.onMouseDown);
-        this.on('pointermove', this.onMouseMove);
-        this.on('rightdown', this.onRightDown);
+        // if (attachedTo) {
+        //     this.isAttached = true;
+        //     this.parent = attachedTo;
+        //     this.attachedToLeft = attachedToLeft!;
+        //     this.attachedToRight = attachedToRight!;
+        //     this.xLocked = true;
+        // } else {
+        //     this.xLocked = false;
+        //     this.isAttached = false;
+        // }
+
+        // if (data.zIndex) {
+        //     this.zIndex = data.zIndex;
+        // }
+
+        // this.eventMode = 'static';
+        // // this.dragging = false;
+        // this.width = data.width * METER;
+        // this.height = data.height * METER;
+        // this.setOrientation(orientation);
+        // this.centerAngle = Math.atan2(-this.height, this.width);
+
+        // this.on('pointerdown', this.onMouseDown);
+        // this.on('pointermove', this.onMouseMove);
+        // this.on('rightdown', this.onRightDown);
+    }
+
+    private async loadTexture(path: string) {
+        const backgroundPatternTexture = await Assets.load(path);
+
+        this.texture = backgroundPatternTexture;
     }
 
     public getId() {
@@ -103,7 +114,7 @@ export class Furniture extends Sprite {
 
         return;
     }
-    private setOrientation(number) {
+    private setOrientation(number: number) {
         if (number > 0) {
             this.anchor.x = 1;
             this.scale.x = -1 * this.scale.x;
@@ -142,12 +153,14 @@ export class Furniture extends Sprite {
         switch (useStore.getState().activeTool) {
             case Tool.Edit: {
                 const action = new EditFurnitureAction(this);
+
                 action.execute();
                 break;
             }
 
             case Tool.Remove: {
                 const action = new DeleteFurnitureAction(this.id);
+
                 action.execute();
                 break;
             }
@@ -160,8 +173,7 @@ export class Furniture extends Sprite {
     }
 
     public serialize() {
-        let res: IFurnitureSerializable;
-        res = {
+        return {
             x: this.x,
             y: this.y,
             height: this.height / METER,
@@ -174,7 +186,6 @@ export class Furniture extends Sprite {
 
             attachedToLeft: this.attachedToLeft,
             attachedToRight: this.attachedToRight,
-        };
-        return res;
+        } as IFurnitureSerializable;
     }
 }
