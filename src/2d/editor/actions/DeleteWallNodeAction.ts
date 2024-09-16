@@ -12,7 +12,5 @@ export class DeleteWallNodeAction implements Action {
     public execute(): void {
         this.receiver.actions.push(this);
         this.receiver.removeWallNode(this.id);
-
-        console.log('xdxd remove');
     }
 }

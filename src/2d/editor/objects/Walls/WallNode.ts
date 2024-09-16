@@ -7,22 +7,24 @@ import { INodeSerializable } from '../../persistence/INodeSerializable';
 import { FloorPlan } from '../FloorPlan';
 import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { isMobile } from 'react-device-detect';
+import { WallType, wallTypeConfig } from './config';
+import { DEFAULT_WALL_TYPE } from './Wall';
 
 export class WallNode extends Graphics {
     private dragging: boolean;
     private id: number;
+
+    private type: WallType = WallType.Partition;
+    private size = 20;
 
     constructor(x: number, y: number, nodeId: number) {
         super();
         this.eventMode = 'static';
         this.id = nodeId;
 
-        //  this.drawCircle(0,0,WALL_NODE_THICKNESS / 2)
-        // if (isMobile) {
-        //     this.setStyles(WALL_NODE_THICKNESS * 2);
-        // } else {
+        this.setSettings();
+
         this.setStyles({});
-        // }
 
         this.position.set(x, y);
         this.zIndex = 999;
@@ -39,9 +41,21 @@ export class WallNode extends Graphics {
         return this.id;
     }
 
-    public setStyles({ size = WALL_NODE_THICKNESS, color = 0x222222 }: { size?: number; color?: string | number }) {
+    private setSettings() {
+        const state = useStore.getState();
+
+        const activeToolSettings = state.activeToolSettings;
+
+        this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
+
+        const wallThickness = wallTypeConfig[this.type].thickness;
+
+        this.size = Math.max(8, wallThickness / 2);
+    }
+
+    public setStyles({ color = 0x222222 }: { color?: string | number }) {
         this.clear();
-        this.circle(0, 0, size / 2);
+        this.circle(0, 0, this.size / 2);
         this.fill(color);
 
         // SQUARE IN PLACE OF WALL DOT

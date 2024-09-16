@@ -32,8 +32,6 @@ export class AddNodeAction implements Action {
         }
 
         if (this.wall) {
-            console.log('xdxd wall on wall', this.coords);
-
             node = this.receiver.addNodeToWall(this.wall, this.coords)!;
 
             if (node == null) {

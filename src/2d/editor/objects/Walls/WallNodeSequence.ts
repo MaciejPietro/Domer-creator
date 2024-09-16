@@ -1,8 +1,9 @@
 import { showNotification } from '@mantine/notifications';
 import { Container } from 'pixi.js';
 import { INodeSerializable } from '../../persistence/INodeSerializable';
-import { Wall } from './Wall';
+import { Wall, WallSettings } from './Wall';
 import { WallNode } from './WallNode';
+import { WallType } from './config';
 
 export class WallNodeSequence extends Container {
     private wallNodes: Map<number, WallNode>;
@@ -119,7 +120,7 @@ export class WallNodeSequence extends Container {
         return this.wallNodes.get(nodeId);
     }
 
-    public addWall(leftNodeId: number, rightNodeId: number) {
+    public addWall(leftNodeId: number, rightNodeId: number, settings?: WallSettings) {
         if (leftNodeId === rightNodeId) return;
 
         if (leftNodeId > rightNodeId) {
@@ -135,7 +136,8 @@ export class WallNodeSequence extends Container {
         this.wallNodeLinks.get(leftNodeId)?.push(rightNodeId);
         const leftNode = this.wallNodes.get(leftNodeId);
         const rightNode = this.wallNodes.get(rightNodeId);
-        const wall = new Wall(leftNode!, rightNode!);
+
+        const wall = new Wall(leftNode!, rightNode!, settings);
 
         this.walls.push(wall);
 

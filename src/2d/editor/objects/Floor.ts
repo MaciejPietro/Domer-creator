@@ -79,9 +79,13 @@ export class Floor extends Container {
                 const newLeftId = nodeCloneMap.get(wall.leftNode.getId());
                 const newRightId = nodeCloneMap.get(wall.rightNode.getId());
 
+                if (!newLeftId || !newRightId) return;
+
                 const newWall = this.wallNodeSequence.addWall(newLeftId, newRightId);
 
-                newWall.setIsExterior(true);
+                if (newWall) {
+                    newWall.setIsExterior(true);
+                }
             });
         }
     }
@@ -181,9 +185,6 @@ export class Floor extends Container {
 
         // @ts-expect-error TODO
         for (const node of wallNodes.values()) {
-            const leftNode = node.leftNode.position;
-            const rightNode = node.rightNode.position;
-
             planNodes.push({
                 a: {
                     x: node.x1 / 100,
@@ -193,6 +194,7 @@ export class Floor extends Container {
                     x: node.x2 / 100,
                     y: node.y2 / 100,
                 },
+                thickness: node.thickness,
             });
         }
         // wall node links
@@ -296,6 +298,8 @@ export class Floor extends Container {
             return;
         }
 
+        const removeWallSettings = { type: wall.type };
+
         // delete wall between left and right node
         this.removeWall(wall);
 
@@ -306,8 +310,8 @@ export class Floor extends Container {
 
         const newNodeId = newNode.getId();
 
-        this.wallNodeSequence.addWall(leftNode, newNodeId);
-        this.wallNodeSequence.addWall(newNodeId, rightNode);
+        this.wallNodeSequence.addWall(leftNode, newNodeId, removeWallSettings);
+        this.wallNodeSequence.addWall(newNodeId, rightNode, removeWallSettings);
 
         return newNode;
     }

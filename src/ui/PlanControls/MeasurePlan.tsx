@@ -48,7 +48,9 @@ export default function MeasurePlan({ fileUrl, lengths, setLengths }: any) {
 
             const measureMain = new MeasureMain(viewportSettings);
 
-            measureMain.onSetLength = (length: number) => setLengths({ ...lengths, real: length });
+            measureMain.onSetLength = (length: number) => {
+                setLengths({ ...lengths, real: length });
+            };
 
             ref.current!.appendChild(app.canvas);
             app.start();
@@ -115,17 +117,17 @@ export class MeasureMain extends Viewport {
     private onPointerDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
 
-        const { startPoint, endPoint } = this.preview;
+        const { pointA, endPoint } = this.preview;
 
-        if (startPoint && !endPoint) {
+        if (pointA && !endPoint) {
             this.setPointB(ev);
         }
 
-        if (!startPoint) {
+        if (!pointA) {
             this.setPointA(ev);
         }
 
-        if (startPoint && endPoint) {
+        if (pointA && endPoint) {
             this.preview.setB(undefined);
             this.setPointA(ev);
         }

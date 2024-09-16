@@ -11,11 +11,9 @@ import { FloorPlan } from '@/2d/editor/objects/FloorPlan';
 const cyl = new THREE.CylinderGeometry(1, 1, 2, 20);
 const tri = new THREE.CylinderGeometry(1, 1, 2, 3);
 
-const WALL_WIDTH = 20;
-
-const distance = (pointA: any, pointB: any) => {
+const distance = (pointA: any, pointB: any, wallWidth: number) => {
     // const fillWallEdges = 0.5;
-    const fillWallEdges = WALL_WIDTH / 100;
+    const fillWallEdges = wallWidth / 100;
 
     return Math.sqrt(Math.pow(pointB.x - pointA.x, 2) + Math.pow(pointB.y - pointA.y, 2)) + fillWallEdges;
 };
@@ -129,13 +127,13 @@ function House({ plan }: any) {
             <Geometry ref={csg} computeVertexNormals>
                 <Base key={'xd'} geometry={new THREE.BoxGeometry(0, 0, 0)} />
 
-                {plan.wallNodes.map(({ a, b }: any, id: number) => {
-                    const dis = distance(a, b); // Length of the wall
+                {plan.wallNodes.map(({ a, b, thickness }: any, id: number) => {
+                    const dis = distance(a, b, thickness); // Length of the wall
                     const mid = midpoint(a, b); // Midpoint between a and b
                     const angle = angleBetweenPoints(a, b); // Angle to rotate the wall
 
                     // Create a box geometry for the wall with the calculated length
-                    const wall = new THREE.BoxGeometry(dis, 2, WALL_WIDTH / 100);
+                    const wall = new THREE.BoxGeometry(dis, 2, thickness / 100);
 
                     return (
                         <group

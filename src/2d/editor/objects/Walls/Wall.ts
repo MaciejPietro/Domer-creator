@@ -15,6 +15,13 @@ import { WallNode } from './WallNode';
 import { AddWallManager } from '../../actions/AddWallManager';
 import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
+import { WallType, wallTypeConfig } from './config';
+
+export const DEFAULT_WALL_TYPE = WallType.Exterior;
+
+export type WallSettings = {
+    type: WallType;
+};
 
 export class Wall extends Graphics {
     leftNode: WallNode;
@@ -30,6 +37,7 @@ export class Wall extends Graphics {
     y2: number;
     thickness: number;
     isExteriorWall: boolean;
+    type: WallType;
 
     dragging: boolean;
     mouseStartPoint: Point;
@@ -38,7 +46,7 @@ export class Wall extends Graphics {
 
     color = '#ffffff';
 
-    constructor(leftNode: WallNode, rightNode: WallNode) {
+    constructor(leftNode: WallNode, rightNode: WallNode, settings?: WallSettings) {
         super();
         this.sortableChildren = true;
         this.eventMode = 'dynamic';
@@ -52,10 +60,20 @@ export class Wall extends Graphics {
         this.label = new Label(0);
 
         this.addChild(this.label);
-        this.thickness = WALL_THICKNESS;
-        this.pivot.set(0, WALL_THICKNESS / 2);
         this.isExteriorWall = true;
         this.drawLine();
+
+        if (settings?.type !== undefined) {
+            this.type = settings?.type;
+        } else {
+            const state = useStore.getState();
+
+            const activeToolSettings = state.activeToolSettings;
+
+            this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
+        }
+
+        this.applySettings();
 
         this.watchStoreChanges();
 
@@ -73,6 +91,13 @@ export class Wall extends Graphics {
         useStore.subscribe(() => {
             this.setStyles();
         });
+    }
+
+    private applySettings() {
+        const wallThickness = wallTypeConfig[this.type].thickness;
+
+        this.thickness = wallThickness;
+        this.pivot.set(0, wallThickness / 2);
     }
 
     public setStyles() {
@@ -96,17 +121,26 @@ export class Wall extends Graphics {
         this.setStyles();
     }
 
-    public setIsExterior(value: boolean) {
-        this.isExteriorWall = value;
-        if (value) {
-            this.thickness = WALL_THICKNESS;
-        } else {
-            this.thickness = INTERIOR_WALL_THICKNESS;
-        }
-        this.pivot.set(0, this.thickness / 2);
-        this.leftNode.setSize(this.thickness);
-        this.rightNode.setSize(this.thickness);
+    public setType(newType: WallType) {
+        if (this.type === newType) return;
+
+        this.type = newType;
+
+        this.applySettings();
         this.drawLine();
+    }
+
+    public setIsExterior(value: boolean) {
+        // this.isExteriorWall = value;
+        // if (value) {
+        //     this.thickness = WALL_THICKNESS;
+        // } else {
+        //     this.thickness = INTERIOR_WALL_THICKNESS;
+        // }
+        // this.pivot.set(0, this.thickness / 2);
+        // this.leftNode.setSize(this.thickness);
+        // this.rightNode.setSize(this.thickness);
+        // this.drawLine();
     }
 
     public getIsExterior() {
@@ -172,7 +206,7 @@ export class Wall extends Graphics {
     private onMouseUp() {
         const clickDuration = Date.now() - this.clickStartTime;
 
-        if (clickDuration < 200) {
+        if (clickDuration < 200 && useStore.getState().activeTool === Tool.Edit) {
             const state = useStore.getState();
 
             state.setFocusedElement(this as unknown as WallNode);
@@ -192,56 +226,69 @@ export class Wall extends Graphics {
 
         const coords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
 
-        console.log('xdxd coords', coords);
-
         const localCoords = ev.getLocalPosition(this as unknown as Container);
 
         const state = useStore.getState();
 
-        if (state.activeTool == Tool.Remove) {
-            this.delete();
-        }
+        switch (state.activeTool) {
+            case Tool.Edit:
+                if (this.dragging) return;
 
-        if (state.activeTool == Tool.WallAdd) {
-            const addNode = new AddNodeAction(this, coords);
+                this.dragging = true;
+                this.mouseStartPoint.x = ev.global.x;
+                this.mouseStartPoint.y = ev.global.y;
 
-            addNode.execute();
-        }
+                this.startLeftNode.x = this.leftNode.position.x;
+                this.startLeftNode.y = this.leftNode.position.y;
 
-        if (state.activeTool == Tool.FurnitureAddWindow) {
-            getWindow()
-                .then((res) => {
-                    const action = new AddFurnitureAction(
-                        res[0],
-                        this,
-                        { x: localCoords.x, y: 0 },
-                        this.leftNode.getId(),
-                        this.rightNode.getId()
-                    );
+                this.startRightNode.x = this.rightNode.position.x;
+                this.startRightNode.y = this.rightNode.position.y;
+                break;
 
-                    action.execute();
+            case Tool.WallAdd:
+                const addNode = new AddNodeAction(this, coords);
 
-                    return;
-                })
-                .catch((err) => console.error(err));
-        }
+                addNode.execute();
+                break;
 
-        if (state.activeTool == Tool.FurnitureAddDoor) {
-            getDoor()
-                .then((res) => {
-                    const action = new AddFurnitureAction(
-                        res[0],
-                        this,
-                        { x: localCoords.x, y: 0 },
-                        this.leftNode.getId(),
-                        this.rightNode.getId()
-                    );
+            case Tool.Remove:
+                this.delete();
 
-                    action.execute();
+                break;
+            case Tool.FurnitureAddWindow:
+                getWindow()
+                    .then((res) => {
+                        const action = new AddFurnitureAction(
+                            res[0],
+                            this,
+                            { x: localCoords.x, y: 0 },
+                            this.leftNode.getId(),
+                            this.rightNode.getId()
+                        );
 
-                    return;
-                })
-                .catch((err) => console.error(err));
+                        action.execute();
+
+                        return;
+                    })
+                    .catch((err) => console.error(err));
+                break;
+            case Tool.WallAdd:
+                getDoor()
+                    .then((res) => {
+                        const action = new AddFurnitureAction(
+                            res[0],
+                            this,
+                            { x: localCoords.x, y: 0 },
+                            this.leftNode.getId(),
+                            this.rightNode.getId()
+                        );
+
+                        action.execute();
+
+                        return;
+                    })
+                    .catch((err) => console.error(err));
+                break;
         }
     }
 

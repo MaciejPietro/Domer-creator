@@ -1,49 +1,55 @@
 import { Icon as TablerIcon } from 'tabler-icons-react';
-import { useRef, useState } from 'react';
-import { FloatingPosition, Tooltip, UnstyledButton } from '@mantine/core';
-import { createStyles } from '@mantine/emotion';
-
-const useStyles = createStyles((theme) => ({
-    link: {
-        width: 40,
-        height: 40,
-        borderRadius: theme.radius.md,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.colors.gray[7],
-
-        '&:hover': {
-            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0],
-        },
-    },
-
-    active: {
-        '&, &:hover': {
-            backgroundColor:
-                theme.colorScheme === 'dark'
-                    ? theme.fn.rgba(theme.colors[theme.primaryColor][9], 0.25)
-                    : theme.colors[theme.primaryColor][0],
-            color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 7],
-        },
-    },
-}));
+import { Menu, Tooltip, UnstyledButton } from '@mantine/core';
 
 interface NavbarLinkProps {
     icon: TablerIcon;
     label?: string;
     active?: boolean;
     onClick?(): void;
-    position?: FloatingPosition;
+    options?: any;
+    position?: 'right' | 'left';
 }
 
-export function NavbarLink({ icon: Icon, label, active, onClick, position = 'right' }: NavbarLinkProps) {
-    const { classes, cx } = useStyles();
+export function NavbarLink({ icon: Icon, label, active, onClick, options, position = 'right' }: NavbarLinkProps) {
+    const Btn = () => (
+        <div
+            onClick={onClick}
+            className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${
+                active
+                    ? 'bg-blue-100  text-blue-500 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-dark-0 hover:bg-gray-100'
+            }`}
+        >
+            <Icon />
+        </div>
+    );
 
-    return (
+    return options ? (
+        <Menu position={position} trigger="hover">
+            <Menu.Target>
+                <UnstyledButton>
+                    <Btn />
+                </UnstyledButton>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+                {options.map((opt: any) => (
+                    <Menu.Item
+                        key={opt.title}
+                        leftSection={opt.icon}
+                        onClick={opt.onClick}
+                        disabled={opt.disabled}
+                        className={opt.active ? 'text-blue-500' : ''}
+                    >
+                        {opt.title}
+                    </Menu.Item>
+                ))}
+            </Menu.Dropdown>
+        </Menu>
+    ) : (
         <Tooltip label={label} position={position} withArrow>
-            <UnstyledButton onClick={onClick} className={cx(classes.link, { [classes.active]: active })}>
-                <Icon />
+            <UnstyledButton>
+                <Btn />
             </UnstyledButton>
         </Tooltip>
     );

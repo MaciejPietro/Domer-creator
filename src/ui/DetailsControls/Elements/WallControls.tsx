@@ -3,14 +3,14 @@ import { ActionIcon, NumberInput, Select } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
-import { WallConfig, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
+import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 
 const WallControls = ({}: any) => {
     const { focusedElement, setFocusedElement } = useStore();
 
     const [details, setDetails] = useState({
-        length: (focusedElement as any)?.length?.toFixed(2) || 0,
-        depth: 50,
+        length: (focusedElement as any)?.length?.toFixed(2) || '0',
+        wallType: (focusedElement as any)?.type || WallType.Exterior,
     });
 
     const handleRemove = () => {
@@ -33,11 +33,14 @@ const WallControls = ({}: any) => {
 
     useEffect(() => {
         if (focusedElement) {
-            const newLength = (focusedElement as any)?.length?.toFixed(2) || 0;
+            const element = focusedElement as Wall;
 
-            setDetails((prevDetails) => ({ ...prevDetails, length: parseFloat(newLength) }));
+            const length = element.length?.toFixed(2) || '0';
+            const wallType = element?.type || WallType.Exterior;
+
+            setDetails((prevDetails) => ({ ...prevDetails, length: parseFloat(length), wallType }));
         }
-    }, [(focusedElement as any)?.length]);
+    }, [focusedElement]);
 
     const handleUpdate = (key: 'length' | 'depth', value: number) => {
         setDetails((prevDetails) => ({ ...prevDetails, [key]: value || 0 }));
@@ -48,9 +51,16 @@ const WallControls = ({}: any) => {
     };
 
     const wallTypeOptions = Object.values(wallTypeConfig).map((wall: WallConfig) => ({
-        label: wall.label,
-        value: wall.width.toString(),
+        label: `${wall.label} (${wall.thickness}cm)`,
+        value: wall.type.toString(),
     }));
+
+    const handleChangeWallType = (val: WallType) => {
+        const element = focusedElement as Wall;
+
+        element?.setType(val);
+        setDetails((prevDetails) => ({ ...prevDetails, wallType: val }));
+    };
 
     return (
         <div>
@@ -66,7 +76,13 @@ const WallControls = ({}: any) => {
             </div>
 
             <div className="mt-4">
-                <Select label="Typ" description="Typ ściany" data={wallTypeOptions} />
+                <Select
+                    label="Typ"
+                    description="Typ ściany"
+                    data={wallTypeOptions}
+                    value={details.wallType.toString()}
+                    onChange={(val) => val && handleChangeWallType(+val)}
+                />
             </div>
 
             <div className="mt-4">

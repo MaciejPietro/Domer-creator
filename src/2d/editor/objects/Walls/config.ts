@@ -1,25 +1,34 @@
+import { BorderHorizontal, BorderInner, BorderLeft } from 'tabler-icons-react';
+
 export enum WallType {
-    External,
+    Exterior,
     LoadBearing,
     Partition,
 }
 
 export type WallConfig = {
     label: string;
-    width: number;
+    thickness: number;
+    type: WallType;
 };
 
 export const wallTypeConfig = Object.freeze({
-    [WallType.External]: {
+    [WallType.Exterior]: {
+        type: WallType.Exterior,
         label: 'Zewnętrzna',
-        width: 40,
+        thickness: 40,
+        icon: BorderLeft,
     },
     [WallType.LoadBearing]: {
+        type: WallType.LoadBearing,
         label: 'Nośna',
-        width: 20,
+        thickness: 20,
+        icon: BorderHorizontal,
     },
     [WallType.Partition]: {
+        type: WallType.Partition,
         label: 'Działowa',
-        width: 10,
+        thickness: 10,
+        icon: BorderInner,
     },
 });
