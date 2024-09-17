@@ -25,6 +25,7 @@ import { DeviceFloppy } from 'tabler-icons-react';
 import backgroundPattern from '../../assets/pattern.svg';
 
 import 'pixi.js/events';
+import { LoadAction } from './actions/LoadAction';
 
 export class Main extends Viewport {
     private floorPlan: FloorPlan;
@@ -97,6 +98,8 @@ export class Main extends Viewport {
         this.on('pointerdown', this.onMouseDown);
         this.on('pointermove', this.updatePreview);
         this.on('pointerup', this.onPointerUp);
+
+        this.loadMockupPlan();
     }
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
@@ -170,6 +173,13 @@ export class Main extends Viewport {
                 this.preview.setA(point);
                 break;
         }
+    }
+
+    private loadMockupPlan() {
+        const action = new LoadAction(`
+                     {"floors":[{"furnitureArray":[],"wallNodes":[{"id":1,"x":2327.4000237816417,"y":2164.4000091552734},{"id":2,"x":2327,"y":2743}],"wallNodeLinks":[[1,[2]],[2,[]],[3,[]],[4,[]],[5,[]]]}],"furnitureId":0,"wallNodeId":5}`);
+
+        action.execute();
     }
 }
 

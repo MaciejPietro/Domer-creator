@@ -35,7 +35,7 @@ export interface EditorStore {
 export const useStore = create<EditorStore>((set, getState) => ({
     // mode: ToolMode.FurnitureMode,
     activeMode: ViewMode.Edit,
-    activeTool: Tool.WallAdd,
+    activeTool: Tool.FurnitureAddDoor,
     activeToolSettings: {},
     floor: 0,
     snap: false,

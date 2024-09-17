@@ -17,7 +17,11 @@ import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { WallType, wallTypeConfig } from './config';
 
-import doorSvg from '@/assets/door.svg';
+import doorSvg from '@/assets/door/door.svg';
+import doorRedSvg from '@/assets/door/door-not-allowed.svg';
+import doorGreenSvg from '@/assets/door/door-allowed.svg';
+
+import { Furniture, FurnitureOrientation } from '../Furniture';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -81,6 +85,7 @@ export class Wall extends Graphics {
 
         this.on('pointerdown', this.onMouseDown);
         this.on('globalpointermove', this.onMouseMove);
+        this.on('pointermove', this.onWallMouseMove);
         this.on('pointerup', this.onMouseUp);
         this.on('pointerupoutside', this.onMouseUp);
         this.on('pointerover', this.onPointerOver);
@@ -121,6 +126,7 @@ export class Wall extends Graphics {
         this.color = '#fff';
 
         this.setStyles();
+        this.removeTempFurniture();
     }
 
     public setType(newType: WallType) {
@@ -338,5 +344,105 @@ export class Wall extends Graphics {
 
     private isEditMode() {
         return useStore.getState().activeMode === ViewMode.Edit;
+    }
+
+    //TODO move all below to different class
+
+    tempFurniture: Furniture | null = null;
+
+    onWallMouseMove(ev: any) {
+        if (this.dragging) {
+            return;
+        }
+
+        const localCoords = ev.getLocalPosition(this as unknown as Container);
+
+        const state = useStore.getState();
+
+        switch (state.activeTool) {
+            case Tool.FurnitureAddDoor:
+                if (this.tempFurniture) {
+                    const furnitureHeight = this.tempFurniture?._texture.height;
+
+                    this.tempFurniture.position.set(localCoords.x, 0);
+                    this.tempFurniture.loadTexture(doorGreenSvg);
+
+                    const furnitureEndX = localCoords.x + furnitureHeight / 2;
+                    const furnitureStartX = localCoords.x - furnitureHeight / 2;
+
+                    const minX = 10;
+                    const maxX = this.length;
+
+                    if (furnitureEndX > maxX - 5 || furnitureStartX < 5) {
+                        this.tempFurniture.loadTexture(doorRedSvg);
+                    } else {
+                        this.tempFurniture.loadTexture(doorGreenSvg);
+                    }
+
+                    const isLeftSide = localCoords.y < this.thickness / 2;
+
+                    if (isLeftSide) {
+                        this.tempFurniture.setOrientation(FurnitureOrientation._180);
+                    } else {
+                        this.tempFurniture.setOrientation(FurnitureOrientation._0);
+                    }
+
+                    return;
+                }
+                const furnitureData = {
+                    _id: '66e7f088294f7393fb6ee24a',
+                    name: 'Door',
+                    width: 1,
+                    height: 1,
+                    imagePath: doorSvg,
+                    category: '66e7f088294f7393fb6ee246',
+                };
+
+                this.tempFurniture = new Furniture(
+                    furnitureData,
+                    3333,
+                    this,
+                    this.leftNode.getId(),
+                    this.rightNode.getId()
+                );
+
+                this.tempFurniture.position.set(localCoords.x, 0);
+
+                this.addChild(this.tempFurniture);
+
+                // const action = new AddFurnitureAction(
+                //     {
+                //         _id: '66e7f088294f7393fb6ee24a',
+                //         name: 'Door',
+                //         width: 1,
+                //         height: 1,
+                //         imagePath: doorSvg,
+                //         category: '66e7f088294f7393fb6ee246',
+                //     },
+                //     this,
+                //     { x: localCoords.x, y: 0 },
+                //     this.leftNode.getId(),
+                //     this.rightNode.getId()
+                // );
+
+                // action.execute();
+
+                break;
+        }
+
+        // const currentPoint = ev.global;
+        // const delta = {
+        //     x: (currentPoint.x - this.mouseStartPoint.x) / main.scale.x,
+        //     y: (currentPoint.y - this.mouseStartPoint.y) / main.scale.y,
+        // };
+
+        // this.leftNode.setPosition(this.startLeftNode.x + delta.x, this.startLeftNode.y + delta.y);
+        // this.rightNode.setPosition(this.startRightNode.x + delta.x, this.startRightNode.y + delta.y);
+    }
+
+    removeTempFurniture() {
+        this.removeChild(this.tempFurniture as Container);
+
+        this.tempFurniture = null;
     }
 }

@@ -134,8 +134,6 @@ export class Floor extends Container {
 
         if (!coords) return;
 
-        console.log('xdxd object', attachedTo, object, coords);
-
         if (attachedTo !== undefined) {
             attachedTo?.addChild(object);
             object.position.set(coords.x, coords.y);
