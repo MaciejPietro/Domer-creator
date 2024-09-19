@@ -132,6 +132,11 @@ export class FloorPlan extends Container {
         this.furnitureId = 0;
     }
 
+    public addFurnitureObject(object: Container, attachedTo: Wall) {
+        this.furnitureId += 1;
+        this.floors[this.currentFloor].addFurnitureObject({ object, attachedTo, id: this.furnitureId });
+    }
+
     public addFurniture(
         obj: FurnitureData,
         attachedTo?: Wall,

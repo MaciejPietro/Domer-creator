@@ -120,6 +120,18 @@ export class Floor extends Container {
         }
     }
 
+    public addFurnitureObject({ object, attachedTo, id }: { object: Container; attachedTo: Wall; id: number }) {
+        object.setId(id);
+
+        this.furnitureArray.set(id, object as Furniture);
+
+        attachedTo.addChild(object);
+
+        console.log('xdxd add', attachedTo);
+
+        return id;
+    }
+
     public addFurniture(
         obj: FurnitureData,
         id: number,

@@ -22,6 +22,7 @@ import doorRedSvg from '@/assets/door/door-not-allowed.svg';
 import doorGreenSvg from '@/assets/door/door-allowed.svg';
 
 import { Furniture, FurnitureOrientation } from '../Furniture';
+import { AddFurnitureObjectAction } from '../../actions/AddFurnitureObjectAction';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -281,7 +282,13 @@ export class Wall extends Graphics {
                     .catch((err) => console.error(err));
                 break;
             case Tool.FurnitureAddDoor:
-                console.log('xdxd getDoor');
+                // console.log('xdxd getDoor', this.tempFurniture);
+
+                // if (this.tempFurniture) {
+                //     const action = new AddFurnitureObjectAction(this.tempFurniture, this);
+
+                //     action.execute();
+                // }
 
                 const action = new AddFurnitureAction(
                     {
@@ -297,6 +304,8 @@ export class Wall extends Graphics {
                     this.leftNode.getId(),
                     this.rightNode.getId()
                 );
+
+                this.removeTempFurniture();
 
                 action.execute();
 
