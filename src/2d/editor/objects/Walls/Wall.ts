@@ -18,12 +18,11 @@ import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { WallType, wallTypeConfig } from './config';
 
 import doorSvg from '@/assets/door/door.svg';
-import doorRedSvg from '@/assets/door/door-not-allowed.svg';
-import doorGreenSvg from '@/assets/door/door-allowed.svg';
 
 import { Furniture, FurnitureOrientation } from '../Furniture';
 import { AddFurnitureObjectAction } from '../../actions/AddFurnitureObjectAction';
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
+import { Door } from '../Furnitures/Door';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -53,6 +52,10 @@ export class Wall extends Graphics {
     mouseStartPoint: Point;
     startLeftNode: Point;
     startRightNode: Point;
+
+    //TODO move all below to different class
+
+    tempFurniture: Door | null = null;
 
     color = '#ffffff';
 
@@ -135,6 +138,20 @@ export class Wall extends Graphics {
         if (this.isEditMode()) {
             this.setStyles();
         }
+
+        this.tempFurniture = new Door();
+
+        this.addChild(this.tempFurniture);
+
+        switch (Tool.FurnitureAddDoor) {
+            case Tool.FurnitureAddDoor:
+                this.removeTempFurniture();
+
+                this.tempFurniture = new Door();
+                this.addChild(this.tempFurniture);
+
+                break;
+        }
     }
 
     private onPointerOut() {
@@ -142,7 +159,14 @@ export class Wall extends Graphics {
         this.color = '#fff';
 
         this.setStyles();
-        this.removeTempFurniture();
+        // this.removeTempFurniture();
+
+        switch (Tool.FurnitureAddDoor) {
+            case Tool.FurnitureAddDoor:
+                this.removeTempFurniture();
+
+                break;
+        }
     }
 
     public setType(newType: WallType) {
@@ -188,7 +212,7 @@ export class Wall extends Graphics {
         this.clear();
         [this.x1, this.y1, this.x2, this.y2] = this.setLineCoords();
 
-        let theta = Math.atan2(this.y2 - this.y1, this.x2 - this.x1); // aflu unghiul sa pot roti
+        let theta = Math.atan2(this.y2 - this.y1, this.x2 - this.x1);
 
         theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
         if (theta < 0) theta = 360 + theta; // range [0, 360)
@@ -309,24 +333,24 @@ export class Wall extends Graphics {
                 //     action.execute();
                 // }
 
-                const action = new AddFurnitureAction(
-                    {
-                        _id: '66e7f088294f7393fb6ee24a',
-                        name: 'Door',
-                        width: 1,
-                        height: 1,
-                        imagePath: doorSvg,
-                        category: '66e7f088294f7393fb6ee246',
-                    },
-                    this,
-                    { x: localCoords.x, y: 0 },
-                    this.leftNode.getId(),
-                    this.rightNode.getId()
-                );
+                // const action = new AddFurnitureAction(
+                //     {
+                //         _id: '66e7f088294f7393fb6ee24a',
+                //         name: 'Door',
+                //         width: 1,
+                //         height: 1,
+                //         imagePath: doorSvg,
+                //         category: '66e7f088294f7393fb6ee246',
+                //     },
+                //     this,
+                //     { x: localCoords.x, y: 0 },
+                //     this.leftNode.getId(),
+                //     this.rightNode.getId()
+                // );
 
-                this.removeTempFurniture();
+                // this.removeTempFurniture();
 
-                action.execute();
+                // action.execute();
 
                 break;
         }
@@ -369,48 +393,49 @@ export class Wall extends Graphics {
         return useStore.getState().activeMode === ViewMode.Edit;
     }
 
-    //TODO move all below to different class
-
-    tempFurniture: Furniture | null = null;
-
     onWallMouseMove(ev: any) {
-        if (this.dragging) {
-            return;
-        }
+        // if (this.dragging) return
+        const state = useStore.getState();
 
         const localCoords = ev.getLocalPosition(this as unknown as Container);
 
-        const state = useStore.getState();
+        this.tempFurniture?.setPosition(localCoords);
+
+        return;
 
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
                 if (this.tempFurniture) {
-                    const furnitureHeight = this.tempFurniture?._texture.height;
+                    const localCoords = ev.getLocalPosition(this as unknown as Container);
 
-                    this.tempFurniture.position.set(localCoords.x, 0);
-                    this.tempFurniture.loadTexture(doorGreenSvg);
+                    this.tempFurniture?.setPosition(localCoords);
 
-                    const furnitureEndX = localCoords.x + furnitureHeight / 2;
-                    const furnitureStartX = localCoords.x - furnitureHeight / 2;
+                    // const furnitureHeight = this.tempFurniture?._texture.height;
 
-                    const minX = 10;
-                    const maxX = this.length;
+                    // this.tempFurniture.position.set(localCoords.x, 0);
+                    // this.tempFurniture.loadTexture(doorSvg);
 
-                    if (furnitureEndX > maxX - 5 || furnitureStartX < 5) {
-                        this.tempFurniture.loadTexture(doorRedSvg);
-                    } else {
-                        this.tempFurniture.loadTexture(doorGreenSvg);
-                    }
+                    // const furnitureEndX = localCoords.x + furnitureHeight / 2;
+                    // const furnitureStartX = localCoords.x - furnitureHeight / 2;
 
-                    const isLeftSide = localCoords.y < this.thickness / 2;
+                    // const minX = 10;
+                    // const maxX = this.length;
 
-                    if (isLeftSide) {
-                        this.tempFurniture.setOrientation(FurnitureOrientation._180);
-                    } else {
-                        this.tempFurniture.setOrientation(FurnitureOrientation._0);
-                    }
+                    // // if (furnitureEndX > maxX - 5 || furnitureStartX < 5) {
+                    // //     this.tempFurniture.loadTexture(doorRedSvg);
+                    // // } else {
+                    // //     this.tempFurniture.loadTexture(doorGreenSvg);
+                    // // }
 
-                    return;
+                    // const isLeftSide = localCoords.y < this.thickness / 2;
+
+                    // if (isLeftSide) {
+                    //     this.tempFurniture.setOrientation(FurnitureOrientation._180);
+                    // } else {
+                    //     this.tempFurniture.setOrientation(FurnitureOrientation._0);
+                    // }
+
+                    // return;
                 }
                 const furnitureData = {
                     _id: '66e7f088294f7393fb6ee24a',
