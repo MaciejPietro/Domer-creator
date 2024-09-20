@@ -23,6 +23,7 @@ import doorGreenSvg from '@/assets/door/door-allowed.svg';
 
 import { Furniture, FurnitureOrientation } from '../Furniture';
 import { AddFurnitureObjectAction } from '../../actions/AddFurnitureObjectAction';
+import { MeasureLabel } from '../TransformControls/MeasureLabel';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -34,7 +35,9 @@ export class Wall extends Graphics {
     leftNode: WallNode;
     rightNode: WallNode;
     length: number;
-    label: Label;
+    label: MeasureLabel;
+
+    focused = false;
 
     clickStartTime: number;
 
@@ -64,7 +67,8 @@ export class Wall extends Graphics {
         this.startLeftNode = { x: 0, y: 0 };
         this.startRightNode = { x: 0, y: 0 };
         this.setLineCoords();
-        this.label = new Label(0);
+
+        this.label = new MeasureLabel(0);
 
         this.addChild(this.label);
         this.isExteriorWall = true;
@@ -97,8 +101,19 @@ export class Wall extends Graphics {
 
     private watchStoreChanges() {
         useStore.subscribe(() => {
-            this.setStyles();
+            this.checkVisibility();
         });
+    }
+
+    private checkVisibility() {
+        const focusedElement = useStore.getState().focusedElement;
+
+        this.setStyles();
+
+        if (focusedElement === this) this.focused = true;
+        if (focusedElement !== this) this.focused = false;
+
+        this.setStyles();
     }
 
     private applySettings() {
@@ -109,13 +124,13 @@ export class Wall extends Graphics {
     }
 
     public setStyles() {
-        const strokeColor = this.isFocused() ? '#1C7ED6' : '#1a1a1a';
+        const strokeColor = this.focused ? '#1C7ED6' : '#1a1a1a';
 
-        this.fill({ color: this.color }).stroke({ width: 2, color: strokeColor });
+        this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
     }
 
     private onPointerOver() {
-        this.color = '#f0f0ff';
+        this.color = '#f5f9ff';
 
         if (this.isEditMode()) {
             this.setStyles();
@@ -189,12 +204,8 @@ export class Wall extends Graphics {
         this.leftNode.angle = theta;
         this.rightNode.angle = theta;
 
-        this.label.update(this.length);
-        this.label.position.x = this.width / 2;
-        this.label.angle = 360 - theta;
-
-        this.label.position.y = 25;
-        this.label.zIndex = 998;
+        this.label.updateText(this.length, this.angle);
+        this.label.updateLine(this.length, this.angle);
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
@@ -212,13 +223,21 @@ export class Wall extends Graphics {
         this.rightNode.setPosition(this.startRightNode.x + delta.x, this.startRightNode.y + delta.y);
     }
 
+    private onMouseClick() {
+        const state = useStore.getState();
+
+        state.setFocusedElement(this as unknown as WallNode);
+
+        this.leftNode.show();
+        this.rightNode.show();
+        this.label.visible = true;
+    }
+
     private onMouseUp() {
         const clickDuration = Date.now() - this.clickStartTime;
 
         if (clickDuration < 200 && useStore.getState().activeTool === Tool.Edit) {
-            const state = useStore.getState();
-
-            state.setFocusedElement(this as unknown as WallNode);
+            this.onMouseClick();
         }
 
         this.dragging = false;
@@ -344,11 +363,6 @@ export class Wall extends Graphics {
 
         // Redraw the wall with the updated node positions
         this.drawLine();
-    }
-
-    private isFocused() {
-        // @ts-expect-error TODO
-        return useStore.getState().focusedElement === this;
     }
 
     private isEditMode() {

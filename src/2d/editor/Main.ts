@@ -119,6 +119,14 @@ export class Main extends Viewport {
         //     return;
         // }
 
+        const isLeftMouseButton = ev.button === 0;
+
+        if (isLeftMouseButton && ev.target === this) {
+            const state = useStore.getState();
+
+            state.setFocusedElement(null);
+        }
+
         this.updateEnd(ev);
     }
 
@@ -143,6 +151,7 @@ export class Main extends Viewport {
                 break;
         }
     }
+
     private checkTools(ev: FederatedPointerEvent) {
         if (ev.button === 2) return;
 

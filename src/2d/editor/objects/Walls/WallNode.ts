@@ -8,7 +8,7 @@ import { FloorPlan } from '../FloorPlan';
 import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { isMobile } from 'react-device-detect';
 import { WallType, wallTypeConfig } from './config';
-import { DEFAULT_WALL_TYPE } from './Wall';
+import { DEFAULT_WALL_TYPE, Wall } from './Wall';
 
 export class WallNode extends Graphics {
     private dragging: boolean;
@@ -28,6 +28,10 @@ export class WallNode extends Graphics {
 
         this.position.set(x, y);
         this.zIndex = 999;
+        this.visible = false;
+
+        this.watchStoreChanges();
+
         this.on('pointerdown', this.onMouseDown);
         this.on('globalpointermove', this.onMouseMove);
         this.on('pointerup', this.onMouseUp);
@@ -41,6 +45,36 @@ export class WallNode extends Graphics {
         return this.id;
     }
 
+    private watchStoreChanges() {
+        useStore.subscribe(() => {
+            this.checkVisibility();
+        });
+    }
+
+    private checkVisibility() {
+        const focusedElement = useStore.getState().focusedElement;
+
+        if (!focusedElement) return this.hide();
+
+        if (focusedElement instanceof Wall) {
+            if (focusedElement.leftNode === this) return;
+            if (focusedElement.rightNode === this) return;
+            this.hide();
+
+            return;
+        }
+
+        this.show();
+    }
+
+    public show() {
+        this.visible = true;
+    }
+
+    public hide() {
+        this.visible = false;
+    }
+
     private setSettings() {
         const state = useStore.getState();
 
@@ -48,15 +82,15 @@ export class WallNode extends Graphics {
 
         this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
 
-        const wallThickness = wallTypeConfig[this.type].thickness;
-
-        this.size = Math.max(8, wallThickness / 2);
+        // const wallThickness = wallTypeConfig[this.type].thickness;
+        // this.size = Math.max(8, wallThickness / 3);
+        this.size = 10;
     }
 
     public setStyles({ color = 0x222222 }: { color?: string | number }) {
         this.clear();
         this.circle(0, 0, this.size / 2);
-        this.fill(color);
+        this.fill(this.dragging ? '#1C7ED6' : color);
 
         // SQUARE IN PLACE OF WALL DOT
         // const background = new Graphics();
@@ -69,7 +103,7 @@ export class WallNode extends Graphics {
 
     private onPointerOver() {
         if (this.isEditMode()) {
-            this.setStyles({ color: '#7f7fff' });
+            this.setStyles({ color: '#1C7ED6' });
         }
     }
 
