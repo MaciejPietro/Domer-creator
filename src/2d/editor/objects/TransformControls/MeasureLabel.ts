@@ -48,9 +48,9 @@ export class MeasureLabel extends Container {
     }
 
     private watchStoreChanges() {
-        useStore.subscribe(() => {
-            this.checkVisibility();
-        });
+        // useStore.subscribe(() => {
+        //     this.checkVisibility();
+        // });
     }
 
     private checkVisibility() {
@@ -61,7 +61,7 @@ export class MeasureLabel extends Container {
         if (focusedElement instanceof Wall) {
             // if (focusedElement.leftNode === this) return;
             // if (focusedElement.rightNode === this) return;
-            this.hide();
+            // this.hide();
 
             return;
         }

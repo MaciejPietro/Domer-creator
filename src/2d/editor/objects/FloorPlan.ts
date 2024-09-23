@@ -8,6 +8,7 @@ import { Action } from '../actions/Action';
 import { useStore } from '../../../stores/EditorStore';
 import { Point } from '../../../helpers/Point';
 import { showNotification } from '@mantine/notifications';
+import { Door } from './Furnitures/Door';
 
 export class FloorPlan extends Container {
     private static instance: FloorPlan;
@@ -132,9 +133,9 @@ export class FloorPlan extends Container {
         this.furnitureId = 0;
     }
 
-    public addFurnitureObject(object: Container, attachedTo: Wall) {
+    public addDoor(object: Door, attachedTo: Wall, position: Point) {
         this.furnitureId += 1;
-        this.floors[this.currentFloor].addFurnitureObject({ object, attachedTo, id: this.furnitureId });
+        this.floors[this.currentFloor].addDoor({ object, attachedTo, id: this.furnitureId, position });
     }
 
     public addFurniture(

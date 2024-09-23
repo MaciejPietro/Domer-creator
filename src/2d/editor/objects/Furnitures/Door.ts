@@ -1,20 +1,28 @@
-import { Container, Graphics, Sprite, Text, TextStyle, Texture } from 'pixi.js';
+import { Container, DEG_TO_RAD, FederatedPointerEvent, Graphics, Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import { Point } from '../../../../helpers/Point';
-import { METER } from '../../constants';
+import { METER, Tool } from '../../constants';
 import { useStore } from '@/stores/EditorStore';
 import { Wall } from '../Walls/Wall';
 
 const COLOR = '#1C7ED6';
 const DOOR_WIDTH = 80;
 
+export type FurnitureOrientation = number; // 0 <-> 359
+
+type DoorProps = {
+    position?: Point;
+};
+
 export class Door extends Container {
     arcLine: Graphics;
     baseLine: Graphics;
+    orientation = 0;
+    clickStartTime: number;
 
-    constructor() {
+    constructor(config?: DoorProps) {
         super();
 
-        this.eventMode = 'none';
+        this.eventMode = 'static';
 
         const { x, y } = { x: 0, y: 0 };
 
@@ -52,12 +60,58 @@ export class Door extends Container {
             .stroke({ width: 2, color: COLOR });
 
         this.addChild(this.baseLine);
+
+        this.on('pointerdown', this.onMouseDown);
+        this.on('pointerup', this.onMouseUp);
+
+        this.clickStartTime = 0;
+
+        if (config?.position) {
+            this.setPosition(config.position);
+        }
     }
 
     public setPosition({ x, y }: Point) {
-        console.log(x);
+        this.baseLine.position = { x, y };
+    }
 
-        this.baseLine.position = { x, y: 0 };
+    public setOrientation(orientation: FurnitureOrientation) {
+        // const radians = orientation * DEG_TO_RAD;
+        // this.baseLine.rotation = radians;
+        // this.orientation = orientation;
+    }
+
+    private onMouseDown(ev: FederatedPointerEvent) {
+        ev.stopPropagation();
+
+        this.clickStartTime = Date.now();
+    }
+
+    private onMouseUp(ev: FederatedPointerEvent) {
+        ev.stopPropagation();
+
+        const clickDuration = Date.now() - this.clickStartTime;
+
+        if (clickDuration < 200) {
+            this.onMouseClick();
+        }
+
+        return;
+    }
+
+    private onMouseClick() {
+        const state = useStore.getState();
+
+        switch (state.activeTool) {
+            case Tool.Edit:
+                console.log('xdxd click', this);
+                state.setFocusedElement(this as unknown as Door);
+
+                // this.leftNode.show();
+                // this.rightNode.show();
+                // this.label.visible = true;
+                break;
+        }
     }
 
     public show() {

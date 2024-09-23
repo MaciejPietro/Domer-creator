@@ -23,6 +23,7 @@ import { Furniture, FurnitureOrientation } from '../Furniture';
 import { AddFurnitureObjectAction } from '../../actions/AddFurnitureObjectAction';
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
 import { Door } from '../Furnitures/Door';
+import { AddDoorAction } from '../../actions/AddDoorAction';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -35,6 +36,7 @@ export class Wall extends Graphics {
     rightNode: WallNode;
     length: number;
     label: MeasureLabel;
+    children: Container[] = [];
 
     focused = false;
 
@@ -92,9 +94,9 @@ export class Wall extends Graphics {
         this.watchStoreChanges();
 
         this.on('pointerdown', this.onMouseDown);
+        this.on('pointerup', this.onMouseUp);
         this.on('globalpointermove', this.onMouseMove);
         this.on('pointermove', this.onWallMouseMove);
-        this.on('pointerup', this.onMouseUp);
         this.on('pointerupoutside', this.onMouseUp);
         this.on('pointerover', this.onPointerOver);
         this.on('pointerout', this.onPointerOut);
@@ -113,9 +115,12 @@ export class Wall extends Graphics {
 
         this.setStyles();
 
-        if (focusedElement === this) this.focused = true;
-        if (focusedElement !== this) this.focused = false;
-
+        if (focusedElement === this) {
+            this.focus();
+        }
+        if (focusedElement !== this) {
+            this.blur();
+        }
         this.setStyles();
     }
 
@@ -132,23 +137,24 @@ export class Wall extends Graphics {
         this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
     }
 
-    private onPointerOver() {
+    private onPointerOver(ev: FederatedPointerEvent) {
         this.color = '#f5f9ff';
 
         if (this.isEditMode()) {
             this.setStyles();
         }
 
-        this.tempFurniture = new Door();
+        const state = useStore.getState();
 
-        this.addChild(this.tempFurniture);
-
-        switch (Tool.FurnitureAddDoor) {
+        switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
                 this.removeTempFurniture();
 
+                const localCoords = ev.getLocalPosition(this as unknown as Container);
+
                 this.tempFurniture = new Door();
                 this.addChild(this.tempFurniture);
+                this.updateFurniturePosition(localCoords);
 
                 break;
         }
@@ -159,7 +165,6 @@ export class Wall extends Graphics {
         this.color = '#fff';
 
         this.setStyles();
-        // this.removeTempFurniture();
 
         switch (Tool.FurnitureAddDoor) {
             case Tool.FurnitureAddDoor:
@@ -229,7 +234,7 @@ export class Wall extends Graphics {
         this.rightNode.angle = theta;
 
         this.label.updateText(this.length, this.angle);
-        this.label.updateLine(this.length, this.angle);
+        this.label.updateLine(this.length);
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
@@ -247,20 +252,54 @@ export class Wall extends Graphics {
         this.rightNode.setPosition(this.startRightNode.x + delta.x, this.startRightNode.y + delta.y);
     }
 
+    public blur() {
+        this.focused = false;
+        this.leftNode.hide();
+        this.rightNode.hide();
+        this.label.hide();
+    }
+
+    public focus() {
+        this.focused = true;
+        this.leftNode.show();
+        this.rightNode.show();
+        this.label.show();
+    }
+
     private onMouseClick() {
         const state = useStore.getState();
 
-        state.setFocusedElement(this as unknown as WallNode);
+        switch (state.activeTool) {
+            case Tool.Edit:
+                state.setFocusedElement(this as unknown as WallNode);
 
-        this.leftNode.show();
-        this.rightNode.show();
-        this.label.visible = true;
+                this.focus();
+                break;
+            case Tool.FurnitureAddDoor:
+                if (this.tempFurniture) {
+                    const { x, y } = this.tempFurniture.baseLine.position;
+
+                    const action = new AddDoorAction(
+                        this.tempFurniture,
+                        this,
+                        { x, y }
+                        // res[0],
+                        // this,
+                        // this.leftNode.getId(),
+                        // this.rightNode.getId()
+                    );
+
+                    action.execute();
+                }
+
+                break;
+        }
     }
 
     private onMouseUp() {
         const clickDuration = Date.now() - this.clickStartTime;
 
-        if (clickDuration < 200 && useStore.getState().activeTool === Tool.Edit) {
+        if (clickDuration < 200) {
             this.onMouseClick();
         }
 
@@ -325,8 +364,6 @@ export class Wall extends Graphics {
                     .catch((err) => console.error(err));
                 break;
             case Tool.FurnitureAddDoor:
-                // console.log('xdxd getDoor', this.tempFurniture);
-
                 // if (this.tempFurniture) {
                 //     const action = new AddFurnitureObjectAction(this.tempFurniture, this);
 
@@ -393,70 +430,74 @@ export class Wall extends Graphics {
         return useStore.getState().activeMode === ViewMode.Edit;
     }
 
-    onWallMouseMove(ev: any) {
+    private updateFurniturePosition(localCoords: Point) {
+        const furnitureHeight = 80;
+
+        const maxX = this.length;
+
+        const wallOffset = 0;
+        const wallThickness = this.thickness;
+
+        const doorThickness = 12;
+
+        const fixedCords = {
+            x: localCoords.x - furnitureHeight / 2,
+            y: 0 + wallThickness - doorThickness,
+        };
+
+        const furnitureEndX = fixedCords.x + furnitureHeight;
+        const furnitureStartX = fixedCords.x;
+
+        if (furnitureEndX > maxX - wallOffset) {
+            fixedCords.x = maxX - wallOffset - furnitureHeight;
+        } else if (furnitureStartX < wallOffset) {
+            fixedCords.x = wallOffset;
+        }
+
+        this.tempFurniture?.setPosition(fixedCords);
+
+        // const isLeftSide = localCoords.y < this.thickness / 2;
+
+        // if (isLeftSide) {
+        //     this.tempFurniture?.setOrientation(0);
+        // } else {
+        //     this.tempFurniture?.setOrientation(FurnitureOrientation._0);
+        // }
+
+        // return;
+    }
+
+    onWallMouseMove(ev: FederatedPointerEvent) {
         // if (this.dragging) return
         const state = useStore.getState();
 
         const localCoords = ev.getLocalPosition(this as unknown as Container);
 
-        this.tempFurniture?.setPosition(localCoords);
-
-        return;
-
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
                 if (this.tempFurniture) {
-                    const localCoords = ev.getLocalPosition(this as unknown as Container);
-
-                    this.tempFurniture?.setPosition(localCoords);
-
-                    // const furnitureHeight = this.tempFurniture?._texture.height;
-
-                    // this.tempFurniture.position.set(localCoords.x, 0);
-                    // this.tempFurniture.loadTexture(doorSvg);
-
-                    // const furnitureEndX = localCoords.x + furnitureHeight / 2;
-                    // const furnitureStartX = localCoords.x - furnitureHeight / 2;
-
-                    // const minX = 10;
-                    // const maxX = this.length;
-
-                    // // if (furnitureEndX > maxX - 5 || furnitureStartX < 5) {
-                    // //     this.tempFurniture.loadTexture(doorRedSvg);
-                    // // } else {
-                    // //     this.tempFurniture.loadTexture(doorGreenSvg);
-                    // // }
-
-                    // const isLeftSide = localCoords.y < this.thickness / 2;
-
-                    // if (isLeftSide) {
-                    //     this.tempFurniture.setOrientation(FurnitureOrientation._180);
-                    // } else {
-                    //     this.tempFurniture.setOrientation(FurnitureOrientation._0);
-                    // }
-
-                    // return;
+                    this.updateFurniturePosition(localCoords);
                 }
-                const furnitureData = {
-                    _id: '66e7f088294f7393fb6ee24a',
-                    name: 'Door',
-                    width: 1,
-                    height: 1,
-                    imagePath: doorSvg,
-                    category: '66e7f088294f7393fb6ee246',
-                };
+                // const furnitureData = {
+                //     _id: '66e7f088294f7393fb6ee24a',
+                //     name: 'Door',
+                //     width: 1,
+                //     height: 1,
+                //     imagePath: doorSvg,
+                //     category: '66e7f088294f7393fb6ee246',
+                // };
 
-                this.tempFurniture = new Furniture(
-                    furnitureData,
-                    3333,
-                    this,
-                    this.leftNode.getId(),
-                    this.rightNode.getId()
-                );
+                // this.tempFurniture = new Furniture(
+                //     furnitureData,
+                //     3333,
+                //     this,
+                //     this.leftNode.getId(),
+                //     this.rightNode.getId()
+                // );
 
-                this.tempFurniture.position.set(localCoords.x, 0);
+                // this.tempFurniture.position.set(localCoords.x, 0);
 
-                this.addChild(this.tempFurniture);
+                // this.addChild(this.tempFurniture);
 
                 // const action = new AddFurnitureAction(
                 //     {

@@ -14,8 +14,6 @@ export class Serializer {
         floorPlanSerializable.wallNodeId = floors[0].getWallNodeSequence().getWallNodeId();
         const resultString = JSON.stringify(floorPlanSerializable);
 
-        console.log('xdxd', resultString);
-
         return resultString;
     }
 

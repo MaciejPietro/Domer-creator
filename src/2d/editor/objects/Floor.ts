@@ -9,6 +9,7 @@ import { FloorSerializable } from '../persistence/FloorSerializable';
 import { Furniture } from './Furniture';
 import { Wall } from './Walls/Wall';
 import { WallNodeSequence } from './Walls/WallNodeSequence';
+import { Door } from './Furnitures/Door';
 
 export class Floor extends Container {
     public furnitureArray: Map<number, Furniture>;
@@ -120,14 +121,30 @@ export class Floor extends Container {
         }
     }
 
-    public addFurnitureObject({ object, attachedTo, id }: { object: Container; attachedTo: Wall; id: number }) {
-        object.setId(id);
+    public addDoor({
+        object,
+        attachedTo,
+        id,
+        position,
+    }: {
+        object: Container;
+        attachedTo: Wall;
+        id: number;
+        position: Point;
+    }) {
+        // object.setId(id);
 
         this.furnitureArray.set(id, object as Furniture);
 
-        attachedTo.addChild(object);
+        const cho = new Door({
+            position,
+        });
 
-        console.log('xdxd add', attachedTo);
+        console.log('xdxd test', object, cho);
+
+        attachedTo.addChild(cho);
+
+        // attachedTo.addChild(object);
 
         return id;
     }

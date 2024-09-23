@@ -4,22 +4,25 @@ import { FurnitureData } from '../../../stores/FurnitureStore';
 import { FloorPlan } from '../objects/FloorPlan';
 import { Wall } from '../objects/Walls/Wall';
 import { Action } from './Action';
+import { Door } from '../objects/Furnitures/Door';
 
-export class AddFurnitureObjectAction implements Action {
-    object: Container;
+export class AddDoorAction implements Action {
+    object: Door;
     attachedTo: Wall;
+    position: Point;
 
     private receiver: FloorPlan;
 
-    constructor(object: Container, attachedTo: Wall) {
+    constructor(object: Door, attachedTo: Wall, position: Point) {
         this.object = object;
         this.attachedTo = attachedTo;
+        this.position = position;
 
         this.receiver = FloorPlan.Instance;
     }
 
     public execute() {
-        this.receiver.addFurnitureObject(this.object, this.attachedTo);
+        this.receiver.addDoor(this.object, this.attachedTo, this.position);
         this.receiver.actions.push(this);
     }
 }

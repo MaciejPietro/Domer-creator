@@ -20,6 +20,9 @@ import {
 } from 'tabler-icons-react';
 
 import WallControls from '@/ui/DetailsControls/Elements/WallControls';
+import { Wall } from '@/2d/editor/objects/Walls/Wall';
+import DoorControls from './Elements/DoorControls';
+import { Door } from '@/2d/editor/objects/Furnitures/Door';
 interface IHelpBody {
     title: string;
     body: ReactNode;
@@ -37,6 +40,8 @@ export function DetailsControls() {
     };
 
     useEffect(() => {
+        console.log('xdxd test', focusedElement);
+
         if (focusedElement) {
             setOpened(true);
         } else {
@@ -58,7 +63,8 @@ export function DetailsControls() {
                 radius="md"
                 position={{ top: 64, right: 10 }}
             >
-                <WallControls />
+                {focusedElement instanceof Wall ? <WallControls /> : null}
+                {focusedElement instanceof Door ? <DoorControls /> : null}
             </Dialog>
         </>
     );
