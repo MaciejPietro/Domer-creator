@@ -90,6 +90,7 @@ export class WallNode extends Graphics {
     public setStyles({ color = 0x222222 }: { color?: string | number }) {
         this.clear();
         this.circle(0, 0, this.size / 2);
+        // bg-blue-500 from tailwind.config.js
         this.fill(this.dragging ? '#1C7ED6' : color);
 
         // SQUARE IN PLACE OF WALL DOT
@@ -103,6 +104,7 @@ export class WallNode extends Graphics {
 
     private onPointerOver() {
         if (this.isEditMode()) {
+            // bg-blue-500 from tailwind.config.js
             this.setStyles({ color: '#1C7ED6' });
         }
     }

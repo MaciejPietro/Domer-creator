@@ -1,9 +1,10 @@
-import { Container, DEG_TO_RAD, FederatedPointerEvent, Graphics, Sprite, Text, TextStyle, Texture } from 'pixi.js';
+import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
 import { Point } from '../../../../helpers/Point';
 import { METER, Tool } from '../../constants';
 import { useStore } from '@/stores/EditorStore';
 import { Wall } from '../Walls/Wall';
 
+// bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
 const DOOR_WIDTH = 80;
 

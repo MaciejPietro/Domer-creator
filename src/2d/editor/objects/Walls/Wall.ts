@@ -128,10 +128,11 @@ export class Wall extends Graphics {
         const wallThickness = wallTypeConfig[this.type].thickness;
 
         this.thickness = wallThickness;
-        this.pivot.set(0, wallThickness / 2);
+        this.pivot.set(0, wallThickness * 0.5);
     }
 
     public setStyles() {
+        // bg-blue-500 from tailwind.config.js
         const strokeColor = this.focused ? '#1C7ED6' : '#1a1a1a';
 
         this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
