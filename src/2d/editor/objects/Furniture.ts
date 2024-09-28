@@ -1,5 +1,4 @@
 import { Assets, Graphics, InteractionEvent, Point, Sprite, Texture, TilingSprite } from 'pixi.js';
-import { endpoint } from '../../../api/api-client';
 import { FurnitureData } from '../../../stores/FurnitureStore';
 import { useStore } from '../../../stores/EditorStore';
 import { DeleteFurnitureAction } from '../actions/DeleteFurnitureAction';

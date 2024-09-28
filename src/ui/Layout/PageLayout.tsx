@@ -29,7 +29,7 @@ export function PageLayout() {
 
     return (
         <>
-            {/* <WelcomeModal /> */}
+            <WelcomeModal />
             <AppNavbar></AppNavbar>
 
             <AppSidebar></AppSidebar>

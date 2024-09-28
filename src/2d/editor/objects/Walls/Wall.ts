@@ -1,5 +1,4 @@
 import { Graphics, FederatedPointerEvent, Texture, Container } from 'pixi.js';
-import { getDoor, getWindow } from '../../../../api/api-client';
 import { euclideanDistance } from '../../../../helpers/EuclideanDistance';
 import { Point } from '../../../../helpers/Point';
 import { getCorrespondingY } from '../../../../helpers/Slope';
@@ -348,21 +347,6 @@ export class Wall extends Graphics {
 
                 break;
             case Tool.FurnitureAddWindow:
-                getWindow()
-                    .then((res) => {
-                        const action = new AddFurnitureAction(
-                            res[0],
-                            this,
-                            { x: localCoords.x, y: 0 },
-                            this.leftNode.getId(),
-                            this.rightNode.getId()
-                        );
-
-                        action.execute();
-
-                        return;
-                    })
-                    .catch((err) => console.error(err));
                 break;
             case Tool.FurnitureAddDoor:
                 // if (this.tempFurniture) {

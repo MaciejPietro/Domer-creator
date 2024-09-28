@@ -1,5 +1,4 @@
 import { Card, Center, Image, Text } from '@mantine/core';
-import { endpoint } from '../../../api/api-client';
 import { AddFurnitureAction } from '../../../2d/editor/actions/AddFurnitureAction';
 import { FurnitureData } from '../../../stores/FurnitureStore';
 
@@ -19,9 +18,9 @@ export function FurnitureItem(item: IFurnitureData) {
     return (
         <Card onClick={() => add(item)} shadow="sm" p="lg">
             <Card.Section style={{ height: 120, padding: 5 }}>
-                <Center>
+                {/* <Center>
                     <Image src={`${endpoint}2d/${data.imagePath}`} fit="contain" height={115} alt={data.name} />
-                </Center>
+                </Center> */}
             </Card.Section>
             <Card.Section>
                 <Center>
