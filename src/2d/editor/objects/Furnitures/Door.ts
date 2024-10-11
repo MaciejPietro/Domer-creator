@@ -17,13 +17,15 @@ type DoorProps = {
 export class Door extends Container {
     arcLine: Graphics;
     baseLine: Graphics;
+    length = DOOR_WIDTH;
     orientation = 0;
     clickStartTime: number;
+    public isTemporary = false;
 
     constructor(config?: DoorProps) {
         super();
 
-        this.eventMode = 'static';
+        this.eventMode = 'none';
 
         const { x, y } = { x: 0, y: 0 };
 
@@ -73,7 +75,8 @@ export class Door extends Container {
     }
 
     public setPosition({ x, y }: Point) {
-        this.baseLine.position = { x, y };
+        // this.baseLine.position = { x, y };
+        this.position = { x, y };
     }
 
     public setOrientation(orientation: FurnitureOrientation) {
@@ -117,6 +120,15 @@ export class Door extends Container {
 
     public show() {
         this.visible = true;
+    }
+
+    public setTemporality(temporary: boolean) {
+        if (temporary) {
+            this.alpha = 0.5;
+        } else {
+            this.alpha = 1;
+        }
+        this.isTemporary = temporary;
     }
 
     public hide() {

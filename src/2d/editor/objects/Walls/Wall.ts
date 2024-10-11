@@ -19,7 +19,6 @@ import { WallType, wallTypeConfig } from './config';
 import doorSvg from '@/assets/door/door.svg';
 
 import { Furniture, FurnitureOrientation } from '../Furniture';
-import { AddFurnitureObjectAction } from '../../actions/AddFurnitureObjectAction';
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
 import { Door } from '../Furnitures/Door';
 import { AddDoorAction } from '../../actions/AddDoorAction';
@@ -34,7 +33,7 @@ export class Wall extends Graphics {
     leftNode: WallNode;
     rightNode: WallNode;
     length: number;
-    label: MeasureLabel;
+    measureLabel: MeasureLabel;
     children: Container[] = [];
 
     focused = false;
@@ -72,9 +71,9 @@ export class Wall extends Graphics {
         this.startRightNode = { x: 0, y: 0 };
         this.setLineCoords();
 
-        this.label = new MeasureLabel(0);
+        this.measureLabel = new MeasureLabel(0);
 
-        this.addChild(this.label);
+        this.addChild(this.measureLabel);
         this.isExteriorWall = true;
         this.drawLine();
 
@@ -153,6 +152,7 @@ export class Wall extends Graphics {
                 const localCoords = ev.getLocalPosition(this as unknown as Container);
 
                 this.tempFurniture = new Door();
+                this.tempFurniture.setTemporality(true);
                 this.addChild(this.tempFurniture);
                 this.updateFurniturePosition(localCoords);
 
@@ -233,8 +233,8 @@ export class Wall extends Graphics {
         this.leftNode.angle = theta;
         this.rightNode.angle = theta;
 
-        this.label.updateText(this.length, this.angle);
-        this.label.updateLine(this.length);
+        this.measureLabel.updateText(this.length, this.angle);
+        this.measureLabel.updateLine(this.length);
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
@@ -256,14 +256,14 @@ export class Wall extends Graphics {
         this.focused = false;
         this.leftNode.hide();
         this.rightNode.hide();
-        this.label.hide();
+        this.measureLabel.hide();
     }
 
     public focus() {
         this.focused = true;
         this.leftNode.show();
         this.rightNode.show();
-        this.label.show();
+        this.measureLabel.show();
     }
 
     private onMouseClick() {
@@ -277,7 +277,9 @@ export class Wall extends Graphics {
                 break;
             case Tool.FurnitureAddDoor:
                 if (this.tempFurniture) {
-                    const { x, y } = this.tempFurniture.baseLine.position;
+                    const { x, y } = this.tempFurniture.position;
+
+                    this.tempFurniture.setTemporality(false);
 
                     const action = new AddDoorAction(
                         this.tempFurniture,
@@ -290,6 +292,8 @@ export class Wall extends Graphics {
                     );
 
                     action.execute();
+
+                    this.removeTempFurniture();
                 }
 
                 break;
@@ -415,12 +419,71 @@ export class Wall extends Graphics {
         return useStore.getState().activeMode === ViewMode.Edit;
     }
 
-    private updateFurniturePosition(localCoords: Point) {
+    private getNextFreeSpot(elementX: number, elementHeight: number): number {
+        const occupiedSpots: { start: number; end: number }[] = [];
+
+        // Collect all occupied spots from children elements
+        this.children.forEach((child) => {
+            if (child instanceof Door && !child.isTemporary) {
+                const x = child.position.x;
+                occupiedSpots.push({ start: x, end: x + child.length });
+            }
+        });
+
+        // Sort occupied spots by their start position
+        occupiedSpots.sort((a, b) => a.start - b.start);
+
+        let currentX = elementX;
+
+        // Iterate through each occupied spot to find the next free spot
+        for (const spot of occupiedSpots) {
+            // If the current position + element height is before the start of the current spot,
+            // then the current position is a valid free spot
+            if (currentX + elementHeight <= spot.start) {
+                return currentX;
+            }
+
+            // If the current position overlaps with the occupied spot, move past the end of this spot
+            if (currentX < spot.end) {
+                currentX = spot.end;
+            }
+        }
+
+        // Return the current position, which will be past all occupied spots
+        return currentX;
+    }
+
+    private getPossibleCords({ x, y }: Point) {
+        const newCords = { x, y };
         const furnitureHeight = 80;
 
         const maxX = this.length;
 
         const wallOffset = 0;
+
+        const furnitureEndX = newCords.x + furnitureHeight;
+        const furnitureStartX = newCords.x;
+
+        const isWallEnd = furnitureEndX > maxX - wallOffset;
+
+        const isWallStart = furnitureStartX < wallOffset;
+
+        if (isWallEnd) {
+            newCords.x = maxX - wallOffset - furnitureHeight;
+        } else if (isWallStart) {
+            newCords.x = wallOffset;
+        }
+
+        const nextX = this.getNextFreeSpot(newCords.x, furnitureHeight);
+
+        newCords.x = nextX;
+
+        return newCords;
+    }
+
+    private updateFurniturePosition(localCoords: Point) {
+        const furnitureHeight = 80;
+
         const wallThickness = this.thickness;
 
         const doorThickness = 12;
@@ -430,16 +493,9 @@ export class Wall extends Graphics {
             y: 0 + wallThickness - doorThickness,
         };
 
-        const furnitureEndX = fixedCords.x + furnitureHeight;
-        const furnitureStartX = fixedCords.x;
+        const newCords = this.getPossibleCords(fixedCords);
 
-        if (furnitureEndX > maxX - wallOffset) {
-            fixedCords.x = maxX - wallOffset - furnitureHeight;
-        } else if (furnitureStartX < wallOffset) {
-            fixedCords.x = wallOffset;
-        }
-
-        this.tempFurniture?.setPosition(fixedCords);
+        this.tempFurniture?.setPosition(newCords);
 
         // const isLeftSide = localCoords.y < this.thickness / 2;
 

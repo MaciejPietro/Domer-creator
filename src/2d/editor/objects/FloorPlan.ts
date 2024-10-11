@@ -135,6 +135,7 @@ export class FloorPlan extends Container {
 
     public addDoor(object: Door, attachedTo: Wall, position: Point) {
         this.furnitureId += 1;
+        object.setTemporality(false);
         this.floors[this.currentFloor].addDoor({ object, attachedTo, id: this.furnitureId, position });
     }
 

@@ -1,31 +1,19 @@
 import { IViewportOptions, PluginManager, Viewport } from 'pixi-viewport';
 
-import {
-    Application,
-    Assets,
-    Container,
-    FederatedPointerEvent,
-    isMobile,
-    Loader,
-    Point,
-    TilingSprite,
-    SCALE_MODES,
-} from 'pixi.js';
+import { Application, Container, FederatedPointerEvent, Point } from 'pixi.js';
 import { FloorPlan } from './objects/FloorPlan';
 import { TransformLayer } from './objects/TransformControls/TransformLayer';
 import { useStore } from '../../stores/EditorStore';
 import { AddNodeAction } from './actions/AddNodeAction';
 import { AddWallManager } from './actions/AddWallManager';
 import { viewportX, viewportY } from '../../helpers/ViewportCoordinates';
-import { Tool, ToolMode, ViewMode } from './constants';
+import { Tool, ViewMode } from './constants';
 import { Pointer } from './Pointer';
 import { Preview } from './actions/MeasureToolManager';
-import { showNotification } from '@mantine/notifications';
-import { DeviceFloppy } from 'tabler-icons-react';
-import backgroundPattern from '../../assets/pattern.svg';
 
 import 'pixi.js/events';
 import { LoadAction } from './actions/LoadAction';
+import { Grid } from './basic/Grid';
 
 export class Main extends Viewport {
     private floorPlan: FloorPlan;
@@ -33,34 +21,18 @@ export class Main extends Viewport {
     public static app: Application;
     transformLayer: TransformLayer;
     addWallManager: AddWallManager;
-    bkgPattern: TilingSprite;
+    grid: Container;
     public pointer: Pointer;
     public preview: Preview;
     constructor(options: IViewportOptions) {
         super(options);
 
-        // connect the events
-        // Loader.shared.onComplete.once(this.setup, this);
-        // // Start loading!
-        // Loader.shared.load();
-        this.loadAssets().then(() => {
-            this.setup.call(this);
-        });
+        this.setup();
+
         this.preview = new Preview({});
         this.addChild(this.preview.getReference());
 
         // this.cursor = 'none';
-    }
-
-    private async loadAssets() {
-        const backgroundPatternTexture = await Assets.load(backgroundPattern);
-        // backgroundPatternTexture.baseTexture.scaleMode = SCALE_MODES.NEAREST;
-
-        this.bkgPattern = new TilingSprite({
-            texture: backgroundPatternTexture,
-            width: this.worldWidth ?? 0,
-            height: this.worldHeight ?? 0,
-        });
     }
 
     private async setup() {
@@ -78,7 +50,8 @@ export class Main extends Viewport {
 
         this.addChildAt(planContainer, 0);
 
-        this.addChild(this.bkgPattern);
+        this.grid = new Grid(this.worldWidth, this.worldHeight);
+        this.addChild(this.grid);
 
         this.floorPlan = FloorPlan.Instance;
         this.addChild(this.floorPlan);
