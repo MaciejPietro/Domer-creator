@@ -3,6 +3,8 @@ import { Point } from '../../../../helpers/Point';
 import { METER, Tool } from '../../constants';
 import { useStore } from '@/stores/EditorStore';
 import { Wall } from '../Walls/Wall';
+import { DeleteFurnitureAction } from '../../actions/DeleteFurnitureAction';
+import { v4 as uuidv4 } from 'uuid';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -12,11 +14,14 @@ export type FurnitureOrientation = number; // 0 <-> 359
 
 type DoorProps = {
     position?: Point;
+    uuid?: string;
 };
 
 export class Door extends Container {
+    uuid = uuidv4();
     arcLine: Graphics;
     baseLine: Graphics;
+    background: Graphics;
     length = DOOR_WIDTH;
     orientation = 0;
     clickStartTime: number;
@@ -25,9 +30,17 @@ export class Door extends Container {
     constructor(config?: DoorProps) {
         super();
 
-        this.eventMode = 'none';
+        this.eventMode = this.isTemporary ? 'none' : 'static';
+
+        // this.uuid = uuidv4();
+
+        if (config?.uuid) this.uuid = config.uuid;
 
         const { x, y } = { x: 0, y: 0 };
+
+        this.background = new Graphics();
+
+        this.setBackground('transparent');
 
         this.baseLine = new Graphics();
 
@@ -64,6 +77,8 @@ export class Door extends Container {
 
         this.addChild(this.baseLine);
 
+        this.watchStoreChanges();
+
         this.on('pointerdown', this.onMouseDown);
         this.on('pointerup', this.onMouseUp);
 
@@ -71,6 +86,32 @@ export class Door extends Container {
 
         if (config?.position) {
             this.setPosition(config.position);
+        }
+    }
+
+    private watchStoreChanges() {
+        useStore.subscribe(() => {
+            this.checkVisibility();
+        });
+    }
+
+    private setBackground(strokeColor: string) {
+        this.background.clear();
+        this.background.rect(-2.5, -2.5, DOOR_WIDTH + 5, DOOR_WIDTH + 5);
+        this.background.fill('transparent');
+        this.background.stroke(strokeColor);
+
+        this.addChild(this.background);
+    }
+
+    private checkVisibility() {
+        const focusedElement = useStore.getState().focusedElement;
+
+        if (focusedElement === this) {
+            this.setBackground('green');
+        }
+        if (focusedElement !== this) {
+            this.setBackground('transparent');
         }
     }
 
@@ -87,6 +128,7 @@ export class Door extends Container {
 
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
+        console.log('xdxd click');
 
         this.clickStartTime = Date.now();
     }
@@ -108,7 +150,6 @@ export class Door extends Container {
 
         switch (state.activeTool) {
             case Tool.Edit:
-                console.log('xdxd click', this);
                 state.setFocusedElement(this as unknown as Door);
 
                 // this.leftNode.show();
@@ -129,9 +170,18 @@ export class Door extends Container {
             this.alpha = 1;
         }
         this.isTemporary = temporary;
+        this.eventMode = temporary ? 'none' : 'static';
     }
 
     public hide() {
         this.visible = false;
+    }
+
+    public delete() {
+        const action = new DeleteFurnitureAction(this.uuid);
+
+        action.execute();
+        // new DeleteWallNodeAction(this.leftNode.getId()).execute();
+        // new DeleteWallNodeAction(this.rightNode.getId()).execute();
     }
 }

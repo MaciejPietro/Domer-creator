@@ -40,8 +40,6 @@ export function DetailsControls() {
     };
 
     useEffect(() => {
-        console.log('xdxd test', focusedElement);
-
         if (focusedElement) {
             setOpened(true);
         } else {

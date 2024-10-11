@@ -5,7 +5,6 @@ import { getCorrespondingY } from '../../../../helpers/Slope';
 import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 
 import { useStore } from '../../../../stores/EditorStore';
-import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 import { AddNodeAction } from '../../actions/AddNodeAction';
 import { DeleteWallAction } from '../../actions/DeleteWallAction';
 import { INTERIOR_WALL_THICKNESS, Tool, ToolMode, ViewMode, WALL_THICKNESS } from '../../constants';
@@ -15,13 +14,14 @@ import { AddWallManager } from '../../actions/AddWallManager';
 import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { WallType, wallTypeConfig } from './config';
+import { v4 as uuidv4 } from 'uuid';
 
 import doorSvg from '@/assets/door/door.svg';
 
 import { Furniture, FurnitureOrientation } from '../Furniture';
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
 import { Door } from '../Furnitures/Door';
-import { AddDoorAction } from '../../actions/AddDoorAction';
+import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -30,6 +30,7 @@ export type WallSettings = {
 };
 
 export class Wall extends Graphics {
+    uuid = uuidv4();
     leftNode: WallNode;
     rightNode: WallNode;
     length: number;
@@ -96,8 +97,8 @@ export class Wall extends Graphics {
         this.on('globalpointermove', this.onMouseMove);
         this.on('pointermove', this.onWallMouseMove);
         this.on('pointerupoutside', this.onMouseUp);
-        this.on('pointerover', this.onPointerOver);
-        this.on('pointerout', this.onPointerOut);
+        this.on('pointerover', this.onMouseOver);
+        this.on('pointerout', this.onMouseOut);
 
         this.clickStartTime = 0;
     }
@@ -136,7 +137,7 @@ export class Wall extends Graphics {
         this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
     }
 
-    private onPointerOver(ev: FederatedPointerEvent) {
+    private onMouseOver(ev: FederatedPointerEvent) {
         this.color = '#f5f9ff';
 
         if (this.isEditMode()) {
@@ -160,7 +161,7 @@ export class Wall extends Graphics {
         }
     }
 
-    private onPointerOut() {
+    private onMouseOut() {
         if (this.dragging) return;
         this.color = '#fff';
 
@@ -200,28 +201,33 @@ export class Wall extends Graphics {
         return this.isExteriorWall;
     }
     public setLineCoords() {
-        if (this.leftNode.x == this.rightNode.x) {
-            if (this.leftNode.y < this.rightNode.y) {
-                return [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
-            } else {
-                return [this.rightNode.x, this.rightNode.y, this.leftNode.x, this.leftNode.y];
-            }
-        } else if (this.leftNode.x < this.rightNode.x) {
-            return [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
-        } else {
-            return [this.rightNode.x, this.rightNode.y, this.leftNode.x, this.leftNode.y];
-        }
+        return [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
     }
 
     public drawLine() {
-        this.clear();
         [this.x1, this.y1, this.x2, this.y2] = this.setLineCoords();
 
         let theta = Math.atan2(this.y2 - this.y1, this.x2 - this.x1);
 
-        theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
-        if (theta < 0) theta = 360 + theta; // range [0, 360)
+        theta *= 180 / Math.PI;
+        if (theta < 0) theta = 360 + theta;
         this.length = euclideanDistance(this.x1, this.x2, this.y1, this.y2);
+
+        const minLength = this.getMinimumWallLength();
+        console.log('xdxd', minLength);
+
+        if (this.length < minLength) {
+            this.leftNode.dragging = false;
+            this.rightNode.dragging = false;
+            console.warn(`Wall length (${this.length}) is less than minimum required length (${minLength})`);
+
+            // this.leftNode.setPosition(this.x1, this.y1, false);
+            // this.rightNode.setPosition(this.x2, this.y2, false);
+
+            // return;
+        }
+
+        this.clear();
 
         this.rect(0, 0, this.length, this.thickness - 2);
 
@@ -235,6 +241,19 @@ export class Wall extends Graphics {
 
         this.measureLabel.updateText(this.length, this.angle);
         this.measureLabel.updateLine(this.length);
+    }
+
+    private getMinimumWallLength(): number {
+        let minLength = 0;
+        this.children.forEach((child) => {
+            if (child instanceof Door || child instanceof Furniture) {
+                const childEndX = child.position.x + child.length;
+                if (childEndX > minLength) {
+                    minLength = childEndX;
+                }
+            }
+        });
+        return minLength + 10; // Add a small buffer (e.g., 10 units)
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
@@ -281,15 +300,7 @@ export class Wall extends Graphics {
 
                     this.tempFurniture.setTemporality(false);
 
-                    const action = new AddDoorAction(
-                        this.tempFurniture,
-                        this,
-                        { x, y }
-                        // res[0],
-                        // this,
-                        // this.leftNode.getId(),
-                        // this.rightNode.getId()
-                    );
+                    const action = new AddFurnitureAction(this.tempFurniture, this, { x, y });
 
                     action.execute();
 

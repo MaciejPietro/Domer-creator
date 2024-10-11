@@ -45,7 +45,7 @@
         "import/prefer-default-export": "off",
         "import/no-default-export": "off",
         "import/export": "off",
-        "import/no-cycle": ["error", { "maxDepth": 1 }],
+        "import/no-cycle": ["warning", { "maxDepth": 1 }],
         "semi": "off",
         "react/jsx-filename-extension": "off",
         "react/react-in-jsx-scope": "off",

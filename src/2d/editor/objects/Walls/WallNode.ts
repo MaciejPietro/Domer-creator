@@ -11,7 +11,7 @@ import { WallType, wallTypeConfig } from './config';
 import { DEFAULT_WALL_TYPE, Wall } from './Wall';
 
 export class WallNode extends Graphics {
-    private dragging: boolean;
+    public dragging: boolean;
     private id: number;
 
     private type: WallType = WallType.Partition;
@@ -144,10 +144,10 @@ export class WallNode extends Graphics {
         FloorPlan.Instance.redrawWalls();
     }
 
-    public setPosition(x: number, y: number) {
+    public setPosition(x: number, y: number, redrawWalls = true) {
         this.x = x;
         this.y = y;
-        FloorPlan.Instance.redrawWalls();
+        if (redrawWalls) FloorPlan.Instance.redrawWalls();
     }
 
     private onMouseUp() {

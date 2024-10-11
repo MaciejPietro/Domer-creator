@@ -10,14 +10,15 @@ import { Furniture } from './Furniture';
 import { Wall } from './Walls/Wall';
 import { WallNodeSequence } from './Walls/WallNodeSequence';
 import { Door } from './Furnitures/Door';
+import { attach } from '@react-three/fiber/dist/declarations/src/core/utils';
 
 export class Floor extends Container {
-    public furnitureArray: Map<number, Furniture>;
+    public furnitureArray: Map<string, Furniture>;
     private wallNodeSequence: WallNodeSequence;
     constructor(floorData?: FloorSerializable, previousFloor?: Floor) {
         super();
 
-        this.furnitureArray = new Map<number, Furniture>();
+        this.furnitureArray = new Map<string, Furniture>();
         this.wallNodeSequence = new WallNodeSequence();
         this.addChild(this.wallNodeSequence);
         this.wallNodeSequence.zIndex = 1002;
@@ -121,59 +122,6 @@ export class Floor extends Container {
         }
     }
 
-    public addDoor({
-        object,
-        attachedTo,
-        id,
-        position,
-    }: {
-        object: Container;
-        attachedTo: Wall;
-        id: number;
-        position: Point;
-    }) {
-        // object.setId(id);
-
-        this.furnitureArray.set(id, object as Furniture);
-
-        const cho = new Door({
-            position,
-        });
-
-        console.log('xdxd test', object, cho);
-
-        attachedTo.addChild(cho);
-
-        // attachedTo.addChild(object);
-
-        return id;
-    }
-
-    public addFurniture(
-        obj: FurnitureData,
-        id: number,
-        attachedTo?: Wall,
-        coords?: Point,
-        attachedToLeft?: number,
-        attachedToRight?: number
-    ) {
-        const object = new Furniture(obj, id, attachedTo, attachedToLeft, attachedToRight);
-
-        this.furnitureArray.set(id, object);
-
-        if (!coords) return;
-
-        if (attachedTo !== undefined) {
-            attachedTo?.addChild(object);
-            object.position.set(coords.x, coords.y);
-        } else {
-            // this.addChild(object);
-            // object.position.set(main.corner.x + 150, main.corner.y + 150);
-        }
-
-        return id;
-    }
-
     private shiftCoordinatesToOrigin(lines: any) {
         if (!lines[0]) return [];
 
@@ -270,18 +218,24 @@ export class Floor extends Container {
         }
     }
 
-    public removeFurniture(id: number) {
-        if (this.furnitureArray.get(id).isAttached) {
-            this.furnitureArray.get(id).parent.removeChild(this.furnitureArray.get(id));
-        } else {
-            this.removeChild(this.furnitureArray.get(id));
-        }
-        this.furnitureArray.get(id).destroy({
-            children: true,
-            texture: false,
-            baseTexture: false,
+    public addFurniture({ object, attachedTo, position }: { object: Door; attachedTo: Wall; position: Point }) {
+        const doorInstance = new Door({
+            uuid: object.uuid,
+            position,
         });
-        this.furnitureArray.delete(id);
+
+        this.furnitureArray.set(object.uuid, doorInstance as unknown as Furniture);
+
+        attachedTo.addChild(doorInstance);
+    }
+
+    public removeFurniture(uuid: string) {
+        const furniture = this.furnitureArray.get(uuid);
+
+        if (furniture) {
+            furniture.parent.removeChild(furniture);
+            this.furnitureArray.delete(uuid);
+        }
     }
 
     public getObject(id: number) {

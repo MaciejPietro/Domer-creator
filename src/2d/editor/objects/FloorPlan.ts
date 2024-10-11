@@ -133,36 +133,18 @@ export class FloorPlan extends Container {
         this.furnitureId = 0;
     }
 
-    public addDoor(object: Door, attachedTo: Wall, position: Point) {
-        this.furnitureId += 1;
+    public addFurniture(object: Door, attachedTo: Wall, position: Point) {
         object.setTemporality(false);
-        this.floors[this.currentFloor].addDoor({ object, attachedTo, id: this.furnitureId, position });
-    }
 
-    public addFurniture(
-        obj: FurnitureData,
-        attachedTo?: Wall,
-        coords?: Point,
-        attachedToLeft?: number,
-        attachedToRight?: number
-    ) {
-        this.furnitureId += 1;
-        this.floors[this.currentFloor].addFurniture(
-            obj,
-            this.furnitureId,
-            attachedTo,
-            coords,
-            attachedToLeft,
-            attachedToRight
-        );
+        this.floors[this.currentFloor].addFurniture({ object, attachedTo, position });
     }
 
     public setFurniturePosition(id: number, x: number, y: number, angle?: number) {
         this.floors[this.currentFloor].setFurniturePosition(id, x, y, angle);
     }
 
-    public removeFurniture(id: number) {
-        this.floors[this.currentFloor].removeFurniture(id);
+    public removeFurniture(uuid: string) {
+        this.floors[this.currentFloor].removeFurniture(uuid);
     }
 
     public getObject(id: number) {

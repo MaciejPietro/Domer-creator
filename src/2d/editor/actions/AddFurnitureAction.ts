@@ -1,34 +1,28 @@
+import { Container } from 'pixi.js';
 import { Point } from '../../../helpers/Point';
 import { FurnitureData } from '../../../stores/FurnitureStore';
 import { FloorPlan } from '../objects/FloorPlan';
 import { Wall } from '../objects/Walls/Wall';
 import { Action } from './Action';
+import { Door } from '../objects/Furnitures/Door';
 
 export class AddFurnitureAction implements Action {
-    obj: FurnitureData;
-    attachedTo?: Wall;
-    coords?: Point;
-    attachedToLeft?: number;
-    attachedToRight?: number;
+    object: Door;
+    attachedTo: Wall;
+    position: Point;
+
     private receiver: FloorPlan;
 
-    constructor(
-        obj: FurnitureData,
-        attachedTo?: Wall,
-        coords?: Point,
-        attachedToLeft?: number,
-        attachedToRight?: number
-    ) {
-        this.obj = obj;
+    constructor(object: Door, attachedTo: Wall, position: Point) {
+        this.object = object;
         this.attachedTo = attachedTo;
-        this.coords = coords;
-        this.attachedToLeft = attachedToLeft;
-        this.attachedToRight = attachedToRight;
+        this.position = position;
+
         this.receiver = FloorPlan.Instance;
     }
 
     public execute() {
-        this.receiver.addFurniture(this.obj, this.attachedTo, this.coords, this.attachedToLeft, this.attachedToRight);
+        this.receiver.addFurniture(this.object, this.attachedTo, this.position);
         this.receiver.actions.push(this);
     }
 }

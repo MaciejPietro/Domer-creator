@@ -1,19 +1,18 @@
-import { FloorPlan } from "../objects/FloorPlan";
-import { Action } from "./Action";
+import { FloorPlan } from '../objects/FloorPlan';
+import { Action } from './Action';
 
 // Action for removing furniture piece from FloorPlan.
 export class DeleteFurnitureAction implements Action {
-    private id:number;
-    private receiver:FloorPlan;
+    private uuid: string;
+    private receiver: FloorPlan;
 
-    constructor(id:number) {
-        this.id = id;
+    constructor(uuid: string) {
+        this.uuid = uuid;
         this.receiver = FloorPlan.Instance;
     }
 
     public execute() {
         this.receiver.actions.push(this);
-        this.receiver.removeFurniture(this.id);
+        this.receiver.removeFurniture(this.uuid);
     }
 }
-
