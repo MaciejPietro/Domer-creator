@@ -80,7 +80,7 @@ const AppSidebar = () => {
 
                         <NavbarLink
                             icon={GridDots}
-                            label="Przyciągaj do siatki (ctrl)"
+                            label="Przyciągaj do siatki"
                             active={snap}
                             onClick={() => {
                                 setSnap(!snap);

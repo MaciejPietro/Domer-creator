@@ -39,7 +39,7 @@ export const useStore = create<EditorStore>((set, getState) => ({
     activeTool: Tool.Edit,
     activeToolSettings: {},
     floor: 0,
-    snap: false,
+    snap: true,
     plan: null,
     app: null,
     focusedElement: null,

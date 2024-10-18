@@ -2,7 +2,7 @@ import { Graphics, FederatedPointerEvent, Texture, Container } from 'pixi.js';
 import { euclideanDistance } from '../../../../helpers/EuclideanDistance';
 import { Point } from '../../../../helpers/Point';
 import { getCorrespondingY } from '../../../../helpers/Slope';
-import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
+import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 
 import { useStore } from '../../../../stores/EditorStore';
 import { AddNodeAction } from '../../actions/AddNodeAction';
@@ -22,6 +22,7 @@ import { Furniture, FurnitureOrientation } from '../Furniture';
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
 import { Door } from '../Furnitures/Door';
 import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
+import { notifications } from '@mantine/notifications';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -51,8 +52,8 @@ export class Wall extends Graphics {
 
     dragging: boolean;
     mouseStartPoint: Point;
-    startLeftNode: Point;
-    startRightNode: Point;
+    // startLeftNode: Point;
+    // startRightNode: Point;
 
     //TODO move all below to different class
 
@@ -68,9 +69,9 @@ export class Wall extends Graphics {
         this.rightNode = rightNode;
         this.dragging = false;
         this.mouseStartPoint = { x: 0, y: 0 };
-        this.startLeftNode = { x: 0, y: 0 };
-        this.startRightNode = { x: 0, y: 0 };
-        this.setLineCoords();
+        // this.startLeftNode = { x: 0, y: 0 };
+        // this.startRightNode = { x: 0, y: 0 };
+        this.getNodesCords();
 
         this.measureLabel = new MeasureLabel(0);
 
@@ -184,48 +185,50 @@ export class Wall extends Graphics {
         this.drawLine();
     }
 
-    public setIsExterior(value: boolean) {
-        // this.isExteriorWall = value;
-        // if (value) {
-        //     this.thickness = WALL_THICKNESS;
-        // } else {
-        //     this.thickness = INTERIOR_WALL_THICKNESS;
-        // }
-        // this.pivot.set(0, this.thickness / 2);
-        // this.leftNode.setSize(this.thickness);
-        // this.rightNode.setSize(this.thickness);
-        // this.drawLine();
-    }
-
     public getIsExterior() {
         return this.isExteriorWall;
     }
-    public setLineCoords() {
+    public getNodesCords() {
         return [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
     }
 
     public drawLine() {
-        [this.x1, this.y1, this.x2, this.y2] = this.setLineCoords();
+        const x1 = this.leftNode.x;
+        const y1 = this.leftNode.y;
+        const x2 = this.rightNode.x;
+        const y2 = this.rightNode.y;
 
-        let theta = Math.atan2(this.y2 - this.y1, this.x2 - this.x1);
-
-        theta *= 180 / Math.PI;
-        if (theta < 0) theta = 360 + theta;
-        this.length = euclideanDistance(this.x1, this.x2, this.y1, this.y2);
+        this.length = Math.floor(euclideanDistance(x1, x2, y1, y2));
 
         const minLength = this.getMinimumWallLength();
-        console.log('xdxd', minLength);
 
         if (this.length < minLength) {
             this.leftNode.dragging = false;
             this.rightNode.dragging = false;
-            console.warn(`Wall length (${this.length}) is less than minimum required length (${minLength})`);
 
-            // this.leftNode.setPosition(this.x1, this.y1, false);
-            // this.rightNode.setPosition(this.x2, this.y2, false);
+            this.leftNode.setToPrevPosition();
+            this.rightNode.setToPrevPosition();
 
-            // return;
+            this.leftNode.setStyles({});
+            this.rightNode.setStyles({});
+
+            notifications.clean();
+
+            notifications.show({
+                title: '🚪 Za krótka ściana',
+                message: 'Nie można zmniejszyć ściany. Usuń drzwi.',
+                color: 'red',
+            });
+
+            this.drawLine();
+
+            return;
         }
+
+        let theta = Math.atan2(y2 - y1, x2 - x1);
+
+        theta *= 180 / Math.PI;
+        if (theta < 0) theta = 360 + theta;
 
         this.clear();
 
@@ -233,7 +236,7 @@ export class Wall extends Graphics {
 
         this.setStyles();
 
-        this.position.set(this.x1, this.y1);
+        this.position.set(x1, y1);
         this.angle = theta;
 
         this.leftNode.angle = theta;
@@ -246,29 +249,36 @@ export class Wall extends Graphics {
     private getMinimumWallLength(): number {
         let minLength = 0;
         this.children.forEach((child) => {
-            if (child instanceof Door || child instanceof Furniture) {
+            if (child instanceof Door) {
                 const childEndX = child.position.x + child.length;
                 if (childEndX > minLength) {
                     minLength = childEndX;
                 }
             }
         });
-        return minLength + 10; // Add a small buffer (e.g., 10 units)
+        return parseInt(minLength.toString());
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
         if (!this.dragging) {
             return;
         }
+        const shouldSnap = useStore.getState().snap;
 
         const currentPoint = ev.global;
-        const delta = {
-            x: (currentPoint.x - this.mouseStartPoint.x) / main.scale.x,
-            y: (currentPoint.y - this.mouseStartPoint.y) / main.scale.y,
-        };
 
-        this.leftNode.setPosition(this.startLeftNode.x + delta.x, this.startLeftNode.y + delta.y);
-        this.rightNode.setPosition(this.startRightNode.x + delta.x, this.startRightNode.y + delta.y);
+        let x = (currentPoint.x - this.mouseStartPoint.x) / main.scale.x;
+        let y = (currentPoint.y - this.mouseStartPoint.y) / main.scale.y;
+
+        if (shouldSnap) {
+            x = snap(x);
+            y = snap(y);
+        }
+
+        this.leftNode.setPosition(this.x1 + x, this.y1 + y, false);
+        this.rightNode.setPosition(this.x2 + x, this.y2 + y, false);
+
+        this.drawLine();
     }
 
     public blur() {
@@ -344,11 +354,11 @@ export class Wall extends Graphics {
                 this.mouseStartPoint.x = ev.global.x;
                 this.mouseStartPoint.y = ev.global.y;
 
-                this.startLeftNode.x = this.leftNode.position.x;
-                this.startLeftNode.y = this.leftNode.position.y;
+                this.x1 = this.leftNode.position.x;
+                this.y1 = this.leftNode.position.y;
 
-                this.startRightNode.x = this.rightNode.position.x;
-                this.startRightNode.y = this.rightNode.position.y;
+                this.x2 = this.rightNode.position.x;
+                this.y2 = this.rightNode.position.y;
                 break;
 
             case Tool.WallAdd:
@@ -404,7 +414,7 @@ export class Wall extends Graphics {
 
     public setLength(newLength: number) {
         // Get the current coordinates of the wall nodes
-        const [x1, y1, x2, y2] = this.setLineCoords();
+        const [x1, y1, x2, y2] = this.getNodesCords();
 
         // Find the direction of the wall (unit vector)
         const deltaX = x2 - x1;

@@ -1,0 +1,20 @@
+{
+  "floors": [
+    {
+      "furnitureArray": [],
+      "wallNodes": [
+        { "id": 1, "x": 2320, "y": 2160 },
+        { "id": 2, "x": 2320, "y": 2740 }
+      ],
+      "wallNodeLinks": [
+        [1, [2]],
+        [2, []],
+        [3, []],
+        [4, []],
+        [5, []]
+      ]
+    }
+  ],
+  "furnitureId": 0,
+  "wallNodeId": 5
+}

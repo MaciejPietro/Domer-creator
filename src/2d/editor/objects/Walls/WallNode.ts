@@ -1,21 +1,25 @@
-import { Graphics, FederatedPointerEvent, Point, Texture } from 'pixi.js';
+import { Graphics, FederatedPointerEvent, Texture } from 'pixi.js';
 import { WALL_NODE_THICKNESS, Tool, ViewMode, WALL_THICKNESS } from '../../constants';
 import { useStore } from '../../../../stores/EditorStore';
 import { AddWallManager } from '../../actions/AddWallManager';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { INodeSerializable } from '../../persistence/INodeSerializable';
 import { FloorPlan } from '../FloorPlan';
-import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
+import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { isMobile } from 'react-device-detect';
 import { WallType, wallTypeConfig } from './config';
 import { DEFAULT_WALL_TYPE, Wall } from './Wall';
+import { main } from '@/2d/EditorRoot';
+import { Point } from '@/helpers/Point';
 
 export class WallNode extends Graphics {
     public dragging: boolean;
     private id: number;
+    mouseStartPoint: Point;
 
     private type: WallType = WallType.Partition;
     private size = 20;
+    public prevPosition = { x: 0, y: 0 };
 
     constructor(x: number, y: number, nodeId: number) {
         super();
@@ -26,6 +30,9 @@ export class WallNode extends Graphics {
 
         this.setStyles({});
 
+        this.mouseStartPoint = { x: 0, y: 0 };
+
+        this.prevPosition = { x, y };
         this.position.set(x, y);
         this.zIndex = 999;
         this.visible = false;
@@ -121,6 +128,8 @@ export class WallNode extends Graphics {
         switch (useStore.getState().activeTool) {
             case Tool.Edit:
                 this.dragging = true;
+                this.mouseStartPoint.x = ev.global.x;
+                this.mouseStartPoint.y = ev.global.y;
                 break;
             case Tool.Remove:
                 this.delete();
@@ -135,16 +144,34 @@ export class WallNode extends Graphics {
         if (!this.dragging) {
             return;
         }
+        const shouldSnap = useStore.getState().snap;
 
-        const currentPoint = { x: ev.global.x, y: ev.global.y };
+        this.prevPosition = { x: this.x, y: this.y };
 
-        this.x = viewportX(currentPoint.x);
-        this.y = viewportY(currentPoint.y);
+        const currentPoint = ev.global;
+
+        let x = currentPoint.x / main.scale.x + main.corner.x;
+        let y = currentPoint.y / main.scale.y + main.corner.y;
+
+        if (shouldSnap) {
+            x = snap(x);
+            y = snap(y);
+        }
+
+        this.x = x;
+        this.y = y;
 
         FloorPlan.Instance.redrawWalls();
     }
 
+    public setToPrevPosition() {
+        this.x = this.prevPosition.x;
+        this.y = this.prevPosition.y;
+    }
+
     public setPosition(x: number, y: number, redrawWalls = true) {
+        this.prevPosition = { x: this.x, y: this.y };
+
         this.x = x;
         this.y = y;
         if (redrawWalls) FloorPlan.Instance.redrawWalls();

@@ -122,11 +122,11 @@ const AddMenu = () => {
             onClick: () => {
                 setTool(Tool.FurnitureAddDoor);
                 cleanNotifications();
-                showNotification({
-                    title: '🚪 Add door',
-                    message: 'Click on wall to add door. Right click to change orientation',
-                    color: 'blue',
-                });
+                // showNotification({
+                //     title: '🚪 Add door',
+                //     message: 'Click on wall to add door. Right click to change orientation',
+                //     color: 'blue',
+                // });
             },
         },
         {

@@ -14,6 +14,7 @@ import { Preview } from './actions/MeasureToolManager';
 import 'pixi.js/events';
 import { LoadAction } from './actions/LoadAction';
 import { Grid } from './basic/Grid';
+import plan from './plan.json';
 
 export class Main extends Viewport {
     private floorPlan: FloorPlan;
@@ -158,8 +159,7 @@ export class Main extends Viewport {
     }
 
     private loadMockupPlan() {
-        const action = new LoadAction(`
-                     {"floors":[{"furnitureArray":[],"wallNodes":[{"id":1,"x":2327.4000237816417,"y":2164.4000091552734},{"id":2,"x":2327,"y":2743}],"wallNodeLinks":[[1,[2]],[2,[]],[3,[]],[4,[]],[5,[]]]}],"furnitureId":0,"wallNodeId":5}`);
+        const action = new LoadAction(JSON.stringify(plan));
 
         action.execute();
     }
@@ -195,13 +195,5 @@ document.onkeydown = (e) => {
             setTool(Tool.None);
             setTool(activeTool);
         }
-    }
-};
-
-document.onkeyup = (e) => {
-    const setSnap = useStore.getState().setSnap;
-
-    if (e.key === 'Control') {
-        setSnap(true);
     }
 };

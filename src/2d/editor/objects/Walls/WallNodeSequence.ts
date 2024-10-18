@@ -189,7 +189,7 @@ export class WallNodeSequence extends Container {
     }
     public drawWalls() {
         this.walls.forEach((wall) => {
-            wall.drawLine();
+            wall.drawLine('drawWalls');
         });
     }
 }

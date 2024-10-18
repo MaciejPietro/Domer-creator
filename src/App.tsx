@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import './App.css';
 import { PageLayout } from './ui/Layout/PageLayout';
 import { useFurnitureStore } from './stores/FurnitureStore';
-import { Notifications } from '@mantine/notifications';
 import { AppShell, MantineProvider } from '@mantine/core';
 import { MantineEmotionProvider } from '@mantine/emotion';
+import { Notifications } from '@mantine/notifications';
 
 function App() {
     const { getCategories } = useFurnitureStore();
