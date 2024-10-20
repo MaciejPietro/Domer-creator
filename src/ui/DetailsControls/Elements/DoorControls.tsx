@@ -4,6 +4,22 @@ import { useStore } from '@/stores/EditorStore';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
 import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
+import {
+    doorOrientationConfig,
+    DoorOrientationObject,
+    doorTypeConfig,
+    DoorTypeObject,
+} from '@/2d/editor/objects/Furnitures/Door/config';
+
+const doorTypeOptions = Object.values(doorTypeConfig).map((door: DoorTypeObject) => ({
+    label: door.label,
+    value: door.type.toString(),
+}));
+
+const doorOrientationOptions = Object.values(doorOrientationConfig).map((door: DoorOrientationObject) => ({
+    label: door.label,
+    value: door.type.toString(),
+}));
 
 const DoorControls = ({}: any) => {
     const { focusedElement, setFocusedElement } = useStore();
@@ -52,11 +68,6 @@ const DoorControls = ({}: any) => {
         }
     };
 
-    const wallTypeOptions = Object.values(wallTypeConfig).map((wall: WallConfig) => ({
-        label: `${wall.label} (${wall.thickness}cm)`,
-        value: wall.type.toString(),
-    }));
-
     const handleChangeWallType = (val: WallType) => {
         const element = focusedElement as Wall;
 
@@ -77,15 +88,21 @@ const DoorControls = ({}: any) => {
                 />
             </div> */}
 
-            {/* <div className="mt-4">
+            <div className="mt-4 grid grid-cols-2 gap-2">
                 <Select
                     label="Typ"
-                    description="Typ drzwi"
-                    data={wallTypeOptions}
-                    value={details.wallType.toString()}
-                    onChange={(val) => val && handleChangeWallType(+val)}
+                    description="Lewe/Prawe"
+                    data={doorTypeOptions}
+                    // onChange={(val) => val && handleChangeWallType(+val)}
                 />
-            </div> */}
+
+                <Select
+                    label="Pozycja"
+                    description="Pozycja na ścianie"
+                    data={doorOrientationOptions}
+                    // onChange={(val) => val && handleChangeWallType(+val)}
+                />
+            </div>
 
             <div className="mt-4">
                 <div className="flex gap-2 items-center">

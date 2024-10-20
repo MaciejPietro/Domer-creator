@@ -4,7 +4,7 @@ import { FurnitureData } from '../../../stores/FurnitureStore';
 import { FloorPlan } from '../objects/FloorPlan';
 import { Wall } from '../objects/Walls/Wall';
 import { Action } from './Action';
-import { Door } from '../objects/Furnitures/Door';
+import { Door } from '../objects/Furnitures/Door/Door';
 
 export class AddFurnitureAction implements Action {
     object: Door;

@@ -8,7 +8,7 @@ import { Action } from '../actions/Action';
 import { useStore } from '../../../stores/EditorStore';
 import { Point } from '../../../helpers/Point';
 import { showNotification } from '@mantine/notifications';
-import { Door } from './Furnitures/Door';
+import { Door } from './Furnitures/Door/Door';
 
 export class FloorPlan extends Container {
     private static instance: FloorPlan;

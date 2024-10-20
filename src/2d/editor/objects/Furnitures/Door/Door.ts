@@ -1,10 +1,10 @@
 import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
-import { Point } from '../../../../helpers/Point';
-import { METER, Tool } from '../../constants';
+import { Point } from '@/helpers/Point';
+import { Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
-import { Wall } from '../Walls/Wall';
-import { DeleteFurnitureAction } from '../../actions/DeleteFurnitureAction';
+import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';
+import { DoorOrientation, DoorType } from './config';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -23,8 +23,9 @@ export class Door extends Container {
     baseLine: Graphics;
     background: Graphics;
     length = DOOR_WIDTH;
-    orientation = 0;
     clickStartTime: number;
+    type = DoorType.Left;
+    orientation = DoorOrientation.West;
     public isTemporary = false;
     public isValid = false;
 

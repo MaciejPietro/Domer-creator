@@ -9,7 +9,7 @@ import { FloorSerializable } from '../persistence/FloorSerializable';
 import { Furniture } from './Furniture';
 import { Wall } from './Walls/Wall';
 import { WallNodeSequence } from './Walls/WallNodeSequence';
-import { Door } from './Furnitures/Door';
+import { Door } from './Furnitures/Door/Door';
 import { attach } from '@react-three/fiber/dist/declarations/src/core/utils';
 
 export class Floor extends Container {

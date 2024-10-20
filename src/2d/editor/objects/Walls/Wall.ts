@@ -14,7 +14,7 @@ import { WallType, wallTypeConfig } from './config';
 import { v4 as uuidv4 } from 'uuid';
 
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
-import { Door } from '../Furnitures/Door';
+import { Door } from '../Furnitures/Door/Door';
 import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 import { notifications } from '@mantine/notifications';
 import { DashedLine } from '../Helpers/DashedLine';
