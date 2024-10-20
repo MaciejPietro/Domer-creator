@@ -26,23 +26,54 @@ export class Door extends Container {
     orientation = 0;
     clickStartTime: number;
     public isTemporary = false;
+    public isValid = false;
 
     constructor(config?: DoorProps) {
         super();
 
-        this.eventMode = this.isTemporary ? 'none' : 'static';
-
-        // this.uuid = uuidv4();
+        this.eventMode = 'none';
 
         if (config?.uuid) this.uuid = config.uuid;
-
-        const { x, y } = { x: 0, y: 0 };
 
         this.background = new Graphics();
 
         this.setBackground('transparent');
 
+        this.setStroke();
+
+        this.watchStoreChanges();
+
+        this.on('pointerdown', this.onMouseDown);
+        this.on('pointerup', this.onMouseUp);
+
+        this.clickStartTime = 0;
+
+        if (config?.position) {
+            this.setPosition(config.position);
+        }
+    }
+
+    private watchStoreChanges() {
+        useStore.subscribe(() => {
+            this.checkVisibility();
+            this.checkEventMode();
+        });
+    }
+
+    private setBackground(strokeColor: string, fillColor = 'transparent') {
+        this.background.clear();
+        this.background.rect(-2.5, -2.5, DOOR_WIDTH + 5, DOOR_WIDTH + 5);
+        this.background.fill(fillColor);
+        this.background.stroke(strokeColor);
+
+        this.addChild(this.background);
+    }
+
+    private setStroke() {
         this.baseLine = new Graphics();
+        const { x, y } = { x: 0, y: 0 };
+
+        const color = this.isValid ? COLOR : 'red';
 
         this.baseLine
             .arc(x, y, DOOR_WIDTH, 0, 0.1)
@@ -76,32 +107,14 @@ export class Door extends Container {
             .stroke({ width: 2, color: COLOR });
 
         this.addChild(this.baseLine);
-
-        this.watchStoreChanges();
-
-        this.on('pointerdown', this.onMouseDown);
-        this.on('pointerup', this.onMouseUp);
-
-        this.clickStartTime = 0;
-
-        if (config?.position) {
-            this.setPosition(config.position);
-        }
     }
 
-    private watchStoreChanges() {
-        useStore.subscribe(() => {
-            this.checkVisibility();
-        });
-    }
+    private checkEventMode() {
+        const activeTool = useStore.getState().activeTool;
 
-    private setBackground(strokeColor: string) {
-        this.background.clear();
-        this.background.rect(-2.5, -2.5, DOOR_WIDTH + 5, DOOR_WIDTH + 5);
-        this.background.fill('transparent');
-        this.background.stroke(strokeColor);
+        this.eventMode = activeTool === Tool.FurnitureAddDoor || activeTool === Tool.WallAdd ? 'none' : 'static';
 
-        this.addChild(this.background);
+        console.log(this.eventMode);
     }
 
     private checkVisibility() {
@@ -116,7 +129,6 @@ export class Door extends Container {
     }
 
     public setPosition({ x, y }: Point) {
-        // this.baseLine.position = { x, y };
         this.position = { x, y };
     }
 
@@ -171,6 +183,16 @@ export class Door extends Container {
         }
         this.isTemporary = temporary;
         this.eventMode = temporary ? 'none' : 'static';
+    }
+
+    public setValidity(isValid = true) {
+        if (isValid) {
+            this.isValid = true;
+        } else {
+            this.isValid = false;
+        }
+
+        this.setBackground('transparent', this.isValid ? 'transparent' : '#ff000020');
     }
 
     public hide() {

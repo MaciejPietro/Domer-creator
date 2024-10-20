@@ -28,7 +28,7 @@ export const wallTypeConfig = Object.freeze({
     [WallType.Partition]: {
         type: WallType.Partition,
         label: 'Działowa',
-        thickness: 10,
+        thickness: 15,
         icon: BorderInner,
     },
 });

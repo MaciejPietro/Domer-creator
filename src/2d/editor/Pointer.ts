@@ -18,12 +18,13 @@ export class Pointer extends Container {
         this.addChild(this.dot);
 
         this.hand = new Graphics();
-        this.hand.circle(0, 0, 7).fill(0xaabbcc);
+        this.hand.circle(0, 0, 4).fill(0xaabbcc);
         this.addChild(this.hand);
-        this.hand.alpha = 0;
     }
 
     public update(ev: FederatedPointerEvent) {
+        // this.hand.alpha = 0;
+
         let worldX = viewportX(ev.global.x);
         let worldY = viewportY(ev.global.y);
 
@@ -36,12 +37,12 @@ export class Pointer extends Container {
     }
 
     public setCursor(cursor: 'grab' | 'default') {
-        if (cursor === 'default') {
-            this.dot.alpha = 1;
-            this.hand.alpha = 0;
-        } else {
-            this.dot.alpha = 0;
-            this.hand.alpha = 1;
-        }
+        //     if (cursor === 'default') {
+        //         this.dot.alpha = 1;
+        //         this.hand.alpha = 0;
+        //     } else {
+        //         this.dot.alpha = 0;
+        //         this.hand.alpha = 1;
+        //     }
     }
 }
