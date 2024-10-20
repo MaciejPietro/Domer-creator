@@ -16,6 +16,8 @@ const DoorControls = ({}: any) => {
     const handleRemove = () => {
         focusedElement?.delete();
 
+        console.log(focusedElement?.parent.children);
+
         setFocusedElement(null);
     };
 

@@ -283,10 +283,12 @@ export class Floor extends Container {
             return;
         }
 
-        const removeWallSettings = { type: wall.type };
+        const removedWallSettings = { type: wall.type };
 
         // delete wall between left and right node
         this.removeWall(wall);
+
+        console.log(coords.x);
 
         // add node and connect walls to it
         const newNode = this.wallNodeSequence.addNode(coords.x, coords.y);
@@ -295,8 +297,8 @@ export class Floor extends Container {
 
         const newNodeId = newNode.getId();
 
-        this.wallNodeSequence.addWall(leftNode, newNodeId, removeWallSettings);
-        this.wallNodeSequence.addWall(newNodeId, rightNode, removeWallSettings);
+        this.wallNodeSequence.addWall(leftNode, newNodeId, removedWallSettings);
+        this.wallNodeSequence.addWall(newNodeId, rightNode, removedWallSettings);
 
         return newNode;
     }

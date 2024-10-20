@@ -116,6 +116,7 @@ export class Wall extends Graphics {
     }
 
     private applySettings() {
+        console.log(wallTypeConfig[this.type]);
         const wallThickness = wallTypeConfig[this.type].thickness;
 
         this.thickness = wallThickness;
@@ -140,6 +141,8 @@ export class Wall extends Graphics {
 
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
+                this.removeTempFurniture();
+
                 const localCoords = ev.getLocalPosition(this as unknown as Container);
 
                 this.tempFurniture = new Door();
@@ -175,6 +178,7 @@ export class Wall extends Graphics {
                 for (const child of this.children) {
                     if (child instanceof DashedLine) {
                         child.visible = false;
+                        child.destroy();
                         this.removeChild(child);
                     }
                 }
@@ -357,6 +361,17 @@ export class Wall extends Graphics {
                         color: 'red',
                     });
                 } else {
+                    const hasChildren = this.children.some((child) => child instanceof Door);
+
+                    if (hasChildren) {
+                        notifications.show({
+                            title: 'Błędna pozycja',
+                            message: 'Nie można podzielić ściany na której znajdują się inne elementy.',
+                            color: 'red',
+                        });
+                        return;
+                    }
+
                     const addNode = new AddNodeAction(
                         this,
                         getClosestPointOnLine(globalCords, [

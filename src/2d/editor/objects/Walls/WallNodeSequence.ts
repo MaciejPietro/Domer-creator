@@ -95,12 +95,6 @@ export class WallNodeSequence extends Container {
             this.wallNodes.delete(id);
             // remove links containing node TODO if implementing undo. remember these
             // this.wallNodeLinks[id].length = 0;
-        } else {
-            showNotification({
-                title: 'Not permitted',
-                color: 'red',
-                message: 'Cannot delete node with walls attached. Please remove walls first.',
-            });
         }
     }
 
@@ -123,13 +117,6 @@ export class WallNodeSequence extends Container {
     public addWall(leftNodeId: number, rightNodeId: number, settings?: WallSettings) {
         if (leftNodeId === rightNodeId) return;
 
-        if (leftNodeId > rightNodeId) {
-            const aux = leftNodeId;
-
-            leftNodeId = rightNodeId;
-            rightNodeId = aux;
-        }
-
         if (this.wallNodeLinks.has(leftNodeId) && this.wallNodeLinks.get(leftNodeId)?.includes(rightNodeId)) {
             return;
         }
@@ -140,10 +127,6 @@ export class WallNodeSequence extends Container {
         const wall = new Wall(leftNode!, rightNode!, settings);
 
         this.walls.push(wall);
-
-        // const wallContainer = new Container();
-
-        // wallContainer.addChild(wall as unknown as Container);
 
         this.addChild(wall as unknown as Container);
         this.drawWalls();
