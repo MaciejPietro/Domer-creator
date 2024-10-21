@@ -32,10 +32,10 @@ export type DoorOrientationObject = {
 export const doorOrientationConfig = Object.freeze({
     [DoorOrientation.West]: {
         type: DoorOrientation.West,
-        label: 'Normalne',
+        label: 'Na zewnątrz',
     },
     [DoorOrientation.East]: {
         type: DoorOrientation.East,
-        label: 'Odbite',
+        label: 'Do wewnątrz',
     },
 });

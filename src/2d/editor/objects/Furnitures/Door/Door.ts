@@ -19,7 +19,6 @@ type DoorProps = {
 
 export class Door extends Container {
     uuid = uuidv4();
-    arcLine: Graphics;
     baseLine: Graphics;
     background: Graphics;
     length = DOOR_WIDTH;
@@ -71,41 +70,81 @@ export class Door extends Container {
     }
 
     private setStroke() {
+        this.baseLine?.clear();
+
         this.baseLine = new Graphics();
         const { x, y } = { x: 0, y: 0 };
 
-        const color = this.isValid ? COLOR : 'red';
+        const strokeSettings = { width: 2, color: COLOR };
 
+        // ARC
         this.baseLine
             .arc(x, y, DOOR_WIDTH, 0, 0.1)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 0.15, 0.25)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 0.3, 0.4)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 0.45, 0.55)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 0.6, 0.7)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 0.75, 0.85)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 0.9, 1.0)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 1.05, 1.15)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 1.2, 1.3)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 1.35, 1.45)
-            .stroke({ width: 2, color: COLOR })
+            .stroke(strokeSettings)
             .arc(x, y, DOOR_WIDTH, 1.5, 1.55)
-            .stroke({ width: 2, color: COLOR });
+            .stroke(strokeSettings);
 
+        // THICK LINE
         this.baseLine.rect(0, 0, x + DOOR_WIDTH, 10).fill({ color: COLOR });
 
+        // LINE
         this.baseLine
             .moveTo(x, y)
             .lineTo(0, y + DOOR_WIDTH)
-            .stroke({ width: 2, color: COLOR });
+            .stroke(strokeSettings);
+
+        if (this.orientation === DoorOrientation.West) {
+            this.position.y = 30;
+            this.scale.y = 1;
+            this.scale.x = this.type === DoorType.Left ? 1 : -1;
+
+            if (this.type === DoorType.Left) {
+                this.baseLine.position.x = 0;
+                this.background.position.x = 0;
+            }
+
+            if (this.type === DoorType.Right) {
+                this.baseLine.position.x = -DOOR_WIDTH;
+                this.background.position.x = -DOOR_WIDTH;
+            }
+        }
+
+        if (this.orientation === DoorOrientation.East) {
+            this.scale.y = -1;
+            this.position.y = 10;
+
+            if (this.type === DoorType.Left) {
+                this.scale.x = -1;
+
+                this.baseLine.position.x = -DOOR_WIDTH;
+                this.background.position.x = -DOOR_WIDTH;
+            }
+
+            if (this.type === DoorType.Right) {
+                this.scale.x = 1;
+
+                this.baseLine.position.x = 0;
+                this.background.position.x = 0;
+            }
+        }
 
         this.addChild(this.baseLine);
     }
@@ -114,8 +153,6 @@ export class Door extends Container {
         const activeTool = useStore.getState().activeTool;
 
         this.eventMode = activeTool === Tool.FurnitureAddDoor || activeTool === Tool.WallAdd ? 'none' : 'static';
-
-        console.log(this.eventMode);
     }
 
     private checkVisibility() {
@@ -133,15 +170,20 @@ export class Door extends Container {
         this.position = { x, y };
     }
 
-    public setOrientation(orientation: FurnitureOrientation) {
-        // const radians = orientation * DEG_TO_RAD;
-        // this.baseLine.rotation = radians;
-        // this.orientation = orientation;
+    public setType(type: DoorType) {
+        this.type = type;
+
+        this.setStroke();
+    }
+
+    public setOrientation(orientation: DoorOrientation) {
+        this.orientation = orientation;
+
+        this.setStroke();
     }
 
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
-        console.log('xdxd click');
 
         this.clickStartTime = Date.now();
     }

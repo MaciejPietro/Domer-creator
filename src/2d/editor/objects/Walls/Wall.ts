@@ -116,7 +116,6 @@ export class Wall extends Graphics {
     }
 
     private applySettings() {
-        console.log(wallTypeConfig[this.type]);
         const wallThickness = wallTypeConfig[this.type].thickness;
 
         this.thickness = wallThickness;
