@@ -1,28 +1,24 @@
-import { Graphics, FederatedPointerEvent, Texture, Container } from 'pixi.js';
+import { Graphics, FederatedPointerEvent, Container } from 'pixi.js';
 import { euclideanDistance } from '../../../../helpers/EuclideanDistance';
 import { Point } from '../../../../helpers/Point';
-import { getCorrespondingY } from '../../../../helpers/Slope';
 import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 
 import { useStore } from '../../../../stores/EditorStore';
 import { AddNodeAction } from '../../actions/AddNodeAction';
 import { DeleteWallAction } from '../../actions/DeleteWallAction';
 import { INTERIOR_WALL_THICKNESS, Tool, ToolMode, ViewMode, WALL_THICKNESS } from '../../constants';
-import { Label } from '../TransformControls/Label';
 import { WallNode } from './WallNode';
-import { AddWallManager } from '../../actions/AddWallManager';
 import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { WallType, wallTypeConfig } from './config';
 import { v4 as uuidv4 } from 'uuid';
 
-import doorSvg from '@/assets/door/door.svg';
-
-import { Furniture, FurnitureOrientation } from '../Furniture';
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
-import { Door } from '../Furnitures/Door';
+import { Door } from '../Furnitures/Door/Door';
 import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 import { notifications } from '@mantine/notifications';
+import { DashedLine } from '../Helpers/DashedLine';
+import { getClosestPointOnLine } from '@/2d/helpers/geometry';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -52,10 +48,6 @@ export class Wall extends Graphics {
 
     dragging: boolean;
     mouseStartPoint: Point;
-    // startLeftNode: Point;
-    // startRightNode: Point;
-
-    //TODO move all below to different class
 
     tempFurniture: Door | null = null;
 
@@ -69,8 +61,7 @@ export class Wall extends Graphics {
         this.rightNode = rightNode;
         this.dragging = false;
         this.mouseStartPoint = { x: 0, y: 0 };
-        // this.startLeftNode = { x: 0, y: 0 };
-        // this.startRightNode = { x: 0, y: 0 };
+
         this.getNodesCords();
 
         this.measureLabel = new MeasureLabel(0);
@@ -159,6 +150,12 @@ export class Wall extends Graphics {
                 this.updateFurniturePosition(localCoords);
 
                 break;
+
+            case Tool.WallAdd:
+                const lineWidth = this.thickness;
+                const line = new DashedLine(lineWidth);
+                line.rotation = Math.PI * 0.5;
+                this.addChild(line);
         }
     }
 
@@ -168,11 +165,22 @@ export class Wall extends Graphics {
 
         this.setStyles();
 
-        switch (Tool.FurnitureAddDoor) {
+        const state = useStore.getState();
+
+        switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
                 this.removeTempFurniture();
 
                 break;
+
+            case Tool.WallAdd:
+                for (const child of this.children) {
+                    if (child instanceof DashedLine) {
+                        child.visible = false;
+                        child.destroy();
+                        this.removeChild(child);
+                    }
+                }
         }
     }
 
@@ -275,8 +283,8 @@ export class Wall extends Graphics {
             y = snap(y);
         }
 
-        this.leftNode.setPosition(this.x1 + x, this.y1 + y, false);
-        this.rightNode.setPosition(this.x2 + x, this.y2 + y, false);
+        this.leftNode.setPosition(this.x1 + x, this.y1 + y);
+        this.rightNode.setPosition(this.x2 + x, this.y2 + y);
 
         this.drawLine();
     }
@@ -295,8 +303,20 @@ export class Wall extends Graphics {
         this.measureLabel.show();
     }
 
-    private onMouseClick() {
+    private onMouseClick(ev: FederatedPointerEvent) {
         const state = useStore.getState();
+
+        const globalCords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
+
+        const localCoords = ev.getLocalPosition(this as unknown as Container);
+
+        let helperLine = null;
+
+        for (const child of this.children) {
+            if (child instanceof DashedLine) {
+                helperLine = child;
+            }
+        }
 
         switch (state.activeTool) {
             case Tool.Edit:
@@ -306,31 +326,64 @@ export class Wall extends Graphics {
                 break;
             case Tool.FurnitureAddDoor:
                 if (this.tempFurniture) {
+                    if (!this.tempFurniture.isValid) {
+                        notifications.clean();
+
+                        notifications.show({
+                            title: '🚪 Niewłaściwa pozycja',
+                            message: 'Nie można dodać drzwi, które kolidują z innymi elementami.',
+                            color: 'red',
+                        });
+                        return;
+                    }
+
                     const { x, y } = this.tempFurniture.position;
 
                     this.tempFurniture.setTemporality(false);
 
+                    this.tempFurniture.setValidity(true);
+
                     const action = new AddFurnitureAction(this.tempFurniture, this, { x, y });
 
                     action.execute();
+                }
 
-                    this.removeTempFurniture();
+                break;
+
+            case Tool.WallAdd:
+                const isOccupied = this.isOccupiedSpot(localCoords.x);
+
+                if (isOccupied) {
+                    notifications.show({
+                        title: 'Nie można stworzyć ściany',
+                        message: 'Nie można stworzyć ściany w miejscu w którym znajdują się inne elementy.',
+                        color: 'red',
+                    });
+                } else {
+                    const hasChildren = this.children.some((child) => child instanceof Door);
+
+                    if (hasChildren) {
+                        notifications.show({
+                            title: 'Błędna pozycja',
+                            message: 'Nie można podzielić ściany na której znajdują się inne elementy.',
+                            color: 'red',
+                        });
+                        return;
+                    }
+
+                    const addNode = new AddNodeAction(
+                        this,
+                        getClosestPointOnLine(globalCords, [
+                            { x: this.leftNode.x, y: this.leftNode.y },
+                            { x: this.rightNode.x, y: this.rightNode.y },
+                        ])
+                    );
+
+                    addNode.execute();
                 }
 
                 break;
         }
-    }
-
-    private onMouseUp() {
-        const clickDuration = Date.now() - this.clickStartTime;
-
-        if (clickDuration < 200) {
-            this.onMouseClick();
-        }
-
-        this.dragging = false;
-
-        return;
     }
 
     private onMouseDown(ev: FederatedPointerEvent) {
@@ -339,10 +392,6 @@ export class Wall extends Graphics {
         if (!this.isEditMode()) return;
 
         this.clickStartTime = Date.now();
-
-        const coords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
-
-        const localCoords = ev.getLocalPosition(this as unknown as Container);
 
         const state = useStore.getState();
 
@@ -360,47 +409,25 @@ export class Wall extends Graphics {
                 this.x2 = this.rightNode.position.x;
                 this.y2 = this.rightNode.position.y;
                 break;
-
-            case Tool.WallAdd:
-                const addNode = new AddNodeAction(this, coords);
-
-                addNode.execute();
-                break;
-
             case Tool.Remove:
                 this.delete();
 
                 break;
             case Tool.FurnitureAddWindow:
                 break;
-            case Tool.FurnitureAddDoor:
-                // if (this.tempFurniture) {
-                //     const action = new AddFurnitureObjectAction(this.tempFurniture, this);
-
-                //     action.execute();
-                // }
-
-                // const action = new AddFurnitureAction(
-                //     {
-                //         _id: '66e7f088294f7393fb6ee24a',
-                //         name: 'Door',
-                //         width: 1,
-                //         height: 1,
-                //         imagePath: doorSvg,
-                //         category: '66e7f088294f7393fb6ee246',
-                //     },
-                //     this,
-                //     { x: localCoords.x, y: 0 },
-                //     this.leftNode.getId(),
-                //     this.rightNode.getId()
-                // );
-
-                // this.removeTempFurniture();
-
-                // action.execute();
-
-                break;
         }
+    }
+
+    private onMouseUp(ev: FederatedPointerEvent) {
+        const clickDuration = Date.now() - this.clickStartTime;
+
+        if (clickDuration < 200) {
+            this.onMouseClick(ev);
+        }
+
+        this.dragging = false;
+
+        return;
     }
 
     public delete() {
@@ -413,26 +440,20 @@ export class Wall extends Graphics {
     }
 
     public setLength(newLength: number) {
-        // Get the current coordinates of the wall nodes
         const [x1, y1, x2, y2] = this.getNodesCords();
 
-        // Find the direction of the wall (unit vector)
         const deltaX = x2 - x1;
         const deltaY = y2 - y1;
         const currentLength = euclideanDistance(x1, x2, y1, y2);
 
-        // Normalize the direction
         const directionX = deltaX / currentLength;
         const directionY = deltaY / currentLength;
 
-        // Calculate the new position for the rightNode based on the new length
         const newRightX = x1 + directionX * newLength;
         const newRightY = y1 + directionY * newLength;
 
-        // Update the right node's position
         this.rightNode.setPosition(newRightX, newRightY);
 
-        // Redraw the wall with the updated node positions
         this.drawLine();
     }
 
@@ -440,10 +461,67 @@ export class Wall extends Graphics {
         return useStore.getState().activeMode === ViewMode.Edit;
     }
 
-    private getNextFreeSpot(elementX: number, elementHeight: number): number {
+    private getXWithinWall(elementX: number): number {
+        // WALL BOUNDARIES
+        const furnitureHeight = this.tempFurniture?.length || 0;
+
+        let currentX = elementX;
+
+        const maxX = this.length;
+
+        const wallOffset = 0;
+
+        let isBusy = false;
+
+        const endX = elementX + furnitureHeight;
+        const startX = elementX;
+
+        const isWallEnd = endX > maxX - wallOffset;
+        const isWallStart = startX < wallOffset;
+
+        if (isWallEnd) {
+            currentX = maxX - wallOffset - furnitureHeight;
+        } else if (isWallStart) {
+            currentX = wallOffset;
+        }
+
+        // MOVE ELEMENT TO NEXT FREE SPOT
+        // const occupiedSpots: { start: number; end: number }[] = [];
+
+        // this.children.forEach((child) => {
+        //     if (child instanceof Door && !child.isTemporary) {
+        //         const x = child.position.x;
+        //         occupiedSpots.push({ start: x, end: x + child.length });
+        //     }
+        // });
+
+        // occupiedSpots.sort((a, b) => a.start - b.start);
+
+        // for (const { start, end } of occupiedSpots) {
+        //     if (currentX + furnitureHeight <= start) {
+        //         return currentX;
+        //     }
+
+        //     if (currentX < end) {
+        //         currentX = end;
+        //     }
+        // }
+
+        return currentX;
+    }
+
+    private isOccupiedSpot(elementX: number): boolean {
+        const furnitureHeight = this.tempFurniture?.length || 0;
+
+        if (furnitureHeight > this.length) return true;
+
+        const startX = elementX;
+        const endX = elementX + furnitureHeight;
+
+        let isOccupied = false;
+
         const occupiedSpots: { start: number; end: number }[] = [];
 
-        // Collect all occupied spots from children elements
         this.children.forEach((child) => {
             if (child instanceof Door && !child.isTemporary) {
                 const x = child.position.x;
@@ -451,59 +529,36 @@ export class Wall extends Graphics {
             }
         });
 
-        // Sort occupied spots by their start position
         occupiedSpots.sort((a, b) => a.start - b.start);
 
-        let currentX = elementX;
-
-        // Iterate through each occupied spot to find the next free spot
-        for (const spot of occupiedSpots) {
-            // If the current position + element height is before the start of the current spot,
-            // then the current position is a valid free spot
-            if (currentX + elementHeight <= spot.start) {
-                return currentX;
+        for (const { start, end } of occupiedSpots) {
+            if (endX >= start && startX <= end) {
+                isOccupied = true;
+                break;
             }
 
-            // If the current position overlaps with the occupied spot, move past the end of this spot
-            if (currentX < spot.end) {
-                currentX = spot.end;
-            }
+            isOccupied = false;
         }
 
-        // Return the current position, which will be past all occupied spots
-        return currentX;
+        return isOccupied;
     }
 
     private getPossibleCords({ x, y }: Point) {
         const newCords = { x, y };
-        const furnitureHeight = 80;
 
-        const maxX = this.length;
+        const currentX = this.getXWithinWall(newCords.x);
 
-        const wallOffset = 0;
+        const isOccupied = this.isOccupiedSpot(currentX);
 
-        const furnitureEndX = newCords.x + furnitureHeight;
-        const furnitureStartX = newCords.x;
+        this.tempFurniture?.setValidity(!isOccupied);
 
-        const isWallEnd = furnitureEndX > maxX - wallOffset;
-
-        const isWallStart = furnitureStartX < wallOffset;
-
-        if (isWallEnd) {
-            newCords.x = maxX - wallOffset - furnitureHeight;
-        } else if (isWallStart) {
-            newCords.x = wallOffset;
-        }
-
-        const nextX = this.getNextFreeSpot(newCords.x, furnitureHeight);
-
-        newCords.x = nextX;
+        newCords.x = currentX;
 
         return newCords;
     }
 
     private updateFurniturePosition(localCoords: Point) {
-        const furnitureHeight = 80;
+        const furnitureHeight = this.tempFurniture?.length || 0;
 
         const wallThickness = this.thickness;
 
@@ -517,20 +572,9 @@ export class Wall extends Graphics {
         const newCords = this.getPossibleCords(fixedCords);
 
         this.tempFurniture?.setPosition(newCords);
-
-        // const isLeftSide = localCoords.y < this.thickness / 2;
-
-        // if (isLeftSide) {
-        //     this.tempFurniture?.setOrientation(0);
-        // } else {
-        //     this.tempFurniture?.setOrientation(FurnitureOrientation._0);
-        // }
-
-        // return;
     }
 
     onWallMouseMove(ev: FederatedPointerEvent) {
-        // if (this.dragging) return
         const state = useStore.getState();
 
         const localCoords = ev.getLocalPosition(this as unknown as Container);
@@ -540,55 +584,21 @@ export class Wall extends Graphics {
                 if (this.tempFurniture) {
                     this.updateFurniturePosition(localCoords);
                 }
-                // const furnitureData = {
-                //     _id: '66e7f088294f7393fb6ee24a',
-                //     name: 'Door',
-                //     width: 1,
-                //     height: 1,
-                //     imagePath: doorSvg,
-                //     category: '66e7f088294f7393fb6ee246',
-                // };
 
-                // this.tempFurniture = new Furniture(
-                //     furnitureData,
-                //     3333,
-                //     this,
-                //     this.leftNode.getId(),
-                //     this.rightNode.getId()
-                // );
+                break;
 
-                // this.tempFurniture.position.set(localCoords.x, 0);
+            case Tool.WallAdd:
+                const isOccupied = this.isOccupiedSpot(localCoords.x);
 
-                // this.addChild(this.tempFurniture);
-
-                // const action = new AddFurnitureAction(
-                //     {
-                //         _id: '66e7f088294f7393fb6ee24a',
-                //         name: 'Door',
-                //         width: 1,
-                //         height: 1,
-                //         imagePath: doorSvg,
-                //         category: '66e7f088294f7393fb6ee246',
-                //     },
-                //     this,
-                //     { x: localCoords.x, y: 0 },
-                //     this.leftNode.getId(),
-                //     this.rightNode.getId()
-                // );
-
-                // action.execute();
+                for (const child of this.children) {
+                    if (child instanceof DashedLine) {
+                        child.setStroke(isOccupied ? 'red' : undefined);
+                        child.setPosition({ x: localCoords.x, y: 0 });
+                    }
+                }
 
                 break;
         }
-
-        // const currentPoint = ev.global;
-        // const delta = {
-        //     x: (currentPoint.x - this.mouseStartPoint.x) / main.scale.x,
-        //     y: (currentPoint.y - this.mouseStartPoint.y) / main.scale.y,
-        // };
-
-        // this.leftNode.setPosition(this.startLeftNode.x + delta.x, this.startLeftNode.y + delta.y);
-        // this.rightNode.setPosition(this.startRightNode.x + delta.x, this.startRightNode.y + delta.y);
     }
 
     removeTempFurniture() {

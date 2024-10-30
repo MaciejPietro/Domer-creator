@@ -3,7 +3,7 @@ import { AddWallManager } from '../2d/editor/actions/AddWallManager';
 import { Tool, ViewMode } from '../2d/editor/constants';
 import { WallNode } from '@/2d/editor/objects/Walls/WallNode';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
-import { Door } from '@/2d/editor/objects/Furnitures/Door';
+import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
 
 export enum ToolMode {
     FurnitureMode,

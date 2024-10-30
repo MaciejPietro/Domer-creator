@@ -4,18 +4,38 @@ import { useStore } from '@/stores/EditorStore';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
 import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
+import {
+    DoorOrientation,
+    doorOrientationConfig,
+    DoorOrientationObject,
+    DoorType,
+    doorTypeConfig,
+    DoorTypeObject,
+} from '@/2d/editor/objects/Furnitures/Door/config';
+import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
+
+const doorTypeOptions = Object.values(doorTypeConfig).map((door: DoorTypeObject) => ({
+    label: door.label,
+    value: door.type.toString(),
+}));
+
+const doorOrientationOptions = Object.values(doorOrientationConfig).map((door: DoorOrientationObject) => ({
+    label: door.label,
+    value: door.type.toString(),
+}));
 
 const DoorControls = ({}: any) => {
     const { focusedElement, setFocusedElement } = useStore();
 
+    const element = focusedElement as Door;
+
     const [details, setDetails] = useState({
-        length: (focusedElement as any)?.length?.toFixed(2) || '0',
-        wallType: (focusedElement as any)?.type || WallType.Exterior,
+        type: element.type,
+        orientation: element.orientation,
     });
 
     const handleRemove = () => {
         focusedElement?.delete();
-
         setFocusedElement(null);
     };
 
@@ -23,7 +43,6 @@ const DoorControls = ({}: any) => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Delete') handleRemove();
         };
-
         window.addEventListener('keydown', handleKeyDown);
 
         return () => {
@@ -31,35 +50,27 @@ const DoorControls = ({}: any) => {
         };
     }, [focusedElement]);
 
-    useEffect(() => {
-        if (focusedElement) {
-            const element = focusedElement as Wall;
+    // useEffect(() => {
+    //     if (focusedElement) {
+    //         const element = focusedElement as Wall;
 
-            const length = element.length?.toFixed(2) || '0';
-            const wallType = element?.type || WallType.Exterior;
+    //         const length = element.length?.toFixed(2) || '0';
+    //         const wallType = element?.type || WallType.Exterior;
 
-            setDetails((prevDetails) => ({ ...prevDetails, length: parseFloat(length), wallType }));
-        }
-    }, [focusedElement]);
+    //         setDetails((prevDetails) => ({ ...prevDetails, length: parseFloat(length), wallType }));
+    //     }
+    // }, [focusedElement]);
 
-    const handleUpdate = (key: 'length' | 'depth', value: number) => {
-        setDetails((prevDetails) => ({ ...prevDetails, [key]: value || 0 }));
+    const handleChangeDoorType = (type: DoorType) => {
+        element.setType(type);
 
-        if (key === 'length' && focusedElement instanceof Wall) {
-            focusedElement?.setLength(value);
-        }
+        setDetails((prevDetails) => ({ ...prevDetails, type }));
     };
 
-    const wallTypeOptions = Object.values(wallTypeConfig).map((wall: WallConfig) => ({
-        label: `${wall.label} (${wall.thickness}cm)`,
-        value: wall.type.toString(),
-    }));
+    const handleChangeDoorOrientation = (orientation: DoorOrientation) => {
+        element.setOrientation(orientation);
 
-    const handleChangeWallType = (val: WallType) => {
-        const element = focusedElement as Wall;
-
-        element?.setType(val);
-        setDetails((prevDetails) => ({ ...prevDetails, wallType: val }));
+        setDetails((prevDetails) => ({ ...prevDetails, orientation }));
     };
 
     return (
@@ -75,25 +86,31 @@ const DoorControls = ({}: any) => {
                 />
             </div> */}
 
-            {/* <div className="mt-4">
+            <div className="mt-4 grid grid-cols-2 gap-2">
                 <Select
                     label="Typ"
-                    description="Typ drzwi"
-                    data={wallTypeOptions}
-                    value={details.wallType.toString()}
-                    onChange={(val) => val && handleChangeWallType(+val)}
+                    description="Lewe/Prawe"
+                    data={doorTypeOptions}
+                    value={element.type.toString()}
+                    onChange={(val) => val && handleChangeDoorType(+val)}
                 />
-            </div> */}
+
+                <Select
+                    label="Pozycja"
+                    description="Pozycja na ścianie"
+                    data={doorOrientationOptions}
+                    value={element.orientation.toString()}
+                    onChange={(val) => val && handleChangeDoorOrientation(+val)}
+                />
+            </div>
 
             <div className="mt-4">
-                <ActionIcon
-                    onClick={handleRemove}
-                    size={32}
-                    variant="default"
-                    aria-label="ActionIcon with size as a number"
-                >
-                    <Trash className="w-5 h-5 text-red-600" />
-                </ActionIcon>
+                <div className="flex gap-2 items-center">
+                    <ActionIcon onClick={handleRemove} size={32} variant="default" aria-label="ActionIcon with delete">
+                        <Trash className="w-5 h-5 text-red-600" />
+                    </ActionIcon>
+                    <span className="text-xs text-gray-600">(delete)</span>
+                </div>
             </div>
         </div>
     );

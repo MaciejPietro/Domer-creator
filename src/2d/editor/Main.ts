@@ -108,6 +108,15 @@ export class Main extends Viewport {
         this.addWallManager.updatePreview(ev);
         this.preview.updatePreview(ev);
         this.pointer.update(ev);
+
+        switch (useStore.getState().activeTool) {
+            case Tool.WallAdd:
+                this.pointer.alpha = 1;
+                break;
+
+            default:
+                this.pointer.alpha = 0;
+        }
     }
     private updateEnd(ev: FederatedPointerEvent) {
         switch (useStore.getState().activeTool) {
@@ -119,6 +128,7 @@ export class Main extends Viewport {
                 // if (!isMobile) {
                 //     this.pause = false;
                 // }
+
                 break;
             case Tool.Edit:
                 // this.pause = false;

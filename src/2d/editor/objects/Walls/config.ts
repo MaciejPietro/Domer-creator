@@ -22,13 +22,13 @@ export const wallTypeConfig = Object.freeze({
     [WallType.LoadBearing]: {
         type: WallType.LoadBearing,
         label: 'Nośna',
-        thickness: 20,
+        thickness: 25,
         icon: BorderHorizontal,
     },
     [WallType.Partition]: {
         type: WallType.Partition,
         label: 'Działowa',
-        thickness: 10,
+        thickness: 15,
         icon: BorderInner,
     },
 });

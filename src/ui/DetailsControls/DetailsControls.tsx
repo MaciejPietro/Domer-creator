@@ -22,7 +22,7 @@ import {
 import WallControls from '@/ui/DetailsControls/Elements/WallControls';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import DoorControls from './Elements/DoorControls';
-import { Door } from '@/2d/editor/objects/Furnitures/Door';
+import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
 interface IHelpBody {
     title: string;
     body: ReactNode;
