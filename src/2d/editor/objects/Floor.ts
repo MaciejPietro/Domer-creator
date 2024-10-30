@@ -136,11 +136,9 @@ export class Floor extends Container {
             line.b.y = line.b.y - shiftY;
         });
 
-        // Check for negative values and apply a positive offset if needed
         const minX = Math.min(...lines.map((line: any) => Math.min(line.a.x, line.b.x)));
         const minY = Math.min(...lines.map((line: any) => Math.min(line.a.y, line.b.y)));
 
-        // If negative values exist, shift all coordinates again to avoid negatives
         if (minX < 0 || minY < 0) {
             const offsetX = Math.abs(minX);
             const offsetY = Math.abs(minY);
