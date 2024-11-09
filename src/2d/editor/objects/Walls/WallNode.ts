@@ -20,10 +20,11 @@ export class WallNode extends Graphics {
     private type: WallType = WallType.Partition;
     private size = 20;
     public prevPosition = { x: 0, y: 0 };
+    private isMouseOver = false;
 
     constructor(x: number, y: number, nodeId: number) {
         super();
-        this.eventMode = 'static';
+        this.eventMode = 'none';
         this.id = nodeId;
 
         this.setSettings();
@@ -44,7 +45,7 @@ export class WallNode extends Graphics {
         this.on('pointerup', this.onMouseUp);
         this.on('pointerupoutside', this.onMouseUp);
 
-        this.on('pointerover', this.onPointerOver);
+        this.on('pointerover', this.onMouseOver);
         this.on('pointerout', this.onPointerOut);
     }
 
@@ -55,6 +56,7 @@ export class WallNode extends Graphics {
     private watchStoreChanges() {
         useStore.subscribe(() => {
             this.checkVisibility();
+            this.checkEventMode();
         });
     }
 
@@ -72,6 +74,19 @@ export class WallNode extends Graphics {
         }
 
         this.show();
+    }
+
+    private checkEventMode() {
+        switch (useStore.getState().activeTool) {
+            case Tool.Edit:
+                this.eventMode = 'static';
+                break;
+
+            default:
+                this.eventMode = 'none';
+
+                break;
+        }
     }
 
     public show() {
@@ -94,6 +109,11 @@ export class WallNode extends Graphics {
         this.size = 10;
     }
 
+    public setVisibility(visible: boolean) {
+        if (this.isMouseOver) return (this.visible = true);
+        this.visible = visible;
+    }
+
     public setStyles({ color = 0x222222 }: { color?: string | number }) {
         this.clear();
         this.circle(0, 0, this.size / 2);
@@ -109,14 +129,24 @@ export class WallNode extends Graphics {
         // this.addChildAt(background, 0);
     }
 
-    private onPointerOver() {
-        if (this.isEditMode()) {
-            // bg-blue-500 from tailwind.config.js
-            this.setStyles({ color: '#1C7ED6' });
+    private onMouseOver() {
+        this.isMouseOver = true;
+        if (!this.isEditMode()) return;
+
+        switch (useStore.getState().activeTool) {
+            case Tool.WallAdd:
+                break;
+
+            default:
+                // bg-blue-500 from tailwind.config.js
+                this.setStyles({ color: '#1C7ED6' });
+                break;
         }
     }
 
     private onPointerOut() {
+        this.isMouseOver = false;
+
         this.setStyles({});
     }
 

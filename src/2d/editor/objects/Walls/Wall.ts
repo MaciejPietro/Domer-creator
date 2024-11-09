@@ -19,6 +19,7 @@ import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 import { notifications } from '@mantine/notifications';
 import { DashedLine } from '../Helpers/DashedLine';
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
+import { AddWallManager } from '../../actions/AddWallManager';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -53,6 +54,9 @@ export class Wall extends Graphics {
 
     color = '#ffffff';
 
+    leftNodePlaceholder: Graphics | undefined;
+    rightNodePlaceholder: Graphics | undefined;
+
     constructor(leftNode: WallNode, rightNode: WallNode, settings?: WallSettings) {
         super();
         this.sortableChildren = true;
@@ -81,6 +85,8 @@ export class Wall extends Graphics {
         }
 
         this.applySettings();
+
+        this.drawWallNodesPlaceholders();
 
         this.watchStoreChanges();
 
@@ -156,6 +162,11 @@ export class Wall extends Graphics {
                 const line = new DashedLine(lineWidth);
                 line.rotation = Math.PI * 0.5;
                 this.addChild(line);
+
+                this.leftNode.setVisibility(true);
+                this.rightNode.setVisibility(true);
+
+                break;
         }
     }
 
@@ -177,10 +188,14 @@ export class Wall extends Graphics {
                 for (const child of this.children) {
                     if (child instanceof DashedLine) {
                         child.visible = false;
-                        child.destroy();
-                        this.removeChild(child);
+                        // this.removeChild(child).destroy();
                     }
                 }
+
+                this.leftNode.setVisibility(false);
+                this.rightNode.setVisibility(false);
+
+                break;
         }
     }
 
@@ -198,6 +213,46 @@ export class Wall extends Graphics {
     }
     public getNodesCords() {
         return [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
+    }
+
+    private drawWallNodesPlaceholders() {
+        this.leftNodePlaceholder?.clear();
+        this.rightNodePlaceholder?.clear();
+
+        const nodes = [
+            { x: 0, y: this.thickness / 2, el: this.leftNodePlaceholder },
+            { x: this.length, y: this.thickness / 2, el: this.rightNodePlaceholder },
+        ];
+        nodes.forEach((node, idx) => {
+            const isRight = idx;
+
+            const nodeItem = new Graphics();
+
+            nodeItem.circle(node.x, node.y, 5);
+            nodeItem.fill('transparent');
+
+            nodeItem.eventMode = 'static';
+
+            nodeItem.on('pointerdown', () => {
+                switch (useStore.getState().activeTool) {
+                    case Tool.WallAdd:
+                        AddWallManager.Instance.step(isRight ? this.rightNode : this.leftNode);
+                        break;
+                }
+            });
+
+            node.el = nodeItem;
+
+            if (isRight) {
+                this.rightNodePlaceholder = nodeItem;
+                this.addChild(this.rightNodePlaceholder);
+            }
+
+            if (!isRight) {
+                this.leftNodePlaceholder = nodeItem;
+                this.addChild(this.leftNodePlaceholder);
+            }
+        });
     }
 
     public drawLine() {
@@ -252,6 +307,7 @@ export class Wall extends Graphics {
 
         this.measureLabel.updateText(this.length, this.angle);
         this.measureLabel.updateLine(this.length);
+        this.drawWallNodesPlaceholders();
     }
 
     private getMinimumWallLength(): number {

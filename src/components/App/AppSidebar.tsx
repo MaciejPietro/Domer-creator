@@ -91,7 +91,7 @@ const AppSidebar = () => {
                                 });
                             }}
                         />
-                        <NavbarLink
+                        {/* <NavbarLink
                             icon={Dimensions}
                             label="Toggle size labels"
                             onClick={() => {
@@ -104,7 +104,7 @@ const AppSidebar = () => {
                                     icon: <Tag />,
                                 });
                             }}
-                        />
+                        /> */}
 
                         <div className="h-px w-full bg-black/15"></div>
 

@@ -28,8 +28,12 @@ import helpAddDoor from '../res/add-door.gif';
 import helpMeasure from '../res/measure-tool.gif';
 interface IHelpBody {
     title: string;
-    body: ReactNode;
+    body?: ReactNode;
 }
+
+const staticHelp = {
+    title: 'Pomoc jest nie dostępna na tym etapie',
+};
 
 export function HelpDialog() {
     const [opened, setOpened] = useState(false);
@@ -49,26 +53,26 @@ export function HelpDialog() {
     //     </>
     //   }
 
-    helpBody[Tool.None] = {
+    helpBody[Tool.None] = staticHelp || {
         title: 'Pointer Mode',
         body: <>...</>,
     };
 
-    helpBody[Tool.Remove] = {
+    helpBody[Tool.Remove] = staticHelp || {
         title: 'Erase Mode',
         body: (
             <>
                 <Image src={helpDelete}></Image>
-                <Group spacing="xs">
+                <Group>
                     <Click /> <ArrowNarrowRight /> <Trash /> <p> Click on object to remove from plan</p>
                 </Group>
-                <Group noWrap={true}>
+                <Group>
                     <Vector /> <p>Wall nodes may only be removed if disconnected</p>
                 </Group>
             </>
         ),
     };
-    helpBody[Tool.Edit] = {
+    helpBody[Tool.Edit] = staticHelp || {
         title: 'Edit Mode',
         body: (
             <>
@@ -83,7 +87,7 @@ export function HelpDialog() {
             </>
         ),
     };
-    helpBody[Tool.WallAdd] = {
+    helpBody[Tool.WallAdd] = staticHelp || {
         title: 'Add Wall',
         body: (
             <>
@@ -101,7 +105,7 @@ export function HelpDialog() {
         ),
     };
 
-    helpBody[Tool.FurnitureAddWindow] = {
+    helpBody[Tool.FurnitureAddWindow] = staticHelp || {
         title: 'Add Window',
         body: (
             <>
@@ -112,7 +116,7 @@ export function HelpDialog() {
             </>
         ),
     };
-    helpBody[Tool.FurnitureAddDoor] = {
+    helpBody[Tool.FurnitureAddDoor] = staticHelp || {
         title: 'Add Door',
         body: (
             <>
@@ -126,7 +130,7 @@ export function HelpDialog() {
             </>
         ),
     };
-    helpBody[Tool.Measure] = {
+    helpBody[Tool.Measure] = staticHelp || {
         title: 'Measure tool',
         body: (
             <>
@@ -140,7 +144,7 @@ export function HelpDialog() {
 
     return (
         <>
-            <Group position="center">
+            <Group>
                 <NavbarLink onClick={() => setOpened((o) => !o)} icon={Help} label="Help" />
             </Group>
 
@@ -150,11 +154,11 @@ export function HelpDialog() {
                 onClose={() => setOpened(false)}
                 size="lg"
                 radius="md"
-                position={{ top: 20, right: 20 }}
+                position={{ bottom: 16, left: 80 }}
             >
-                <Text size="sm" style={{ marginBottom: 10 }} weight={500}>
+                <Text size="sm">
                     <b>{helpBody[activeTool].title}</b>
-                    {helpBody[activeTool].body}
+                    {/* {helpBody[activeTool].body} */}
                 </Text>
             </Dialog>
         </>
