@@ -5,6 +5,8 @@ import { useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';
 import { DoorOrientation, DoorType } from './config';
+import { notifications } from '@mantine/notifications';
+import { Wall } from '../../Walls/Wall';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -15,6 +17,7 @@ export type FurnitureOrientation = number; // 0 <-> 359
 type DoorProps = {
     position?: Point;
     uuid?: string;
+    parent?: Wall;
 };
 
 export class Door extends Container {
@@ -25,6 +28,7 @@ export class Door extends Container {
     clickStartTime: number;
     type = DoorType.Left;
     orientation = DoorOrientation.West;
+    customParent: Wall | undefined;
     public isTemporary = false;
     public isValid = false;
 
@@ -34,6 +38,7 @@ export class Door extends Container {
         this.eventMode = 'none';
 
         if (config?.uuid) this.uuid = config.uuid;
+        if (config?.parent) this.customParent = config.parent;
 
         this.background = new Graphics();
 
@@ -60,9 +65,9 @@ export class Door extends Container {
         });
     }
 
-    private setBackground(strokeColor: string, fillColor = 'transparent') {
+    private setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
         this.background.clear();
-        this.background.rect(-2.5, -2.5, DOOR_WIDTH + 5, DOOR_WIDTH + 5);
+        this.background.rect(-2.5, -2.5, this.length + 5, this.length + 5);
         this.background.fill(fillColor);
         this.background.stroke(strokeColor);
 
@@ -79,40 +84,43 @@ export class Door extends Container {
 
         // ARC
         this.baseLine
-            .arc(x, y, DOOR_WIDTH, 0, 0.1)
+            .arc(x, y, this.length, 0, 0.1)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 0.15, 0.25)
+            .arc(x, y, this.length, 0.15, 0.25)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 0.3, 0.4)
+            .arc(x, y, this.length, 0.3, 0.4)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 0.45, 0.55)
+            .arc(x, y, this.length, 0.45, 0.55)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 0.6, 0.7)
+            .arc(x, y, this.length, 0.6, 0.7)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 0.75, 0.85)
+            .arc(x, y, this.length, 0.75, 0.85)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 0.9, 1.0)
+            .arc(x, y, this.length, 0.9, 1.0)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 1.05, 1.15)
+            .arc(x, y, this.length, 1.05, 1.15)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 1.2, 1.3)
+            .arc(x, y, this.length, 1.2, 1.3)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 1.35, 1.45)
+            .arc(x, y, this.length, 1.35, 1.45)
             .stroke(strokeSettings)
-            .arc(x, y, DOOR_WIDTH, 1.5, 1.55)
+            .arc(x, y, this.length, 1.5, 1.55)
             .stroke(strokeSettings);
 
         // THICK LINE
-        this.baseLine.rect(0, 0, x + DOOR_WIDTH, 10).fill({ color: COLOR });
+        this.baseLine.rect(0, 0, x + this.length, 10).fill({ color: COLOR });
 
         // LINE
         this.baseLine
             .moveTo(x, y)
-            .lineTo(0, y + DOOR_WIDTH)
+            .lineTo(0, y + this.length)
             .stroke(strokeSettings);
 
         if (this.orientation === DoorOrientation.West) {
-            this.position.y = 30;
+            this.position.y = (this.customParent?.thickness || 0) - 12;
+
+            console.log(this.position.y);
+
             this.scale.y = 1;
             this.scale.x = this.type === DoorType.Left ? 1 : -1;
 
@@ -122,8 +130,8 @@ export class Door extends Container {
             }
 
             if (this.type === DoorType.Right) {
-                this.baseLine.position.x = -DOOR_WIDTH;
-                this.background.position.x = -DOOR_WIDTH;
+                this.baseLine.position.x = -this.length;
+                this.background.position.x = -this.length;
             }
         }
 
@@ -134,8 +142,8 @@ export class Door extends Container {
             if (this.type === DoorType.Left) {
                 this.scale.x = -1;
 
-                this.baseLine.position.x = -DOOR_WIDTH;
-                this.background.position.x = -DOOR_WIDTH;
+                this.baseLine.position.x = -this.length;
+                this.background.position.x = -this.length;
             }
 
             if (this.type === DoorType.Right) {
@@ -162,18 +170,63 @@ export class Door extends Container {
             this.setBackground('green');
         }
         if (focusedElement !== this) {
-            this.setBackground('transparent');
+            this.setBackground();
         }
     }
 
-    public setPosition({ x, y }: Point) {
-        this.position = { x, y };
+    public setPosition({ x, y }: Nullable<Point>) {
+        const wallParentThickness = this.customParent?.thickness || 0;
+        const fixedY = this.orientation === DoorOrientation.West ? wallParentThickness - 12 : 10;
+
+        this.position = { x: x ?? this.position.x, y: fixedY };
     }
 
     public setType(type: DoorType) {
         this.type = type;
 
         this.setStroke();
+    }
+
+    public setLength(length: number) {
+        const prevLength = this.length;
+        this.length = length;
+
+        const occupiedSpots: Array<{
+            start: number;
+            end: number;
+        }> = [];
+
+        for (const child of this.parent.children) {
+            if (child instanceof Door) {
+                occupiedSpots.push({ start: child.position.x, end: child.position.x + child.length });
+            }
+        }
+
+        occupiedSpots.sort((a, b) => a.start - b.start);
+
+        console.log(occupiedSpots);
+
+        for (const key in occupiedSpots) {
+            const current = occupiedSpots[key];
+            const next = occupiedSpots[+key + 1];
+
+            if (current.end > next?.start) {
+                this.length = prevLength;
+
+                notifications.clean();
+
+                notifications.show({
+                    title: '🚪 Nie można zmienić szerokości',
+                    message: 'Drzwi nie mogą nachodzić na siebie',
+                    color: 'red',
+                });
+
+                return;
+            }
+        }
+
+        this.setStroke();
+        this.setBackground('green');
     }
 
     public setOrientation(orientation: DoorOrientation) {

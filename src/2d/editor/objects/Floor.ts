@@ -220,6 +220,7 @@ export class Floor extends Container {
         const doorInstance = new Door({
             uuid: object.uuid,
             position,
+            parent: attachedTo,
         });
 
         this.furnitureArray.set(object.uuid, doorInstance as unknown as Furniture);

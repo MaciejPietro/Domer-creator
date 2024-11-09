@@ -11,6 +11,8 @@ import {
     DoorType,
     doorTypeConfig,
     DoorTypeObject,
+    doorWidthConfig,
+    DoorWidthObject,
 } from '@/2d/editor/objects/Furnitures/Door/config';
 import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
 
@@ -24,6 +26,11 @@ const doorOrientationOptions = Object.values(doorOrientationConfig).map((door: D
     value: door.type.toString(),
 }));
 
+const doorWidthOptions = Object.values(doorWidthConfig).map((door: DoorWidthObject) => ({
+    label: door.label,
+    value: door.width.toString(),
+}));
+
 const DoorControls = ({}: any) => {
     const { focusedElement, setFocusedElement } = useStore();
 
@@ -32,6 +39,7 @@ const DoorControls = ({}: any) => {
     const [details, setDetails] = useState({
         type: element.type,
         orientation: element.orientation,
+        width: element.length,
     });
 
     const handleRemove = () => {
@@ -73,6 +81,12 @@ const DoorControls = ({}: any) => {
         setDetails((prevDetails) => ({ ...prevDetails, orientation }));
     };
 
+    const handleChangeDoorWidth = (width: number) => {
+        element.setLength(width);
+
+        setDetails((prevDetails) => ({ ...prevDetails, width }));
+    };
+
     return (
         <div>
             <h2 className="text-base font-medium my-0 -mt-2">Drzwi</h2>
@@ -86,21 +100,30 @@ const DoorControls = ({}: any) => {
                 />
             </div> */}
 
-            <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="mt-4 ">
                 <Select
                     label="Typ"
-                    description="Lewe/Prawe"
                     data={doorTypeOptions}
                     value={element.type.toString()}
                     onChange={(val) => val && handleChangeDoorType(+val)}
                 />
+            </div>
 
+            <div className="mt-3">
                 <Select
                     label="Pozycja"
-                    description="Pozycja na ścianie"
                     data={doorOrientationOptions}
                     value={element.orientation.toString()}
                     onChange={(val) => val && handleChangeDoorOrientation(+val)}
+                />
+            </div>
+
+            <div className="mt-4 ">
+                <Select
+                    label="Szerokość"
+                    data={doorWidthOptions}
+                    value={element.length.toString()}
+                    onChange={(val) => val && handleChangeDoorWidth(+val)}
                 />
             </div>
 

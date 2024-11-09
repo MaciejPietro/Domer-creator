@@ -150,8 +150,9 @@ export class Wall extends Graphics {
 
                 const localCoords = ev.getLocalPosition(this as unknown as Container);
 
-                this.tempFurniture = new Door();
+                this.tempFurniture = new Door({ parent: this });
                 this.tempFurniture.setTemporality(true);
+
                 this.addChild(this.tempFurniture);
                 this.updateFurniturePosition(localCoords);
 
@@ -206,6 +207,15 @@ export class Wall extends Graphics {
 
         this.applySettings();
         this.drawLine();
+        this.updateChildren();
+    }
+
+    private updateChildren() {
+        for (const item of this.children) {
+            if (item instanceof Door) {
+                item.setPosition({ x: null, y: null });
+            }
+        }
     }
 
     public getIsExterior() {
