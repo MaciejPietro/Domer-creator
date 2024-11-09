@@ -55,7 +55,7 @@ import { NavbarLink } from '@/ui/NavbarLink';
 import { WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 
 const AddMenu = () => {
-    const { activeTool, setTool, activeToolSettings, setToolSettings } = useStore();
+    const { helpMode, activeTool, setTool, activeToolSettings, setToolSettings } = useStore();
 
     const addOptions = [
         {
@@ -79,6 +79,15 @@ const AddMenu = () => {
                 //     message: 'Click to draw walls. Double click on wall node to end sequence.',
                 //     color: 'blue',
                 // });
+                if (helpMode) {
+                    cleanNotifications();
+                    showNotification({
+                        title: '✏️ Rysuj ściany',
+                        message:
+                            'Kliknij aby zacząć rysować ścianę. Kliknij na ⚫ na istniejącej ścianie aby zacząć rysowanie od niej',
+                        color: 'blue',
+                    });
+                }
             },
             options: [
                 {
@@ -121,12 +130,15 @@ const AddMenu = () => {
             position: 'bottom',
             onClick: () => {
                 setTool(Tool.FurnitureAddDoor);
-                cleanNotifications();
-                // showNotification({
-                //     title: '🚪 Add door',
-                //     message: 'Click on wall to add door. Right click to change orientation',
-                //     color: 'blue',
-                // });
+
+                if (helpMode) {
+                    cleanNotifications();
+                    showNotification({
+                        title: '🚪 Drzwi',
+                        message: 'Kliknij na ścianę aby dodać drzwi',
+                        color: 'blue',
+                    });
+                }
             },
         },
         {
@@ -137,20 +149,24 @@ const AddMenu = () => {
             position: 'bottom',
             onClick: () => {
                 setTool(Tool.FurnitureAddWindow);
-                // cleanNotifications();
-                // showNotification({
-                //     title: '🪟 Add window',
-                //     message: 'Click on wall to add window',
-                //     color: 'blue',
-                // });
+
+                if (helpMode) {
+                    cleanNotifications();
+                    showNotification({
+                        title: '🪟 Okno',
+                        message: 'Kliknij na ścianę aby dodać okno',
+                        color: 'blue',
+                    });
+                }
             },
         },
         {
             id: Tool.FurnitureAddDoor,
             icon: Armchair, // Assuming Door is a valid component
-            title: 'Dodaj meble',
+            title: 'Wkrótce',
             active: activeTool === Tool.FurnitureAdd,
             position: 'bottom',
+            disabled: true,
             onClick: () => {
                 // setTool(Tool.FurnitureAdd);
                 // cleanNotifications();
@@ -171,7 +187,8 @@ const AddMenu = () => {
                     label={opt.title}
                     icon={icon}
                     onClick={opt.onClick}
-                    position={opt.position as FloatingPosition}
+                    position={opt.position as 'right' | 'left' | undefined}
+                    disabled={opt.disabled}
                     active={opt.active}
                     options={opt.options}
                 ></NavbarLink>

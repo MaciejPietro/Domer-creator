@@ -86,7 +86,8 @@ const AppSidebar = () => {
                                 setSnap(!snap);
                                 cleanNotifications();
                                 showNotification({
-                                    message: 'Snap to grid now ' + (snap ? 'Off' : 'On'),
+                                    message:
+                                        'Tryb przyciągania do siatki został ' + (snap ? 'wyłączony' : 'aktywowany'),
                                     icon: snap ? <Table /> : <TableOff />,
                                 });
                             }}

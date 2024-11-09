@@ -41,7 +41,7 @@ import useTranslation from '@/hooks/useTranslation';
 import { NavbarLink } from '@/ui/NavbarLink';
 
 const AddMenu = () => {
-    const { activeTool, setTool } = useStore();
+    const { activeTool, setTool, helpMode } = useStore();
 
     const addOptions = [
         {
@@ -67,6 +67,19 @@ const AddMenu = () => {
             onClick: () => {
                 setTool(Tool.Remove);
 
+                if (activeTool === Tool.Remove) {
+                    setTool(Tool.Edit);
+                } else {
+                    if (helpMode) {
+                        cleanNotifications();
+                        showNotification({
+                            title: '🗑️ Tryb usuwania',
+                            message: 'Kliknij na element aby go usunąć. ⚠️ Tej akcji nie będzie można cofnąć;',
+                            color: 'blue',
+                        });
+                    }
+                }
+
                 // setTool(Tool.WallAdd);
                 // cleanNotifications();
                 // showNotification({
@@ -86,11 +99,15 @@ const AddMenu = () => {
                     setTool(Tool.Edit);
                 } else {
                     setTool(Tool.Measure);
-                    // cleanNotifications();
-                    // showNotification({
-                    //     title: '📐 Measure tool',
-                    //     message: 'Click and drag to measure areas',
-                    // });
+
+                    if (helpMode) {
+                        cleanNotifications();
+                        showNotification({
+                            title: '📐 Tryb miarki',
+                            message: 'Kliknij na obszar roboczy aby zaznaczyć punkt początkowy miarki',
+                            color: 'blue',
+                        });
+                    }
                 }
             },
         },

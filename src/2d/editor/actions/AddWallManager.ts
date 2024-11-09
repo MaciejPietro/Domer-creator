@@ -41,8 +41,6 @@ export class AddWallManager {
     }
 
     public step(node: WallNode) {
-        console.log(node);
-
         // first click. set first node
         if (this.previousNode === undefined) {
             this.previousNode = node;

@@ -8,9 +8,18 @@ interface NavbarLinkProps {
     onClick?(): void;
     options?: any;
     position?: 'right' | 'left';
+    disabled?: boolean;
 }
 
-export function NavbarLink({ icon: Icon, label, active, onClick, options, position = 'right' }: NavbarLinkProps) {
+export function NavbarLink({
+    icon: Icon,
+    label,
+    active,
+    onClick,
+    options,
+    position = 'right',
+    disabled = false,
+}: NavbarLinkProps) {
     const Btn = () => (
         <div
             onClick={onClick}
@@ -18,7 +27,7 @@ export function NavbarLink({ icon: Icon, label, active, onClick, options, positi
                 active
                     ? 'bg-blue-100  text-blue-500 dark:text-primary-400'
                     : 'text-gray-600 dark:text-dark-0 hover:bg-gray-100'
-            }`}
+            } ${disabled ? 'opacity-25 cursor-not-allowed' : ''}`}
         >
             <Icon />
         </div>
@@ -48,7 +57,7 @@ export function NavbarLink({ icon: Icon, label, active, onClick, options, positi
         </Menu>
     ) : (
         <Tooltip label={label} position={position} withArrow>
-            <UnstyledButton>
+            <UnstyledButton disabled={disabled}>
                 <Btn />
             </UnstyledButton>
         </Tooltip>

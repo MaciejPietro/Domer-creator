@@ -19,10 +19,12 @@ export interface EditorStore {
     activeMode: ViewMode;
     activeTool: Tool;
     activeToolSettings: any;
+    helpMode: boolean;
     snap: boolean;
     plan: any;
     app: any;
     focusedElement: FocusedElement;
+    setHelpMode: (isActive: boolean) => void;
     setActiveMode: (mode: ViewMode) => void;
     setTool: (tool: Tool) => void;
     setToolSettings: (settings: any) => void;
@@ -38,6 +40,7 @@ export const useStore = create<EditorStore>((set, getState) => ({
     activeMode: ViewMode.Edit,
     activeTool: Tool.Edit,
     activeToolSettings: {},
+    helpMode: false,
     floor: 0,
     snap: true,
     plan: null,
@@ -46,6 +49,11 @@ export const useStore = create<EditorStore>((set, getState) => ({
     setFocusedElement: (element: FocusedElement) => {
         set(() => ({
             focusedElement: element,
+        }));
+    },
+    setHelpMode: (isActive: boolean) => {
+        set(() => ({
+            helpMode: isActive,
         }));
     },
     setFloor: (floor: number) => {
