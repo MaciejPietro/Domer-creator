@@ -1,4 +1,4 @@
-import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
 import { Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { DoorOrientation, DoorType } from './config';
 import { notifications } from '@mantine/notifications';
 import { Wall } from '../../Walls/Wall';
+import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -14,55 +15,49 @@ const DOOR_WIDTH = 80;
 
 export type FurnitureOrientation = number; // 0 <-> 359
 
-type DoorProps = {
-    position?: Point;
-    uuid?: string;
-    parent?: Wall;
-};
+type DoorProps = {};
 
-export class Door extends Container {
-    uuid = uuidv4();
+export class Door extends BuildingElement {
     baseLine: Graphics;
-    background: Graphics;
     length = DOOR_WIDTH;
-    clickStartTime: number;
     type = DoorType.Left;
     orientation = DoorOrientation.West;
-    customParent: Wall | undefined;
-    public isTemporary = false;
-    public isValid = false;
 
-    constructor(config?: DoorProps) {
-        super();
-
-        this.eventMode = 'none';
-
-        if (config?.uuid) this.uuid = config.uuid;
-        if (config?.parent) this.customParent = config.parent;
-
-        this.background = new Graphics();
+    constructor(config?: DoorProps & BuildingElementProps) {
+        super({
+            position: config?.position,
+            uuid: config?.uuid,
+            parent: config?.parent,
+        });
 
         this.setBackground('transparent');
 
         this.setStroke();
-
-        this.watchStoreChanges();
-
-        this.on('pointerdown', this.onMouseDown);
-        this.on('pointerup', this.onMouseUp);
-
-        this.clickStartTime = 0;
 
         if (config?.position) {
             this.setPosition(config.position);
         }
     }
 
-    private watchStoreChanges() {
-        useStore.subscribe(() => {
-            this.checkVisibility();
-            this.checkEventMode();
-        });
+    protected onStoreChange() {
+        this.checkVisibility();
+        this.checkEventMode();
+    }
+
+    public setValidity(isValid = true) {
+        if (isValid) {
+            this.isValid = true;
+        } else {
+            this.isValid = false;
+        }
+
+        this.setBackground('transparent', this.isValid ? 'transparent' : '#ff000020');
+    }
+
+    public setType(type: DoorType) {
+        this.type = type;
+
+        this.setStroke();
     }
 
     private setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
@@ -176,53 +171,27 @@ export class Door extends Container {
 
     public setPosition({ x, y }: Nullable<Point>) {
         const wallParentThickness = this.customParent?.thickness || 0;
+
         const fixedY = this.orientation === DoorOrientation.West ? wallParentThickness - 12 : 10;
 
         this.position = { x: x ?? this.position.x, y: fixedY };
-    }
-
-    public setType(type: DoorType) {
-        this.type = type;
-
-        this.setStroke();
     }
 
     public setLength(length: number) {
         const prevLength = this.length;
         this.length = length;
 
-        const occupiedSpots: Array<{
-            start: number;
-            end: number;
-        }> = [];
+        if (this.isCollide()) {
+            this.length = prevLength;
 
-        for (const child of this.parent.children) {
-            if (child instanceof Door) {
-                occupiedSpots.push({ start: child.position.x, end: child.position.x + child.length });
-            }
-        }
+            notifications.clean();
 
-        occupiedSpots.sort((a, b) => a.start - b.start);
-
-        console.log(occupiedSpots);
-
-        for (const key in occupiedSpots) {
-            const current = occupiedSpots[key];
-            const next = occupiedSpots[+key + 1];
-
-            if (current.end > next?.start) {
-                this.length = prevLength;
-
-                notifications.clean();
-
-                notifications.show({
-                    title: '🚪 Nie można zmienić szerokości',
-                    message: 'Drzwi nie mogą nachodzić na siebie',
-                    color: 'red',
-                });
-
-                return;
-            }
+            notifications.show({
+                title: '🚪 Nie można zmienić szerokości',
+                message: 'Drzwi nie mogą nachodzić na siebie',
+                color: 'red',
+            });
+            return;
         }
 
         this.setStroke();
@@ -233,73 +202,5 @@ export class Door extends Container {
         this.orientation = orientation;
 
         this.setStroke();
-    }
-
-    private onMouseDown(ev: FederatedPointerEvent) {
-        ev.stopPropagation();
-
-        this.clickStartTime = Date.now();
-    }
-
-    private onMouseUp(ev: FederatedPointerEvent) {
-        ev.stopPropagation();
-
-        const clickDuration = Date.now() - this.clickStartTime;
-
-        if (clickDuration < 200) {
-            this.onMouseClick();
-        }
-
-        return;
-    }
-
-    private onMouseClick() {
-        const state = useStore.getState();
-
-        switch (state.activeTool) {
-            case Tool.Edit:
-                state.setFocusedElement(this as unknown as Door);
-
-                // this.leftNode.show();
-                // this.rightNode.show();
-                // this.label.visible = true;
-                break;
-        }
-    }
-
-    public show() {
-        this.visible = true;
-    }
-
-    public setTemporality(temporary: boolean) {
-        if (temporary) {
-            this.alpha = 0.5;
-        } else {
-            this.alpha = 1;
-        }
-        this.isTemporary = temporary;
-        this.eventMode = temporary ? 'none' : 'static';
-    }
-
-    public setValidity(isValid = true) {
-        if (isValid) {
-            this.isValid = true;
-        } else {
-            this.isValid = false;
-        }
-
-        this.setBackground('transparent', this.isValid ? 'transparent' : '#ff000020');
-    }
-
-    public hide() {
-        this.visible = false;
-    }
-
-    public delete() {
-        const action = new DeleteFurnitureAction(this.uuid);
-
-        action.execute();
-        // new DeleteWallNodeAction(this.leftNode.getId()).execute();
-        // new DeleteWallNodeAction(this.rightNode.getId()).execute();
     }
 }

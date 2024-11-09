@@ -48,9 +48,6 @@ import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
 
 import { Tool } from '@/2d/editor/constants';
-import { useFurnitureStore } from '@/stores/FurnitureStore';
-import AddPlan from '@/ui/PlanControls/AddPlan';
-import useTranslation from '@/hooks/useTranslation';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 
@@ -73,12 +70,6 @@ const AddMenu = () => {
                     setToolSettings({ ...activeToolSettings, wallType: WallType.Exterior });
                 }
 
-                // cleanNotifications();
-                // showNotification({
-                //     title: '✏️ Wall drawing mode',
-                //     message: 'Click to draw walls. Double click on wall node to end sequence.',
-                //     color: 'blue',
-                // });
                 if (helpMode) {
                     cleanNotifications();
                     showNotification({
@@ -94,7 +85,6 @@ const AddMenu = () => {
                     icon: <BorderLeft />,
                     title: 'Zewnętrzna',
                     active: activeToolSettings.wallType === WallType.Exterior,
-                    // disabled: !plan,
                     onClick: () => {
                         setTool(Tool.WallAdd);
                         setToolSettings({ ...activeToolSettings, wallType: WallType.Exterior });
@@ -103,7 +93,6 @@ const AddMenu = () => {
                 {
                     icon: <BorderHorizontal />,
                     title: 'Nośna',
-                    // disabled: !plan,
                     active: activeToolSettings.wallType === WallType.LoadBearing,
                     onClick: () => {
                         setTool(Tool.WallAdd);
@@ -113,7 +102,6 @@ const AddMenu = () => {
                 {
                     icon: <BorderInner />,
                     title: 'Działowa',
-                    // disabled: !plan,
                     active: activeToolSettings.wallType === WallType.Partition,
                     onClick: () => {
                         setTool(Tool.WallAdd);
@@ -124,7 +112,7 @@ const AddMenu = () => {
         },
         {
             id: Tool.FurnitureAddDoor,
-            icon: Door, // Assuming Door is a valid component
+            icon: Door,
             title: 'Dodaj drzwi',
             active: activeTool === Tool.FurnitureAddDoor,
             position: 'bottom',
@@ -143,7 +131,7 @@ const AddMenu = () => {
         },
         {
             id: Tool.FurnitureAddWindow,
-            icon: Window, // Assuming Window is a valid component
+            icon: Window,
             title: 'Dodaj okno',
             active: activeTool === Tool.FurnitureAddWindow,
             position: 'bottom',
@@ -162,7 +150,7 @@ const AddMenu = () => {
         },
         {
             id: Tool.FurnitureAddDoor,
-            icon: Armchair, // Assuming Door is a valid component
+            icon: Armchair,
             title: 'Wkrótce',
             active: activeTool === Tool.FurnitureAdd,
             position: 'bottom',
