@@ -79,9 +79,20 @@ export class MeasureLabel extends Container {
     }
 
     public updateText(length: number, angle: number) {
-        this.textContainer.position.x = length / 2 - 20;
+        if (angle <= 90 || angle >= 270) {
+            this.textContainer.scale.y = 1;
+            this.textContainer.scale.x = 1;
+            this.textContainer.position.x = length / 2 - 20;
+            this.textContainer.position.y = -20;
+        }
 
-        this.textContainer.position.y = -20;
+        if (angle > 90 && angle < 270) {
+            this.textContainer.scale.y = -1;
+            this.textContainer.scale.x = -1;
+            this.textContainer.position.x = length / 2 + 20;
+            this.textContainer.position.y = -6;
+        }
+
         this.textContainer.zIndex = 998;
 
         this.text.text = this.toMeter(length);
