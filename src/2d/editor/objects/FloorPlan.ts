@@ -96,8 +96,8 @@ export class FloorPlan extends Container {
             this.floors.push(floor);
         }
 
-        this.furnitureId = plan.furnitureId;
-        this.floors[0].getWallNodeSequence().setId(plan.wallNodeId);
+        // this.furnitureId = plan.furnitureId;
+        // this.floors[0].getWallNodeSequence().setId(plan.wallNodeId);
         this.addChild(this.floors[this.currentFloor]);
     }
 

@@ -40,7 +40,7 @@ const AppNavbar = () => {
     const modeOptions = [];
 
     return (
-        <AppShell.Header className="flex justify-between pl-16 py-1.5">
+        <AppShell.Header className="flex justify-between pl-20 py-1.5">
             {/* <AppShellSection grow> */}
             {/* <Group className="flex flex-col" align="center"> */}
             <Group>
@@ -53,6 +53,7 @@ const AppNavbar = () => {
                 </Group>
             </Group>
             <div>
+                <ModeMenu />
                 <DetailsControls />
             </div>
             {/* </Group> */}

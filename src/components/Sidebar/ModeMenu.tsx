@@ -1,35 +1,5 @@
-import { AppShell, Tooltip, UnstyledButton, Group, Menu, Divider, Drawer, Modal, AppShellSection } from '@mantine/core';
-import { useRef, useState } from 'react';
-import { createStyles } from '@mantine/emotion';
-import {
-    Icon as TablerIcon,
-    Armchair,
-    BorderLeft,
-    BuildingWarehouse,
-    // ArrowBottomSquare,
-    DeviceFloppy,
-    Upload,
-    Ruler2,
-    StairsUp,
-    StairsDown,
-    Eye,
-    Pencil,
-    Eraser,
-    Window,
-    Door,
-    Plus,
-    Help,
-    SquareX,
-    Dimensions,
-    Printer,
-    Shape,
-    Shape3,
-    BrandWindows,
-    Table,
-    TableOff,
-    Tag,
-    Badge3d,
-} from 'tabler-icons-react';
+import { Group, AppShellSection } from '@mantine/core';
+import { Pencil, Badge3d } from 'tabler-icons-react';
 
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
@@ -63,13 +33,15 @@ const ModeMenu = () => {
     return (
         <>
             <AppShellSection grow>
-                <Group className="flex flex-col justify-end h-full" align="center">
+                <Group className="flex gap-2 pr-4" align="center">
                     {modes.map((mode) => (
                         <NavbarLink
                             key={mode.label}
                             icon={mode.icon}
                             active={activeMode === mode.mode}
                             label={mode.label}
+                            // @ts-expect-error ??
+                            position="bottom"
                             onClick={() => {
                                 setActiveMode(mode.mode);
                                 // if (activeTool === Tool.Measure) {

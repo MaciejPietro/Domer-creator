@@ -1,22 +1,56 @@
 {
   "floors": [
     {
-      "furnitureArray": [],
+      "furnitureArray": [
+        {
+          "uuid": "0cdb930d-234a-4360-a9f9-3725d03eee43",
+          "wallUuid": "6b874ee8-ff09-40be-a950-9d8c83fd544a",
+          "x": 189.99999999999997,
+          "y": 10,
+          "length": 120,
+          "orientation": 1,
+          "type": 1,
+          "element": "door"
+        }
+      ],
       "wallNodes": [
-        { "id": 1, "x": 2320, "y": 2160 },
-        { "id": 2, "x": 2320, "y": 2740 },
-
-        { "id": 3, "x": 2800, "y": 2740 }
+        {
+          "id": 1,
+          "x": 2320,
+          "y": 2160
+        },
+        {
+          "id": 2,
+          "x": 2320,
+          "y": 2740
+        },
+        {
+          "id": 3,
+          "x": 2800,
+          "y": 2740
+        }
       ],
       "wallNodeLinks": [
-        [1, [2]],
-        [2, [3]],
-        [3, []],
-        [4, []],
-        [5, []]
+        [
+          1,
+          [
+            {
+              "id": 2,
+              "wallUuid": "6b874ee8-ff09-40be-a950-9d8c83fd544a"
+            }
+          ]
+        ],
+        [
+          2,
+          [
+            {
+              "id": 3,
+              "wallUuid": "d6e26923-850f-4772-afca-1d3433c334ae"
+            }
+          ]
+        ],
+        [3, []]
       ]
     }
-  ],
-  "furnitureId": 0,
-  "wallNodeId": 5
+  ]
 }

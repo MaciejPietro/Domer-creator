@@ -8,6 +8,8 @@ import { DoorOrientation, DoorType } from './config';
 import { notifications } from '@mantine/notifications';
 import { Wall } from '../../Walls/Wall';
 import { BuildingElement, BuildingElementProps } from '../BuildingElement';
+import { INodeSerializable } from '@/2d/editor/persistence/INodeSerializable';
+import { IDoorSerializable } from './IDoorSerializable';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -15,7 +17,11 @@ const DOOR_WIDTH = 80;
 
 export type FurnitureOrientation = number; // 0 <-> 359
 
-type DoorProps = {};
+type DoorProps = {
+    length?: number;
+    type?: DoorType;
+    orientation?: DoorOrientation;
+};
 
 export class Door extends BuildingElement {
     baseLine: Graphics;
@@ -30,13 +36,27 @@ export class Door extends BuildingElement {
             parent: config?.parent,
         });
 
+        if (config) {
+            if (config.position) {
+                this.setPosition(config.position);
+            }
+
+            if (config.length !== undefined) {
+                this.length = config.length!;
+            }
+
+            if (config.type !== undefined) {
+                this.type = config.type!;
+            }
+
+            if (config.orientation !== undefined) {
+                this.orientation = config.orientation!;
+            }
+        }
+
         this.setBackground('transparent');
 
         this.setStroke();
-
-        if (config?.position) {
-            this.setPosition(config.position);
-        }
     }
 
     protected onStoreChange() {
@@ -133,8 +153,6 @@ export class Door extends BuildingElement {
         if (this.orientation === DoorOrientation.West) {
             this.position.y = (this.customParent?.thickness || 0) - 12;
 
-            console.log(this.position.y);
-
             this.scale.y = 1;
             this.scale.x = this.type === DoorType.Left ? 1 : -1;
 
@@ -221,5 +239,22 @@ export class Door extends BuildingElement {
         this.orientation = orientation;
 
         this.setStroke();
+    }
+
+    public serialize() {
+        const parent = this.parent as Wall;
+
+        const res: IDoorSerializable = {
+            uuid: this.uuid,
+            wallUuid: parent.uuid,
+            x: this.x,
+            y: this.y,
+            length: this.length,
+            orientation: this.orientation,
+            type: this.type,
+            element: 'door',
+        };
+
+        return res;
     }
 }

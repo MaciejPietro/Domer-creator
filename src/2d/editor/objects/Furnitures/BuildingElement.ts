@@ -30,6 +30,7 @@ export abstract class BuildingElement extends Container {
 
         if (config?.uuid) this.uuid = config.uuid;
         if (config?.parent) this.customParent = config.parent;
+        // if (config?.parent) this.parent = config.parent;
 
         this.background = new Graphics();
 
@@ -50,10 +51,12 @@ export abstract class BuildingElement extends Container {
     protected onStoreChange() {}
 
     protected isCollide() {
+        const endX = this.customParent?.length || Infinity;
+
         const occupiedSpots: Array<{
             start: number;
             end: number;
-        }> = [];
+        }> = [{ start: endX, end: endX }];
 
         for (const child of this.parent.children) {
             if (child instanceof BuildingElement) {
@@ -98,8 +101,6 @@ export abstract class BuildingElement extends Container {
 
         switch (state.activeTool) {
             case Tool.Edit:
-                console.log('xdxd elo', this);
-
                 state.setFocusedElement(this as any);
 
                 break;

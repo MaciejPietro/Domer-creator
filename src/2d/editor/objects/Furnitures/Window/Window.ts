@@ -2,13 +2,11 @@ import { Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
 import { COLOR_ACTIVE_ELEMENT_BORDER, COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
-import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
-import { v4 as uuidv4 } from 'uuid';
 import { WindowType } from './config';
 import { notifications } from '@mantine/notifications';
 import { Wall } from '../../Walls/Wall';
 import { BuildingElement, BuildingElementProps } from '../BuildingElement';
-import { DashedLine } from '../../Helpers/DashedLine';
+import { IWindowSerializable } from './IWindowSerializable';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -16,7 +14,11 @@ const WINDOW_WIDTH = 80;
 const WINDOW_HEIGHT = 140;
 const WINDOW_BOTTOM = 90;
 
-type WindowProps = {};
+type WindowProps = {
+    length?: number;
+    height?: number;
+    bottom?: number;
+};
 
 export class WindowElement extends BuildingElement {
     baseLine: Graphics;
@@ -33,13 +35,27 @@ export class WindowElement extends BuildingElement {
             parent: config?.parent,
         });
 
+        if (config) {
+            if (config.position) {
+                this.setPosition(config.position);
+            }
+
+            if (config.length !== undefined) {
+                this.length = config.length!;
+            }
+
+            if (config.height !== undefined) {
+                this.height = config.height!;
+            }
+
+            if (config.bottom !== undefined) {
+                this.bottom = config.bottom!;
+            }
+        }
+
         this.setBackground('transparent');
 
         this.setStroke();
-
-        if (config?.position) {
-            this.setPosition(config.position);
-        }
     }
 
     public get height() {
@@ -93,8 +109,6 @@ export class WindowElement extends BuildingElement {
         const { x, y } = { x: 0, y: 0 };
 
         const strokeSettings = { width: 2, color: COLOR };
-
-        console.log('xdxd new', this.length);
 
         // WALL GAP
         this.baseLine
@@ -160,8 +174,6 @@ export class WindowElement extends BuildingElement {
         const prevLength = this.length;
         this.length = length;
 
-        console.log('xdxd bla', length);
-
         if (this.isCollide()) {
             this.length = prevLength;
             notifications.clean();
@@ -175,5 +187,23 @@ export class WindowElement extends BuildingElement {
 
         this.setStroke();
         this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
+    }
+
+    public serialize() {
+        const parent = this.parent as Wall;
+
+        const res: IWindowSerializable = {
+            uuid: this.uuid,
+            wallUuid: parent.uuid,
+            x: this.x,
+            y: this.y,
+            length: this.length,
+            height: this.height,
+            bottom: this.bottom,
+            type: this.type,
+            element: 'window',
+        };
+
+        return res;
     }
 }

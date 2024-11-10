@@ -26,7 +26,8 @@ import { AddWallManager } from '../../actions/AddWallManager';
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
 export type WallSettings = {
-    type: WallType;
+    uuid?: string;
+    type?: WallType;
 };
 
 export class Wall extends Graphics {
@@ -85,6 +86,8 @@ export class Wall extends Graphics {
 
             this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
         }
+
+        if (settings?.uuid) this.uuid = settings.uuid;
 
         this.applySettings();
 

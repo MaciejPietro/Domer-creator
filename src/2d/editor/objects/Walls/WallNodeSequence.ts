@@ -5,6 +5,13 @@ import { Wall, WallSettings } from './Wall';
 import { WallNode } from './WallNode';
 import { WallType } from './config';
 
+export type NodeLinksWithWall = Map<
+    number,
+    Array<{
+        id: number;
+        wallUuid: string;
+    }>
+>;
 export class WallNodeSequence extends Container {
     private wallNodes: Map<number, WallNode>;
     private wallNodeLinks: Map<number, number[]>;
@@ -48,13 +55,44 @@ export class WallNodeSequence extends Container {
         return this.wallNodeLinks;
     }
 
-    public load(nodes: INodeSerializable[], nodeLinks: Map<number, number[]>) {
+    public getWallNodeLinksWithUuid() {
+        const walls = this.getWalls();
+
+        const lll = Array.from(this.getWallNodeLinks().entries());
+
+        const my = lll.reduce((acc, [aNodeId, nodes]) => {
+            const nodesWithWalls = nodes.map((bNodeId) => {
+                const foundWall = walls.find(({ leftNode, rightNode }) => {
+                    const leftMatch = leftNode.getId() === aNodeId || rightNode.getId() === aNodeId;
+                    const rightMatch = leftNode.getId() === bNodeId || rightNode.getId() === bNodeId;
+
+                    return leftMatch && rightMatch;
+                });
+
+                return {
+                    id: bNodeId,
+                    wallUuid: foundWall?.uuid || null,
+                };
+            });
+
+            acc.push([aNodeId, nodesWithWalls]);
+
+            return acc;
+        }, [] as any);
+
+        return my;
+    }
+
+    public load(nodes: INodeSerializable[], nodeLinks: NodeLinksWithWall) {
         for (const node of nodes) {
             this.addNode(node.x, node.y, node.id);
         }
+        console.log(Array.from(nodeLinks));
+
         for (const [src, dests] of Array.from(nodeLinks)) {
             for (const dest of dests) {
-                this.addWall(src, dest);
+                const { id, wallUuid } = dest;
+                this.addWall(src, id, { uuid: wallUuid });
             }
         }
     }

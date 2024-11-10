@@ -10,9 +10,10 @@ export class Serializer {
 
             floorPlanSerializable.floors.push(floorSerializable);
         }
-        floorPlanSerializable.furnitureId = furnitureId;
-        floorPlanSerializable.wallNodeId = floors[0].getWallNodeSequence().getWallNodeId();
-        const resultString = JSON.stringify(floorPlanSerializable);
+
+        // floorPlanSerializable.furnitureId = furnitureId;
+        // floorPlanSerializable.wallNodeId = floors[0].getWallNodeSequence().getWallNodeId();
+        const resultString = floorPlanSerializable;
 
         return resultString;
     }

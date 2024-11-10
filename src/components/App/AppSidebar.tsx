@@ -44,6 +44,7 @@ import { DeleteFloorAction } from '@/2d/editor/actions/DeleteFloorAction';
 import AddMenu from '@/components/Sidebar/AddMenu';
 import ModeMenu from '../Sidebar/ModeMenu';
 import PlanMenu from '../Sidebar/PlanMenu';
+import DropdownMenu from '../Sidebar/DropdownMenu';
 
 const AppSidebar = () => {
     const { activeTool, setTool, activeMode, floor, setSnap, snap } = useStore();
@@ -67,7 +68,9 @@ const AppSidebar = () => {
     return (
         <div className="absolute">
             <AppShell.Navbar className="px-2 py-4 flex flex-col justify-between">
-                <div></div>
+                <div>
+                    <DropdownMenu />
+                </div>
                 <AppShellSection>
                     <Group className="flex flex-col" align="center">
                         {activeMode === ViewMode.Edit && (
@@ -75,8 +78,6 @@ const AppSidebar = () => {
                                 <PlanMenu />
                             </>
                         )}
-
-                        <div className="h-px w-full bg-black/15"></div>
 
                         <NavbarLink
                             icon={GridDots}
@@ -141,7 +142,7 @@ const AppSidebar = () => {
                         </Group>
                         <div className="h-px w-full bg-black/15"></div> */}
 
-                        <Group className="flex flex-col" align="center">
+                        {/* <Group className="flex flex-col" align="center">
                             <NavbarLink
                                 icon={DeviceFloppy}
                                 label="Save plan"
@@ -154,7 +155,7 @@ const AppSidebar = () => {
 
                             <NavbarLink onClick={() => fileRef.current?.click()} icon={Upload} label="Load plan" />
                             <input ref={fileRef as any} onChange={handleChange} multiple={false} type="file" hidden />
-                        </Group>
+                        </Group> */}
 
                         <HelpDialog />
                     </Group>
