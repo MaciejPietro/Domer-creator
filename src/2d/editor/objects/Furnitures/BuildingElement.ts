@@ -13,7 +13,7 @@ export type BuildingElementProps = {
     parent?: Wall;
 };
 
-export class BuildingElement extends Container {
+export abstract class BuildingElement extends Container {
     uuid = uuidv4();
     background: Graphics;
     clickStartTime: number;
@@ -96,6 +96,8 @@ export class BuildingElement extends Container {
 
         switch (state.activeTool) {
             case Tool.Edit:
+                console.log('xdxd elo', this);
+
                 state.setFocusedElement(this as any);
 
                 break;

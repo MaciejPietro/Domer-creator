@@ -15,6 +15,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
 import { Door } from '../Furnitures/Door/Door';
+import { WindowElement } from '../Furnitures/Window/Window';
+
 import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 import { notifications } from '@mantine/notifications';
 import { DashedLine } from '../Helpers/DashedLine';
@@ -50,7 +52,7 @@ export class Wall extends Graphics {
     dragging: boolean;
     mouseStartPoint: Point;
 
-    tempFurniture: Door | null = null;
+    tempFurniture: Door | WindowElement | null = null;
 
     color = '#ffffff';
 
@@ -144,13 +146,16 @@ export class Wall extends Graphics {
 
         const state = useStore.getState();
 
+        const localCoords = ev.getLocalPosition(this as unknown as Container);
+
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
+            case Tool.FurnitureAddWindow:
                 this.removeTempFurniture();
 
-                const localCoords = ev.getLocalPosition(this as unknown as Container);
+                const Element = state.activeTool === Tool.FurnitureAddDoor ? Door : WindowElement;
 
-                this.tempFurniture = new Door({ parent: this });
+                this.tempFurniture = new Element({ parent: this });
                 this.tempFurniture.setTemporality(true);
 
                 this.addChild(this.tempFurniture);
@@ -181,6 +186,7 @@ export class Wall extends Graphics {
 
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
+            case Tool.FurnitureAddWindow:
                 this.removeTempFurniture();
 
                 break;
@@ -391,25 +397,34 @@ export class Wall extends Graphics {
                 this.focus();
                 break;
             case Tool.FurnitureAddDoor:
+            case Tool.FurnitureAddWindow:
                 if (this.tempFurniture) {
-                    if (!this.tempFurniture.isValid) {
+                    const isDoor = state.activeTool === Tool.FurnitureAddDoor;
+                    const furniture = isDoor ? (this.tempFurniture as Door) : (this.tempFurniture as WindowElement);
+
+                    if (!furniture.isValid) {
                         notifications.clean();
 
+                        const icon = isDoor ? '🚪' : '🪟';
+                        const message = isDoor
+                            ? 'Nie można dodać drzwi, które kolidują z innymi elementami'
+                            : 'Nie można dodać okna, które koliduje z innymi elementami';
+
                         notifications.show({
-                            title: '🚪 Niewłaściwa pozycja',
-                            message: 'Nie można dodać drzwi, które kolidują z innymi elementami.',
+                            title: `${icon} Niewłaściwa pozycja`,
+                            message,
                             color: 'red',
                         });
                         return;
                     }
 
-                    const { x, y } = this.tempFurniture.position;
+                    const { x, y } = furniture.position;
 
-                    this.tempFurniture.setTemporality(false);
+                    furniture.setTemporality(false);
 
-                    this.tempFurniture.setValidity(true);
+                    furniture.setValidity(true);
 
-                    const action = new AddFurnitureAction(this.tempFurniture, this, { x, y });
+                    const action = new AddFurnitureAction(furniture, this, { x, y });
 
                     action.execute();
                 }
@@ -426,7 +441,9 @@ export class Wall extends Graphics {
                         color: 'red',
                     });
                 } else {
-                    const hasChildren = this.children.some((child) => child instanceof Door);
+                    const hasChildren = this.children.some(
+                        (child) => child instanceof Door || child instanceof WindowElement
+                    );
 
                     if (hasChildren) {
                         notifications.show({
@@ -589,7 +606,7 @@ export class Wall extends Graphics {
         const occupiedSpots: { start: number; end: number }[] = [];
 
         this.children.forEach((child) => {
-            if (child instanceof Door && !child.isTemporary) {
+            if ((child instanceof Door || child instanceof WindowElement) && !child.isTemporary) {
                 const x = child.position.x;
                 occupiedSpots.push({ start: x, end: x + child.length });
             }
@@ -647,6 +664,7 @@ export class Wall extends Graphics {
 
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
+            case Tool.FurnitureAddWindow:
                 if (this.tempFurniture) {
                     this.updateFurniturePosition(localCoords);
                 }
@@ -658,7 +676,11 @@ export class Wall extends Graphics {
 
                 for (const child of this.children) {
                     if (child instanceof DashedLine) {
-                        child.setStroke(isOccupied ? 'red' : undefined);
+                        const hasOccupiedElements = this.children.some(
+                            (el) => el instanceof Door || el instanceof WindowElement
+                        );
+
+                        child.setStroke(isOccupied ? 'red' : hasOccupiedElements ? 'orange' : undefined);
                         child.setPosition({ x: localCoords.x, y: 0 });
                     }
                 }

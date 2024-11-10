@@ -23,6 +23,8 @@ import WallControls from '@/ui/DetailsControls/Elements/WallControls';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import DoorControls from './Elements/DoorControls';
 import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
+import { WindowElement } from '@/2d/editor/objects/Furnitures/Window/Window';
+import WindowControls from './Elements/WindowControls';
 interface IHelpBody {
     title: string;
     body: ReactNode;
@@ -63,6 +65,7 @@ export function DetailsControls() {
             >
                 {focusedElement instanceof Wall ? <WallControls /> : null}
                 {focusedElement instanceof Door ? <DoorControls /> : null}
+                {focusedElement instanceof WindowElement ? <WindowControls /> : null}
             </Dialog>
         </>
     );

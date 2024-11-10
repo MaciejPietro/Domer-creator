@@ -5,15 +5,16 @@ import { FloorPlan } from '../objects/FloorPlan';
 import { Wall } from '../objects/Walls/Wall';
 import { Action } from './Action';
 import { Door } from '../objects/Furnitures/Door/Door';
+import { WindowElement } from '../objects/Furnitures/Window/Window';
 
 export class AddFurnitureAction implements Action {
-    object: Door;
+    object: Door | WindowElement;
     attachedTo: Wall;
     position: Point;
 
     private receiver: FloorPlan;
 
-    constructor(object: Door, attachedTo: Wall, position: Point) {
+    constructor(object: Door | WindowElement, attachedTo: Wall, position: Point) {
         this.object = object;
         this.attachedTo = attachedTo;
         this.position = position;

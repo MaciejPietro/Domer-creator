@@ -17,6 +17,7 @@ import {
     Trash,
     Vector,
     ZoomIn,
+    ArrowAutofitWidth,
 } from 'tabler-icons-react';
 import { Tool } from '../2d/editor/constants';
 import helpAddWall from '../res/add-wall.gif';

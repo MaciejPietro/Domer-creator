@@ -4,6 +4,7 @@ import { Tool, ViewMode } from '../2d/editor/constants';
 import { WallNode } from '@/2d/editor/objects/Walls/WallNode';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
+import { WindowElement } from '@/2d/editor/objects/Furnitures/Window/Window';
 
 export enum ToolMode {
     FurnitureMode,
@@ -11,7 +12,7 @@ export enum ToolMode {
     ViewMode,
 }
 
-type FocusedElement = null | WallNode | Wall | Door;
+type FocusedElement = null | WallNode | Wall | Door | WindowElement;
 
 export interface EditorStore {
     // mode: ToolMode;

@@ -9,6 +9,7 @@ import { useStore } from '../../../stores/EditorStore';
 import { Point } from '../../../helpers/Point';
 import { showNotification } from '@mantine/notifications';
 import { Door } from './Furnitures/Door/Door';
+import { WindowElement } from './Furnitures/Window/Window';
 
 export class FloorPlan extends Container {
     private static instance: FloorPlan;
@@ -133,7 +134,7 @@ export class FloorPlan extends Container {
         this.furnitureId = 0;
     }
 
-    public addFurniture(object: Door, attachedTo: Wall, position: Point) {
+    public addFurniture(object: Door | WindowElement, attachedTo: Wall, position: Point) {
         object.setTemporality(false);
 
         this.floors[this.currentFloor].addFurniture({ object, attachedTo, position });

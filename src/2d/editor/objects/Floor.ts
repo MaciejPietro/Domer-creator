@@ -11,6 +11,7 @@ import { Wall } from './Walls/Wall';
 import { WallNodeSequence } from './Walls/WallNodeSequence';
 import { Door } from './Furnitures/Door/Door';
 import { attach } from '@react-three/fiber/dist/declarations/src/core/utils';
+import { WindowElement } from './Furnitures/Window/Window';
 
 export class Floor extends Container {
     public furnitureArray: Map<string, Furniture>;
@@ -216,16 +217,38 @@ export class Floor extends Container {
         }
     }
 
-    public addFurniture({ object, attachedTo, position }: { object: Door; attachedTo: Wall; position: Point }) {
-        const doorInstance = new Door({
-            uuid: object.uuid,
-            position,
-            parent: attachedTo,
-        });
+    public addFurniture({
+        object,
+        attachedTo,
+        position,
+    }: {
+        object: Door | WindowElement;
+        attachedTo: Wall;
+        position: Point;
+    }) {
+        let elementInstance = null;
 
-        this.furnitureArray.set(object.uuid, doorInstance as unknown as Furniture);
+        if (object instanceof Door) {
+            elementInstance = new Door({
+                uuid: object.uuid,
+                position,
+                parent: attachedTo,
+            });
+        }
 
-        attachedTo.addChild(doorInstance);
+        if (object instanceof WindowElement) {
+            elementInstance = new WindowElement({
+                uuid: object.uuid,
+                position,
+                parent: attachedTo,
+            });
+        }
+
+        if (!elementInstance) throw Error('Element is not Door, nor Window');
+
+        this.furnitureArray.set(object.uuid, elementInstance as unknown as Furniture);
+
+        attachedTo.addChild(elementInstance);
     }
 
     public removeFurniture(uuid: string) {
