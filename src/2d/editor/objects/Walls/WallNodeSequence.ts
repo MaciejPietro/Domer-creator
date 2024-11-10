@@ -5,13 +5,13 @@ import { Wall, WallSettings } from './Wall';
 import { WallNode } from './WallNode';
 import { WallType } from './config';
 
-export type NodeLinksWithWall = Map<
+export type NodeLinksWithWall = [
     number,
     Array<{
         id: number;
         wallUuid: string;
-    }>
->;
+    }>,
+];
 export class WallNodeSequence extends Container {
     private wallNodes: Map<number, WallNode>;
     private wallNodeLinks: Map<number, number[]>;
@@ -83,32 +83,37 @@ export class WallNodeSequence extends Container {
         return my;
     }
 
-    public load(nodes: INodeSerializable[], nodeLinks: NodeLinksWithWall) {
+    public load(nodes: INodeSerializable[], nodeLinks: NodeLinksWithWall[]) {
+        const nodesIds = [];
+
         for (const node of nodes) {
             this.addNode(node.x, node.y, node.id);
         }
-        console.log(Array.from(nodeLinks));
 
-        for (const [src, dests] of Array.from(nodeLinks)) {
+        for (const [src, dests] of nodeLinks) {
             for (const dest of dests) {
                 const { id, wallUuid } = dest;
-                this.addWall(src, id, { uuid: wallUuid });
+                this.addWall(id, src, { uuid: wallUuid });
+                nodesIds.push(id);
+                nodesIds.push(src);
             }
         }
+
+        WallNodeSequence.wallNodeId = nodesIds.length ? Math.max(...nodesIds) : 0;
     }
 
-    // drop everything
     public reset() {
-        // for (const key of Array.from(this.wallNodes.keys())) {
-        //     this.wallNodes.get(key)?.destroy(true);
-        // }
-        // this.wallNodes.clear();
-        // for (const wall of this.walls) {
-        //     wall.destroy(true);
-        // }
-        // this.walls = [];
-        // this.wallNodeLinks.clear();
-        // WallNodeSequence.wallNodeId = 0;
+        for (const key of Array.from(this.wallNodes.keys())) {
+            this.wallNodes.get(key)?.destroy(true);
+        }
+        this.wallNodes.clear();
+        for (const wall of this.walls) {
+            // TODO wall is not fully destroyed, so I have to check if (this.context) in Wall class
+            wall.destroy(true);
+        }
+        this.walls = [];
+        this.wallNodeLinks.clear();
+        WallNodeSequence.wallNodeId = 0;
     }
 
     public remove(id: number) {

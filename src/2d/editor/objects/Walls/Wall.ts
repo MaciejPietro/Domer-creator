@@ -108,7 +108,7 @@ export class Wall extends Graphics {
 
     private watchStoreChanges() {
         useStore.subscribe(() => {
-            this.checkVisibility();
+            if (this.context) this.checkVisibility();
         });
     }
 
@@ -259,6 +259,26 @@ export class Wall extends Graphics {
                         break;
                 }
             });
+
+            // nodeItem.on('pointerup', (ev: FederatedPointerEvent) => {
+            //     ev.stopPropagation();
+
+            //     switch (useStore.getState().activeTool) {
+            //         case Tool.WallAdd:
+            //             const globalCords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
+
+            //             const addNode = new AddNodeAction(
+            //                 this,
+            //                 getClosestPointOnLine(globalCords, [
+            //                     { x: this.leftNode.x, y: this.leftNode.y },
+            //                     { x: this.rightNode.x, y: this.rightNode.y },
+            //                 ])
+            //             );
+
+            //             addNode.execute();
+            //             break;
+            //     }
+            // });
 
             node.el = nodeItem;
 
@@ -412,8 +432,6 @@ export class Wall extends Graphics {
                         const message = isDoor
                             ? 'Nie można dodać drzwi, które kolidują z innymi elementami'
                             : 'Nie można dodać okna, które koliduje z innymi elementami';
-
-                        console.log(message);
 
                         notifications.show({
                             title: `${icon} Niewłaściwa pozycja`,

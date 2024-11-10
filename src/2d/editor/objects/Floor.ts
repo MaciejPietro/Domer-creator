@@ -62,9 +62,7 @@ export class Floor extends Container {
     }
 
     public applyFloorData(floorData: FloorSerializable) {
-        const nodeLinks: NodeLinksWithWall = new Map(floorData.wallNodeLinks);
-
-        this.wallNodeSequence.load(floorData.wallNodes, nodeLinks);
+        this.wallNodeSequence.load(floorData.wallNodes, floorData.wallNodeLinks);
 
         for (const item of floorData.furnitureArray) {
             if (item.element === 'door') {
@@ -153,79 +151,84 @@ export class Floor extends Container {
     }
 
     public reset() {
-        // for (const id of this.furnitureArray.keys()) {
-        //     this.removeFurniture(id);
-        // }
-        // this.wallNodeSequence.reset();
-        // this.furnitureArray = new Map<number, Furniture>();
+        for (const id of this.furnitureArray.keys()) {
+            this.removeFurniture(id);
+        }
+        this.wallNodeSequence.reset();
+        this.furnitureArray = new Map();
     }
 
     public getWallNodeSequence() {
         return this.wallNodeSequence;
     }
 
-    public clearScreen() {
-        // for (const child of this.children) {
-        //     child.visible = false;
-        // }
-    }
+    // public clearScreen() {
+    //     for (const child of this.children) {
+    //         child.visible = false;
+    //     }
+    // }
 
     private shiftCoordinatesToOrigin(lines: any) {
-        // if (!lines[0]) return [];
-        // const shiftX = lines[0].a.x;
-        // const shiftY = lines[0].a.y;
-        // // Shift all coordinates
-        // lines.forEach((line: any) => {
-        //     line.a.x = line.a.x - shiftX;
-        //     line.a.y = line.a.y - shiftY;
-        //     line.b.x = line.b.x - shiftX;
-        //     line.b.y = line.b.y - shiftY;
-        // });
-        // const minX = Math.min(...lines.map((line: any) => Math.min(line.a.x, line.b.x)));
-        // const minY = Math.min(...lines.map((line: any) => Math.min(line.a.y, line.b.y)));
-        // if (minX < 0 || minY < 0) {
-        //     const offsetX = Math.abs(minX);
-        //     const offsetY = Math.abs(minY);
-        //     lines.forEach((line: any) => {
-        //         line.a.x += offsetX;
-        //         line.a.y += offsetY;
-        //         line.b.x += offsetX;
-        //         line.b.y += offsetY;
-        //     });
-        // }
-        // return lines;
+        if (!lines[0]) return [];
+        const shiftX = lines[0].a.x;
+        const shiftY = lines[0].a.y;
+        // Shift all coordinates
+        lines.forEach((line: any) => {
+            line.a.x = line.a.x - shiftX;
+            line.a.y = line.a.y - shiftY;
+            line.b.x = line.b.x - shiftX;
+            line.b.y = line.b.y - shiftY;
+        });
+        const minX = Math.min(...lines.map((line: any) => Math.min(line.a.x, line.b.x)));
+        const minY = Math.min(...lines.map((line: any) => Math.min(line.a.y, line.b.y)));
+        if (minX < 0 || minY < 0) {
+            const offsetX = Math.abs(minX);
+            const offsetY = Math.abs(minY);
+            lines.forEach((line: any) => {
+                line.a.x += offsetX;
+                line.a.y += offsetY;
+                line.b.x += offsetX;
+                line.b.y += offsetY;
+            });
+        }
+        return lines;
     }
 
     public getPlan() {
-        // const plan = new FloorSerializable();
-        // const wallNodes = this.wallNodeSequence.getWalls();
-        // const planNodes = [];
-        // @ts-expect-error TODO
-        // for (const node of wallNodes.values()) {
-        //     planNodes.push({
-        //         a: {
-        //             x: node.x1 / 100,
-        //             y: node.y1 / 100,
-        //         },
-        //         b: {
-        //             x: node.x2 / 100,
-        //             y: node.y2 / 100,
-        //         },
-        //         thickness: node.thickness,
-        //     });
-        // }
+        const plan = new FloorSerializable();
+        const wallNodes = this.wallNodeSequence.getWalls();
+        const planNodes = [];
+
+        for (const node of wallNodes.values()) {
+            const { leftNode, rightNode } = node;
+
+            planNodes.push({
+                a: {
+                    x: leftNode.x / 100,
+                    y: leftNode.y / 100,
+                },
+                b: {
+                    x: rightNode.x / 100,
+                    y: rightNode.y / 100,
+                },
+                thickness: node.thickness,
+            });
+        }
+
         // wall node links
-        // plan.wallNodeLinks = Array.from(this.wallNodeSequence.getWallNodeLinks().entries());
+        plan.wallNodeLinks = Array.from(this.wallNodeSequence.getWallNodeLinks().entries());
+
         // furniture
         // const serializedFurniture = [];
         // for (const furniture of this.furnitureArray.values()) {
         //     serializedFurniture.push(furniture.serialize());
         // }
         // plan.furnitureArray = serializedFurniture;
-        // return {
-        //     // ...plan,
-        //     wallNodes: this.shiftCoordinatesToOrigin(planNodes),
-        // };
+
+        return {
+            // ...plan,
+            wallNodes: this.shiftCoordinatesToOrigin(planNodes),
+        };
     }
 
     public serialize(): FloorSerializable {
@@ -350,8 +353,6 @@ export class Floor extends Container {
 
         // delete wall between left and right node
         this.removeWall(wall);
-
-        console.log(coords.x);
 
         // add node and connect walls to it
         const newNode = this.wallNodeSequence.addNode(coords.x, coords.y);

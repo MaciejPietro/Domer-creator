@@ -54,20 +54,20 @@ const calculateCenterPoint = (wallNodes: any) => {
 export default function SceneRoot() {
     const plan = FloorPlan.Instance.getPlan();
 
-    const data = {
-        wallNodes: [
-            { a: { x: 0, y: 0 }, b: { x: 0, y: 20 } }, // Left wall
-            { a: { x: 0, y: 20 }, b: { x: 16, y: 20 } }, // Top wall (first part)
-            { a: { x: 16, y: 20 }, b: { x: 16, y: 12 } }, // Interior wall (for garage/room)
-            { a: { x: 16, y: 12 }, b: { x: 24, y: 12 } }, // Top wall (second part, extending for garage)
-            { a: { x: 24, y: 12 }, b: { x: 24, y: 0 } }, // Right wall of garage/extension
-            { a: { x: 24, y: 0 }, b: { x: 20, y: 0 } }, // Bottom wall (connecting garage to house)
-            { a: { x: 20, y: 0 }, b: { x: 20, y: 8 } }, // Interior wall (right side of main house)
-            { a: { x: 20, y: 8 }, b: { x: 4, y: 8 } }, // Middle wall (porch or living area)
-            { a: { x: 4, y: 8 }, b: { x: 4, y: 0 } }, // Left interior wall
-            { a: { x: 4, y: 0 }, b: { x: 0, y: 0 } }, // Bottom left wall (back to starting point)
-        ],
-    };
+    // const data = {
+    //     wallNodes: [
+    //         { a: { x: 0, y: 0 }, b: { x: 0, y: 20 } }, // Left wall
+    //         { a: { x: 0, y: 20 }, b: { x: 16, y: 20 } }, // Top wall (first part)
+    //         { a: { x: 16, y: 20 }, b: { x: 16, y: 12 } }, // Interior wall (for garage/room)
+    //         { a: { x: 16, y: 12 }, b: { x: 24, y: 12 } }, // Top wall (second part, extending for garage)
+    //         { a: { x: 24, y: 12 }, b: { x: 24, y: 0 } }, // Right wall of garage/extension
+    //         { a: { x: 24, y: 0 }, b: { x: 20, y: 0 } }, // Bottom wall (connecting garage to house)
+    //         { a: { x: 20, y: 0 }, b: { x: 20, y: 8 } }, // Interior wall (right side of main house)
+    //         { a: { x: 20, y: 8 }, b: { x: 4, y: 8 } }, // Middle wall (porch or living area)
+    //         { a: { x: 4, y: 8 }, b: { x: 4, y: 0 } }, // Left interior wall
+    //         { a: { x: 4, y: 0 }, b: { x: 0, y: 0 } }, // Bottom left wall (back to starting point)
+    //     ],
+    // };
 
     const centerPoint = calculateCenterPoint(plan.wallNodes);
 

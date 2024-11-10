@@ -24,7 +24,7 @@ export class AddNodeAction implements Action {
     }
 
     public execute() {
-        let node: WallNode;
+        let newNode: WallNode;
 
         if (useStore.getState().snap == true) {
             this.coords.x = snap(this.coords.x);
@@ -32,17 +32,18 @@ export class AddNodeAction implements Action {
         }
 
         if (this.wall) {
-            node = this.receiver.addNodeToWall(this.wall, this.coords)!;
+            newNode = this.receiver.addNodeToWall(this.wall, this.coords)!;
 
-            if (node == null) {
+            if (!newNode) return;
+        } else {
+            if (!AddWallManager.Instance.checkStep(this.coords)) {
                 return;
             }
-        } else {
-            if (!AddWallManager.Instance.checkStep(this.coords)) return;
 
-            node = this.receiver.addNode(this.coords.x, this.coords.y)!;
+            newNode = this.receiver.addNode(this.coords.x, this.coords.y)!;
         }
-        AddWallManager.Instance.step(node);
+
+        AddWallManager.Instance.step(newNode);
         this.receiver.actions.push(this);
     }
 }

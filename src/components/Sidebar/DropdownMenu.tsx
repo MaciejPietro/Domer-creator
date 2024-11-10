@@ -1,4 +1,5 @@
 import { LoadAction } from '@/2d/editor/actions/LoadAction';
+import { ResetAction } from '@/2d/editor/actions/ResetAction';
 import { SaveAction } from '@/2d/editor/actions/SaveAction';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { Menu, Group } from '@mantine/core';
@@ -49,7 +50,14 @@ const DropdownMenu = () => {
 
                     <Menu.Divider />
 
-                    <Menu.Item leftSection={<Rotate size={16} />} onClick={() => undefined}>
+                    <Menu.Item
+                        leftSection={<Rotate size={16} />}
+                        onClick={() => {
+                            const action = new ResetAction();
+
+                            action.execute();
+                        }}
+                    >
                         <span className="text-sm">Zacznij od nowa</span>
                     </Menu.Item>
 

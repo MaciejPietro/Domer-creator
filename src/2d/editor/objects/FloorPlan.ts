@@ -121,14 +121,21 @@ export class FloorPlan extends Container {
         this.changeFloor(1);
     }
 
-    // cleans up everything. prepare for new load. TODO Feature multiple floors
+    public restart() {
+        this.reset();
+
+        this.floors = [];
+        this.actions = [];
+        this.floors.push(new Floor());
+        this.addChild(this.floors[0]);
+        this.serializer = new Serializer();
+    }
+
     private reset() {
-        // remove furniture
         for (const floor of this.floors) {
             floor.reset();
         }
 
-        // remove all floors
         this.floors = [];
         this.currentFloor = 0;
         this.furnitureId = 0;
