@@ -1,6 +1,7 @@
 export const enum WindowType {
     Fixed,
     Casement,
+    Single,
 }
 
 export type WindowTypeObject = {
@@ -14,6 +15,10 @@ export type WindowWidthObject = {
 };
 
 export const windowTypeConfig = Object.freeze({
+    [WindowType.Single]: {
+        type: WindowType.Single,
+        label: 'Jednoskrzydłowe',
+    },
     [WindowType.Casement]: {
         type: WindowType.Casement,
         label: 'Dwuskrzydłowe',

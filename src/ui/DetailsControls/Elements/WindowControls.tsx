@@ -27,10 +27,12 @@ import {
     MIN_WINDOW_WIDTH,
 } from '@/2d/editor/objects/Furnitures/Window/constants';
 
-const doorTypeOptions = Object.values(windowTypeConfig).map((window: WindowTypeObject) => ({
-    label: window.label,
-    value: window.type.toString(),
-}));
+const doorTypeOptions = Object.values(windowTypeConfig)
+    .reverse()
+    .map((window: WindowTypeObject) => ({
+        label: window.label,
+        value: window.type.toString(),
+    }));
 
 const windowWidthOptions = [
     { value: MIN_WINDOW_WIDTH, label: `${MIN_WINDOW_WIDTH}cm` },
@@ -82,6 +84,9 @@ const WindowControls = ({}: any) => {
 
     const [details, setDetails] = useState({
         type: element.type,
+        length: element.length,
+        height: element.height,
+        bottom: element.bottom,
     });
 
     const handleRemove = () => {
@@ -100,21 +105,23 @@ const WindowControls = ({}: any) => {
         };
     }, [focusedElement]);
 
-    // useEffect(() => {
-    //     if (focusedElement) {
-    //         const element = focusedElement as Wall;
-
-    //         const length = element.length?.toFixed(2) || '0';
-    //         const wallType = element?.type || WallType.Exterior;
-
-    //         setDetails((prevDetails) => ({ ...prevDetails, length: parseFloat(length), wallType }));
-    //     }
-    // }, [focusedElement]);
-
     const handleChangeWindowType = (type: WindowType) => {
         element.setType(type);
 
         setDetails((prevDetails) => ({ ...prevDetails, type }));
+    };
+
+    const handleUpdate = (type: 'length' | 'height' | 'bottom', value: number) => {
+        if (type === 'length') {
+            element.setLength(value);
+            setDetails((prevDetails) => ({ ...prevDetails, length: value }));
+        }
+
+        if (type === 'height' || type === 'bottom') {
+            element[type] = value;
+
+            setDetails((prevDetails) => ({ ...prevDetails, [type]: value }));
+        }
     };
 
     return (
@@ -153,6 +160,8 @@ const WindowControls = ({}: any) => {
                         min={MIN_WINDOW_WIDTH}
                         max={MAX_WINDOW_WIDTH}
                         marks={windowWidthOptions}
+                        value={element.length}
+                        onChange={(value) => handleUpdate('length', +value)}
                     />
                 </div>
             </div>
@@ -172,6 +181,8 @@ const WindowControls = ({}: any) => {
                         min={MIN_WINDOW_HEIGHT}
                         max={MAX_WINDOW_HEIGHT}
                         marks={windowHeightOptions}
+                        value={element.height}
+                        onChange={(value) => handleUpdate('height', +value)}
                     />
                 </div>
             </div>
@@ -190,6 +201,8 @@ const WindowControls = ({}: any) => {
                         min={MIN_WINDOW_BOTTOM}
                         max={MAX_WINDOW_BOTTOM}
                         marks={windowBottomOptions}
+                        value={element.bottom}
+                        onChange={(value) => handleUpdate('bottom', +value)}
                     />
                 </div>
             </div>

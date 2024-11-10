@@ -3,7 +3,7 @@ import { Application, Container } from 'pixi.js';
 
 import { IViewportOptions, Viewport } from 'pixi-viewport';
 import { useStore } from '../stores/EditorStore';
-import { METER } from '@/2d/editor/constants';
+import { COLOR_BACKGROUND, METER } from '@/2d/editor/constants';
 // import { InteractionManager } from '@pixi/interaction';
 import { extensions } from '@pixi/core';
 import { EventSystem } from '@pixi/events';
@@ -26,7 +26,7 @@ export function EditorRoot() {
                 view: document.getElementById('pixi-canvas') as HTMLCanvasElement,
                 resolution: window.devicePixelRatio || 1,
                 autoDensity: true,
-                backgroundColor: 0xebebeb,
+                backgroundColor: COLOR_BACKGROUND,
                 antialias: true,
                 resizeTo: window,
             });

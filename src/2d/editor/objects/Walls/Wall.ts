@@ -218,7 +218,7 @@ export class Wall extends Graphics {
 
     private updateChildren() {
         for (const item of this.children) {
-            if (item instanceof Door) {
+            if (item instanceof Door || item instanceof WindowElement) {
                 item.setPosition({ x: null, y: null });
             }
         }
@@ -329,7 +329,7 @@ export class Wall extends Graphics {
     private getMinimumWallLength(): number {
         let minLength = 0;
         this.children.forEach((child) => {
-            if (child instanceof Door) {
+            if (child instanceof Door || child instanceof WindowElement) {
                 const childEndX = child.position.x + child.length;
                 if (childEndX > minLength) {
                     minLength = childEndX;
@@ -409,6 +409,8 @@ export class Wall extends Graphics {
                         const message = isDoor
                             ? 'Nie można dodać drzwi, które kolidują z innymi elementami'
                             : 'Nie można dodać okna, które koliduje z innymi elementami';
+
+                        console.log(message);
 
                         notifications.show({
                             title: `${icon} Niewłaściwa pozycja`,

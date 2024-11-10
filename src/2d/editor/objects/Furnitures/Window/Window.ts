@@ -1,6 +1,6 @@
 import { Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
-import { Tool } from '@/2d/editor/constants';
+import { COLOR_ACTIVE_ELEMENT_BORDER, COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,13 +13,18 @@ import { DashedLine } from '../../Helpers/DashedLine';
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
 const WINDOW_WIDTH = 80;
+const WINDOW_HEIGHT = 140;
+const WINDOW_BOTTOM = 90;
 
 type WindowProps = {};
 
 export class WindowElement extends BuildingElement {
     baseLine: Graphics;
     length = WINDOW_WIDTH;
-    type = WindowType.Casement;
+    private _height = WINDOW_HEIGHT;
+
+    bottom = WINDOW_BOTTOM;
+    type = WindowType.Single;
 
     constructor(config?: WindowProps & BuildingElementProps) {
         super({
@@ -37,6 +42,13 @@ export class WindowElement extends BuildingElement {
         }
     }
 
+    public get height() {
+        return this._height;
+    }
+    public set height(value) {
+        this._height = value;
+    }
+
     protected onStoreChange() {
         this.checkVisibility();
         this.checkEventMode();
@@ -52,15 +64,21 @@ export class WindowElement extends BuildingElement {
     }
 
     public setType(type: WindowType) {
-        // this.type = type;
-        // this.setStroke();
+        this.type = type;
+        this.setStroke();
     }
 
     private setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
         const wallParentThickness = this.customParent?.thickness || 0;
+        const offset = 10;
 
         this.background.clear();
-        this.background.rect(0, -wallParentThickness / 2, this.length, wallParentThickness);
+        this.background.rect(
+            0 - offset / 2,
+            -wallParentThickness / 2 - offset / 2,
+            this.length + offset,
+            wallParentThickness + offset
+        );
         this.background.fill(fillColor);
         this.background.stroke(strokeColor);
         this.addChild(this.background);
@@ -76,8 +94,14 @@ export class WindowElement extends BuildingElement {
 
         const strokeSettings = { width: 2, color: COLOR };
 
-        console.log(this.length);
+        console.log('xdxd new', this.length);
 
+        // WALL GAP
+        this.baseLine
+            .rect(0, -wallParentThickness / 2, x + this.length, wallParentThickness)
+            .fill({ color: COLOR_BACKGROUND });
+
+        // DASHED LINE
         const cutWidth = 5;
         const num = Math.floor(this.length / cutWidth);
 
@@ -88,46 +112,25 @@ export class WindowElement extends BuildingElement {
                 .stroke(strokeSettings);
         }
 
-        // this.baseLine.addChild(line);
-
-        // ARC
-        // this.baseLine
-        //     .arc(x, y, this.length, 0, 0.1)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 0.15, 0.25)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 0.3, 0.4)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 0.45, 0.55)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 0.6, 0.7)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 0.75, 0.85)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 0.9, 1.0)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 1.05, 1.15)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 1.2, 1.3)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 1.35, 1.45)
-        //     .stroke(strokeSettings)
-        //     .arc(x, y, this.length, 1.5, 1.55)
-        //     .stroke(strokeSettings);
-
-        // // THICK LINE
-        // this.baseLine.rect(0, 0, x + this.length, 10).fill({ color: COLOR });
-
-        // // LINE
+        // // TOP LINE
         this.baseLine
             .moveTo(0, -wallParentThickness / 2)
             .lineTo(0, wallParentThickness / 2)
             .stroke(strokeSettings);
 
+        // BOTTOM LINE
         this.baseLine
             .moveTo(this.length, -wallParentThickness / 2)
             .lineTo(this.length, wallParentThickness / 2)
             .stroke(strokeSettings);
+
+        // CASEMENT LINE
+        if (this.type === WindowType.Casement) {
+            this.baseLine
+                .moveTo(this.length / 2, -5)
+                .lineTo(this.length / 2, 5)
+                .stroke(strokeSettings);
+        }
 
         this.addChild(this.baseLine);
     }
@@ -138,13 +141,13 @@ export class WindowElement extends BuildingElement {
     }
 
     private checkVisibility() {
-        // const focusedElement = useStore.getState().focusedElement;
-        // if (focusedElement === this) {
-        //     this.setBackground('green');
-        // }
-        // if (focusedElement !== this) {
-        //     this.setBackground();
-        // }
+        const focusedElement = useStore.getState().focusedElement;
+        if (focusedElement === this) {
+            this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
+        }
+        if (focusedElement !== this) {
+            this.setBackground();
+        }
     }
 
     public setPosition({ x, y }: Nullable<Point>) {
@@ -154,19 +157,23 @@ export class WindowElement extends BuildingElement {
     }
 
     public setLength(length: number) {
-        // const prevLength = this.length;
-        // this.length = length;
-        // if (this.isCollide()) {
-        //     this.length = prevLength;
-        //     notifications.clean();
-        //     notifications.show({
-        //         title: '🚪 Nie można zmienić szerokości',
-        //         message: 'Drzwi nie mogą nachodzić na siebie',
-        //         color: 'red',
-        //     });
-        //     return;
-        // }
-        // this.setStroke();
-        // this.setBackground('green');
+        const prevLength = this.length;
+        this.length = length;
+
+        console.log('xdxd bla', length);
+
+        if (this.isCollide()) {
+            this.length = prevLength;
+            notifications.clean();
+            notifications.show({
+                title: '🪟 Nie można zmienić szerokości',
+                message: 'Elementy na ścianie nie mogą nachodzić na siebie',
+                color: 'red',
+            });
+            return;
+        }
+
+        this.setStroke();
+        this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
     }
 }

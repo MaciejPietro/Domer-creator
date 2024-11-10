@@ -4,6 +4,7 @@ import { Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';
+import { WindowElement } from './Window/Window';
 import { Door } from './Door/Door';
 import { Wall } from '../Walls/Wall';
 
@@ -18,6 +19,7 @@ export abstract class BuildingElement extends Container {
     background: Graphics;
     clickStartTime: number;
     customParent: Wall | undefined;
+    length = 0;
     public isTemporary = false;
     public isValid = false;
 
@@ -54,7 +56,7 @@ export abstract class BuildingElement extends Container {
         }> = [];
 
         for (const child of this.parent.children) {
-            if (child instanceof Door) {
+            if (child instanceof BuildingElement) {
                 occupiedSpots.push({ start: child.position.x, end: child.position.x + child.length });
             }
         }
@@ -100,6 +102,10 @@ export abstract class BuildingElement extends Container {
 
                 state.setFocusedElement(this as any);
 
+                break;
+
+            case Tool.Remove:
+                this.delete();
                 break;
         }
     }

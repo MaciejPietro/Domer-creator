@@ -10,6 +10,9 @@ export const WALL_NODE_THICKNESS = 0.15 * METER;
 
 export const LABEL_OFFSET = 10;
 
+export const COLOR_BACKGROUND = '#EBEBEB';
+export const COLOR_ACTIVE_ELEMENT_BORDER = '#60e06f';
+
 export enum Modes {
     Idle,
     Dragging,

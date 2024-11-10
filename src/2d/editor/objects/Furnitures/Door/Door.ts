@@ -1,6 +1,6 @@
 import { Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
-import { Tool } from '@/2d/editor/constants';
+import { COLOR_ACTIVE_ELEMENT_BORDER, COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';
@@ -61,8 +61,10 @@ export class Door extends BuildingElement {
     }
 
     private setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
+        const offset = 10;
+
         this.background.clear();
-        this.background.rect(-2.5, -2.5, this.length + 5, this.length + 5);
+        this.background.rect(-offset / 2, -offset / 2, this.length + offset, this.length + offset);
         this.background.fill(fillColor);
         this.background.stroke(strokeColor);
 
@@ -71,6 +73,7 @@ export class Door extends BuildingElement {
 
     private setStroke() {
         this.baseLine?.clear();
+        const wallParentThickness = this.customParent?.thickness || 0;
 
         this.baseLine = new Graphics();
         const { x, y } = { x: 0, y: 0 };
@@ -102,6 +105,11 @@ export class Door extends BuildingElement {
             .arc(x, y, this.length, 1.5, 1.55)
             .stroke(strokeSettings);
 
+        // WALL GAP
+        this.baseLine
+            .rect(0, -wallParentThickness + 11, x + this.length, wallParentThickness)
+            .fill({ color: COLOR_BACKGROUND });
+
         // THICK LINE
         this.baseLine.rect(0, 0, x + this.length, 10).fill({ color: COLOR });
 
@@ -110,6 +118,17 @@ export class Door extends BuildingElement {
             .moveTo(x, y)
             .lineTo(0, y + this.length)
             .stroke(strokeSettings);
+
+        // WALL GAP LINES
+        this.baseLine
+            .moveTo(x, y)
+            .lineTo(x, -wallParentThickness + 12)
+            .stroke({ width: 1, color: 'black' });
+
+        this.baseLine
+            .moveTo(x + this.length, y)
+            .lineTo(x + this.length, -wallParentThickness + 12)
+            .stroke({ width: 1, color: 'black' });
 
         if (this.orientation === DoorOrientation.West) {
             this.position.y = (this.customParent?.thickness || 0) - 12;
@@ -162,7 +181,7 @@ export class Door extends BuildingElement {
         const focusedElement = useStore.getState().focusedElement;
 
         if (focusedElement === this) {
-            this.setBackground('green');
+            this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
         }
         if (focusedElement !== this) {
             this.setBackground();
@@ -188,14 +207,14 @@ export class Door extends BuildingElement {
 
             notifications.show({
                 title: '🚪 Nie można zmienić szerokości',
-                message: 'Drzwi nie mogą nachodzić na siebie',
+                message: 'Elementy na ścianie nie mogą nachodzić na siebie',
                 color: 'red',
             });
             return;
         }
 
         this.setStroke();
-        this.setBackground('green');
+        this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
     }
 
     public setOrientation(orientation: DoorOrientation) {
