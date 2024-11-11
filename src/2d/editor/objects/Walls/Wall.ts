@@ -22,6 +22,7 @@ import { notifications } from '@mantine/notifications';
 import { DashedLine } from '../Helpers/DashedLine';
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
 import { AddWallManager } from '../../actions/AddWallManager';
+import { DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -259,26 +260,6 @@ export class Wall extends Graphics {
                         break;
                 }
             });
-
-            // nodeItem.on('pointerup', (ev: FederatedPointerEvent) => {
-            //     ev.stopPropagation();
-
-            //     switch (useStore.getState().activeTool) {
-            //         case Tool.WallAdd:
-            //             const globalCords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
-
-            //             const addNode = new AddNodeAction(
-            //                 this,
-            //                 getClosestPointOnLine(globalCords, [
-            //                     { x: this.leftNode.x, y: this.leftNode.y },
-            //                     { x: this.rightNode.x, y: this.rightNode.y },
-            //                 ])
-            //             );
-
-            //             addNode.execute();
-            //             break;
-            //     }
-            // });
 
             node.el = nodeItem;
 
@@ -591,35 +572,13 @@ export class Wall extends Graphics {
             currentX = wallOffset;
         }
 
-        // MOVE ELEMENT TO NEXT FREE SPOT
-        // const occupiedSpots: { start: number; end: number }[] = [];
-
-        // this.children.forEach((child) => {
-        //     if (child instanceof Door && !child.isTemporary) {
-        //         const x = child.position.x;
-        //         occupiedSpots.push({ start: x, end: x + child.length });
-        //     }
-        // });
-
-        // occupiedSpots.sort((a, b) => a.start - b.start);
-
-        // for (const { start, end } of occupiedSpots) {
-        //     if (currentX + furnitureHeight <= start) {
-        //         return currentX;
-        //     }
-
-        //     if (currentX < end) {
-        //         currentX = end;
-        //     }
-        // }
-
         return currentX;
     }
 
     private isOccupiedSpot(elementX: number): boolean {
         const furnitureHeight = this.tempFurniture?.length || 0;
 
-        if (furnitureHeight > this.length) return true;
+        if (furnitureHeight > this.length - DISTANCE_FROM_WALL) return true;
 
         const startX = elementX;
         const endX = elementX + furnitureHeight;
@@ -636,6 +595,8 @@ export class Wall extends Graphics {
         });
 
         occupiedSpots.sort((a, b) => a.start - b.start);
+
+        console.log(occupiedSpots);
 
         for (const { start, end } of occupiedSpots) {
             if (endX >= start && startX <= end) {
@@ -654,9 +615,9 @@ export class Wall extends Graphics {
 
         const currentX = this.getXWithinWall(newCords.x);
 
-        const isOccupied = this.isOccupiedSpot(currentX);
+        const isCoolide = this.tempFurniture?.isCollide();
 
-        this.tempFurniture?.setValidity(!isOccupied);
+        this.tempFurniture?.setValidity(!isCoolide);
 
         newCords.x = currentX;
 

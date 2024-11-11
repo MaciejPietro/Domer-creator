@@ -14,6 +14,8 @@ export type BuildingElementProps = {
     parent?: Wall;
 };
 
+export const DISTANCE_FROM_WALL = 25;
+
 export abstract class BuildingElement extends Container {
     uuid = uuidv4();
     background: Graphics;
@@ -56,13 +58,16 @@ export abstract class BuildingElement extends Container {
 
     protected onStoreChange() {}
 
-    protected isCollide() {
+    public isCollide() {
         const endX = this.customParent?.length || Infinity;
 
         const occupiedSpots: Array<{
             start: number;
             end: number;
-        }> = [{ start: endX, end: endX }];
+        }> = [
+            { start: DISTANCE_FROM_WALL, end: DISTANCE_FROM_WALL },
+            { start: endX - DISTANCE_FROM_WALL, end: endX - DISTANCE_FROM_WALL },
+        ];
 
         for (const child of this.parent.children) {
             if (child instanceof BuildingElement) {
