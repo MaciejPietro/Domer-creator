@@ -32,10 +32,6 @@ export class WallNodeSequence extends Container {
         WallNodeSequence.wallNodeId = id;
     }
 
-    public getExteriorWalls(): Wall[] {
-        return this.walls.filter((wall) => wall.isExteriorWall);
-    }
-
     public getWallNodeId() {
         return WallNodeSequence.wallNodeId;
     }

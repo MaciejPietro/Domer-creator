@@ -7,6 +7,7 @@ import { notifications } from '@mantine/notifications';
 import { Wall } from '../../Walls/Wall';
 import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 import { IWindowSerializable } from './IWindowSerializable';
+import { WINDOW_Z_INDEX } from './constants';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -27,6 +28,7 @@ export class WindowElement extends BuildingElement {
 
     bottom = WINDOW_BOTTOM;
     type = WindowType.Single;
+    zIndex = WINDOW_Z_INDEX;
 
     constructor(config?: WindowProps & BuildingElementProps) {
         super({
@@ -103,7 +105,7 @@ export class WindowElement extends BuildingElement {
     private setStroke() {
         this.baseLine?.clear();
 
-        const wallParentThickness = this.customParent?.thickness || 0;
+        const wallParentThickness = (this.customParent?.thickness || 0) + 1;
 
         this.baseLine = new Graphics();
         const { x, y } = { x: 0, y: 0 };
@@ -145,6 +147,8 @@ export class WindowElement extends BuildingElement {
                 .lineTo(this.length / 2, 5)
                 .stroke(strokeSettings);
         }
+
+        this.baseLine.position = { x: 0, y: 1 };
 
         this.addChild(this.baseLine);
     }

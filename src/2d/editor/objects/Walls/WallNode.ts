@@ -1,4 +1,4 @@
-import { Graphics, FederatedPointerEvent, Texture } from 'pixi.js';
+import { Graphics, FederatedPointerEvent, Texture, Container } from 'pixi.js';
 import { WALL_NODE_THICKNESS, Tool, ViewMode, WALL_THICKNESS } from '../../constants';
 import { useStore } from '../../../../stores/EditorStore';
 import { AddWallManager } from '../../actions/AddWallManager';
@@ -14,9 +14,10 @@ import { Point } from '@/helpers/Point';
 import { Building } from 'tabler-icons-react';
 import { BuildingElement } from '../Furnitures/BuildingElement';
 
-export class WallNode extends Graphics {
+export class WallNode extends Container {
     public dragging: boolean;
     private id: number;
+    private dot = new Graphics();
     mouseStartPoint: Point;
 
     private type: WallType = WallType.Partition;
@@ -38,7 +39,7 @@ export class WallNode extends Graphics {
         this.prevPosition = { x, y };
         this.position.set(x, y);
         this.zIndex = 999;
-        this.visible = false;
+        this.dot.visible = false;
 
         this.watchStoreChanges();
 
@@ -93,11 +94,11 @@ export class WallNode extends Graphics {
     }
 
     public show() {
-        this.visible = true;
+        this.dot.visible = true;
     }
 
     public hide() {
-        this.visible = false;
+        this.dot.visible = false;
     }
 
     private setSettings() {
@@ -113,21 +114,25 @@ export class WallNode extends Graphics {
     }
 
     public setVisibility(visible: boolean) {
-        if (this.isMouseOver) return (this.visible = true);
-        this.visible = visible;
+        if (this.isMouseOver) return (this.dot.visible = true);
+        this.dot.visible = visible;
     }
 
     public setStyles({ color = 0x222222 }: { color?: string | number }) {
-        this.clear();
-        this.circle(0, 0, this.size / 2);
+        this.dot.clear();
+        this.dot.circle(0, 0, this.size / 2);
         // bg-blue-500 from tailwind.config.js
-        this.fill(this.dragging ? '#1C7ED6' : color);
+        this.dot.fill(this.dragging ? '#1C7ED6' : color);
+
+        this.addChild(this.dot);
+
+        this.dot.zIndex = 1;
 
         // SQUARE IN PLACE OF WALL DOT
         // const background = new Graphics();
-        // background.rect(-WALL_THICKNESS / 2, -WALL_THICKNESS / 2, WALL_THICKNESS, WALL_THICKNESS);
+        // background.rect(-WALL_THICKNESS / 2 + 1, -WALL_THICKNESS / 2 + 2, WALL_THICKNESS - 1, WALL_THICKNESS - 2);
         // background.fill('white');
-        // background.stroke({ texture: Texture.WHITE, width: 2, color: 'black' });
+        // // background.stroke({ texture: Texture.WHITE, width: 1, color: 'black' });
         // background.zIndex = -1;
         // this.addChildAt(background, 0);
     }

@@ -18,17 +18,20 @@ export const wallTypeConfig = Object.freeze({
         label: 'Zewnętrzna',
         thickness: 40,
         icon: BorderLeft,
+        zIndex: 14,
     },
     [WallType.LoadBearing]: {
         type: WallType.LoadBearing,
         label: 'Nośna',
         thickness: 25,
         icon: BorderHorizontal,
+        zIndex: 12,
     },
     [WallType.Partition]: {
         type: WallType.Partition,
         label: 'Działowa',
         thickness: 15,
         icon: BorderInner,
+        zIndex: 10,
     },
 });

@@ -70,6 +70,7 @@ export default function SceneRoot() {
                     <House plan={plan} />
                     <Environment />
                     <OrbitControls makeDefault target={centerPoint} />
+                    {/* <directionalLight intensity={0.5} /> */}
                 </Canvas>
             ) : (
                 <div className="w-full h-screen flex justify-center items-center gap-2 text-xl text-gray-800">

@@ -5,12 +5,13 @@ import { getCorrespondingY } from '../../../helpers/Slope';
 import { FurnitureData } from '../../../stores/FurnitureStore';
 import { main } from '../../EditorRoot';
 import { METER } from '../constants';
-import { FloorSerializable } from '../persistence/FloorSerializable';
+import { FloorSerializable, IFurnitureSerializable } from '../persistence/FloorSerializable';
 import { Wall } from './Walls/Wall';
 import { NodeLinksWithWall, WallNodeSequence } from './Walls/WallNodeSequence';
 import { Door } from './Furnitures/Door/Door';
 import { attach } from '@react-three/fiber/dist/declarations/src/core/utils';
 import { WindowElement } from './Furnitures/Window/Window';
+import { cmToM } from '@/utils/transform';
 
 type Furniture = WindowElement | Door;
 
@@ -194,7 +195,7 @@ export class Floor extends Container {
         return lines;
     }
 
-    public getPlan(withFurnitures = false) {
+    public getPlan(for3D = false) {
         const plan = new FloorSerializable();
         const wallNodes = this.wallNodeSequence.getWalls();
         const planNodes = [];
@@ -210,7 +211,7 @@ export class Floor extends Container {
         for (const wallNode of wallNodes.values()) {
             const { leftNode, rightNode } = wallNode;
 
-            const planNode = {
+            const planNode: any = {
                 a: {
                     x: leftNode.x / 100,
                     y: leftNode.y / 100,
@@ -222,10 +223,12 @@ export class Floor extends Container {
                 thickness: wallNode.thickness,
             };
 
-            if (withFurnitures) {
+            if (for3D) {
                 planNode.furnitures = plan.furnitureArray.filter((furniture) => {
                     return furniture.wallUuid === wallNode.uuid;
                 }, []);
+
+                planNode.length = wallNode.length;
             }
 
             planNodes.push(planNode);
@@ -238,7 +241,7 @@ export class Floor extends Container {
             wallNodes: this.shiftCoordinatesToOrigin(planNodes),
         };
 
-        if (withFurnitures) {
+        if (for3D) {
         }
 
         return res;

@@ -48,8 +48,7 @@ export class Wall extends Graphics {
     y1: number;
     y2: number;
     thickness: number;
-    isExteriorWall: boolean;
-    type: WallType;
+    type = WallType.Exterior;
 
     dragging: boolean;
     mouseStartPoint: Point;
@@ -70,12 +69,13 @@ export class Wall extends Graphics {
         this.dragging = false;
         this.mouseStartPoint = { x: 0, y: 0 };
 
+        // this.zIndex = wallTypeConfig[this.type].zIndex;
+
         this.getNodesCords();
 
         this.measureLabel = new MeasureLabel(0);
 
         this.addChild(this.measureLabel);
-        this.isExteriorWall = true;
         this.drawLine();
 
         if (settings?.type !== undefined) {
@@ -215,6 +215,8 @@ export class Wall extends Graphics {
 
         this.type = newType;
 
+        // this.zIndex = wallTypeConfig[this.type].zIndex;
+
         this.applySettings();
         this.drawLine();
         this.updateChildren();
@@ -228,9 +230,6 @@ export class Wall extends Graphics {
         }
     }
 
-    public getIsExterior() {
-        return this.isExteriorWall;
-    }
     public getNodesCords() {
         return [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
     }
@@ -315,7 +314,9 @@ export class Wall extends Graphics {
 
         this.clear();
 
-        this.rect(0, 0, this.length, this.thickness - 2);
+        // testing fill end and start of the wall, previously was         this.rect(0, 0, this.length, this.thickness);
+        // this.rect(-this.thickness / 2, 0, this.length + this.thickness, this.thickness);
+        this.rect(0, 0, this.length, this.thickness);
 
         this.setStyles();
 

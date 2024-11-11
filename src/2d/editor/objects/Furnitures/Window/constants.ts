@@ -6,3 +6,5 @@ export const MAX_WINDOW_HEIGHT = 200;
 
 export const MIN_WINDOW_BOTTOM = 0;
 export const MAX_WINDOW_BOTTOM = 150;
+
+export const WINDOW_Z_INDEX = 20;
