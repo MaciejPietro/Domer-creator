@@ -11,6 +11,8 @@ import { WallType, wallTypeConfig } from './config';
 import { DEFAULT_WALL_TYPE, Wall } from './Wall';
 import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
+import { Building } from 'tabler-icons-react';
+import { BuildingElement } from '../Furnitures/BuildingElement';
 
 export class WallNode extends Graphics {
     public dragging: boolean;
@@ -64,6 +66,7 @@ export class WallNode extends Graphics {
         const focusedElement = useStore.getState().focusedElement;
 
         if (!focusedElement) return this.hide();
+        if (focusedElement instanceof BuildingElement) return this.hide();
 
         if (focusedElement instanceof Wall) {
             if (focusedElement.leftNode === this) return;

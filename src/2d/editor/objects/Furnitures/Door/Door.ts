@@ -191,7 +191,6 @@ export class Door extends BuildingElement {
 
     private checkEventMode() {
         const activeTool = useStore.getState().activeTool;
-
         this.eventMode = activeTool === Tool.FurnitureAddDoor || activeTool === Tool.WallAdd ? 'none' : 'static';
     }
 
