@@ -18,7 +18,7 @@ export class Serializer {
         return resultString;
     }
 
-    public serializePlan(floors: Floor[]) {
+    public serializePlanForExport(floors: Floor[]) {
         const floorPlanSerializable = new FloorPlanSerializable();
 
         for (const floor of floors) {
@@ -26,7 +26,20 @@ export class Serializer {
 
             floorPlanSerializable.floors.push(floorSerializable);
         }
-        // floorPlanSerializable.wallNodeId = floors[0].getWallNodeSequence().getWallNodeId();
+
+        return floorPlanSerializable.floors[0];
+    }
+
+    public serializePlanForModel(floors: Floor[]) {
+        const floorPlanSerializable = new FloorPlanSerializable();
+
+        for (const floor of floors) {
+            const floorSerializable = floor.getPlan(true);
+
+            floorPlanSerializable.floors.push(floorSerializable);
+        }
+
+        console.log(floorPlanSerializable.floors[0]);
 
         return floorPlanSerializable.floors[0];
     }

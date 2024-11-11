@@ -76,23 +76,24 @@ const AppSidebar = () => {
                         {activeMode === ViewMode.Edit && (
                             <>
                                 <PlanMenu />
+                                <NavbarLink
+                                    icon={GridDots}
+                                    label="Przyciągaj do siatki"
+                                    active={snap}
+                                    onClick={() => {
+                                        setSnap(!snap);
+                                        cleanNotifications();
+                                        showNotification({
+                                            message:
+                                                'Tryb przyciągania do siatki został ' +
+                                                (snap ? 'wyłączony' : 'aktywowany'),
+                                            icon: snap ? <Table /> : <TableOff />,
+                                        });
+                                    }}
+                                />
                             </>
                         )}
 
-                        <NavbarLink
-                            icon={GridDots}
-                            label="Przyciągaj do siatki"
-                            active={snap}
-                            onClick={() => {
-                                setSnap(!snap);
-                                cleanNotifications();
-                                showNotification({
-                                    message:
-                                        'Tryb przyciągania do siatki został ' + (snap ? 'wyłączony' : 'aktywowany'),
-                                    icon: snap ? <Table /> : <TableOff />,
-                                });
-                            }}
-                        />
                         {/* <NavbarLink
                             icon={Dimensions}
                             label="Toggle size labels"

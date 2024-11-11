@@ -6,7 +6,7 @@
           "uuid": "bf752070-ddbc-438c-b3aa-962723fd2206",
           "wallUuid": "20ae1c0e-9b31-4cb1-958e-1c64891366dd",
           "x": 101.58550345613003,
-          "y": 13,
+          "y": 28,
           "length": 80,
           "orientation": 0,
           "type": 0,
@@ -16,7 +16,7 @@
           "uuid": "3bb126ad-93c8-4a15-9465-1450e2407394",
           "wallUuid": "7232ce2b-b5fa-4264-bdc2-5e40ca597b65",
           "x": 131.99595641467545,
-          "y": 13,
+          "y": 28,
           "length": 80,
           "orientation": 0,
           "type": 0,
@@ -85,36 +85,9 @@
           "bottom": 90,
           "type": 2,
           "element": "window"
-        },
-        {
-          "uuid": "3fd516c9-e1e2-4e79-941a-f8c6a2215a6c",
-          "wallUuid": "a8a641c8-dfea-4b56-b81b-4b267bcce61d",
-          "x": 94.87256707682684,
-          "y": 19,
-          "length": 80,
-          "height": 140,
-          "bottom": 90,
-          "type": 2,
-          "element": "window"
-        },
-        {
-          "uuid": "4c9b70cd-6d44-4077-8b91-d0865c3c0021",
-          "wallUuid": "4f5932b2-25a6-4231-a0ca-2d6894dbfc04",
-          "x": 120.13162741674546,
-          "y": 19,
-          "length": 80,
-          "height": 140,
-          "bottom": 90,
-          "type": 2,
-          "element": "window"
         }
       ],
       "wallNodes": [
-        {
-          "id": 1,
-          "x": 2200,
-          "y": 2200
-        },
         {
           "id": 2,
           "x": 2200,
@@ -136,11 +109,6 @@
           "y": 2400
         },
         {
-          "id": 6,
-          "x": 2800,
-          "y": 2200
-        },
-        {
           "id": 7,
           "x": 2220,
           "y": 2400
@@ -151,32 +119,19 @@
           "y": 2400
         },
         {
-          "id": 9,
-          "x": 2500,
-          "y": 2200
-        },
-        {
           "id": 10,
           "x": 2500,
           "y": 2400
         }
       ],
       "wallNodeLinks": [
-        [
-          1,
-          [
-            {
-              "id": 8,
-              "wallUuid": "fbffabfa-28b6-48d8-9f12-5ab1b5e6c3ad"
-            }
-          ]
-        ],
+        [1, []],
         [
           2,
           [
             {
-              "id": 3,
-              "wallUuid": "f282deb1-d706-4ef9-b608-667dfc9ac39d"
+              "id": 8,
+              "wallUuid": "01e8fb24-8176-4d75-b4b4-379d24f58936"
             }
           ]
         ],
@@ -184,8 +139,8 @@
           3,
           [
             {
-              "id": 4,
-              "wallUuid": "e352d456-39ed-438c-8195-3735e569c914"
+              "id": 2,
+              "wallUuid": "f282deb1-d706-4ef9-b608-667dfc9ac39d"
             }
           ]
         ],
@@ -193,8 +148,8 @@
           4,
           [
             {
-              "id": 5,
-              "wallUuid": "861377f2-e90f-487f-b5c5-a02f6e756d61"
+              "id": 3,
+              "wallUuid": "e352d456-39ed-438c-8195-3735e569c914"
             }
           ]
         ],
@@ -202,52 +157,25 @@
           5,
           [
             {
-              "id": 6,
-              "wallUuid": "6362bee6-5d01-4404-b259-40cedbbd1f9b"
-            }
-          ]
-        ],
-        [
-          6,
-          [
-            {
-              "id": 9,
-              "wallUuid": "4f5932b2-25a6-4231-a0ca-2d6894dbfc04"
-            }
-          ]
-        ],
-        [
-          8,
-          [
-            {
-              "id": 2,
-              "wallUuid": "01e8fb24-8176-4d75-b4b4-379d24f58936"
+              "id": 4,
+              "wallUuid": "861377f2-e90f-487f-b5c5-a02f6e756d61"
             },
             {
               "id": 10,
-              "wallUuid": "7232ce2b-b5fa-4264-bdc2-5e40ca597b65"
+              "wallUuid": "20ae1c0e-9b31-4cb1-958e-1c64891366dd"
             }
           ]
         ],
-        [
-          9,
-          [
-            {
-              "id": 1,
-              "wallUuid": "a8a641c8-dfea-4b56-b81b-4b267bcce61d"
-            },
-            {
-              "id": 10,
-              "wallUuid": "0813ae51-0f29-4fc2-a944-07d045d8d163"
-            }
-          ]
-        ],
+        [6, []],
+        [7, []],
+        [8, []],
+        [9, []],
         [
           10,
           [
             {
-              "id": 5,
-              "wallUuid": "20ae1c0e-9b31-4cb1-958e-1c64891366dd"
+              "id": 8,
+              "wallUuid": "7232ce2b-b5fa-4264-bdc2-5e40ca597b65"
             }
           ]
         ]

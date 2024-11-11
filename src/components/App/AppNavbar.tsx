@@ -32,32 +32,34 @@ import {
     Tag,
     Wall,
 } from 'tabler-icons-react';
-import { Tool } from '@/2d/editor/constants';
+import { Tool, ToolMode, ViewMode } from '@/2d/editor/constants';
 import { NavbarLink } from '@/ui/NavbarLink';
 import SelectMenu from '../Navbar/SelectMenu';
+import { useStore } from '@/stores/EditorStore';
 
 const AppNavbar = () => {
     const modeOptions = [];
+    const { activeMode } = useStore();
 
     return (
         <AppShell.Header className="flex justify-between pl-20 py-1.5">
-            {/* <AppShellSection grow> */}
-            {/* <Group className="flex flex-col" align="center"> */}
             <Group>
-                <Group gap={4}>
-                    <SelectMenu />
-                </Group>
-                <div className="w-px h-6 bg-black/25"></div>
-                <Group gap={4}>
-                    <AddMenu />
-                </Group>
+                {activeMode === ViewMode.Edit ? (
+                    <>
+                        <Group gap={4}>
+                            <SelectMenu />
+                        </Group>
+                        <div className="w-px h-6 bg-black/25"></div>
+                        <Group gap={4}>
+                            <AddMenu />
+                        </Group>
+                    </>
+                ) : null}
             </Group>
             <div>
                 <ModeMenu />
                 <DetailsControls />
             </div>
-            {/* </Group> */}
-            {/* </AppShellSection> */}
         </AppShell.Header>
     );
 };

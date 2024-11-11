@@ -194,15 +194,23 @@ export class Floor extends Container {
         return lines;
     }
 
-    public getPlan() {
+    public getPlan(withFurnitures = false) {
         const plan = new FloorSerializable();
         const wallNodes = this.wallNodeSequence.getWalls();
         const planNodes = [];
 
-        for (const node of wallNodes.values()) {
-            const { leftNode, rightNode } = node;
+        // FURNITURES
+        const serializedFurniture = [];
+        for (const furniture of this.furnitureArray.values()) {
+            serializedFurniture.push(furniture.serialize());
+        }
+        plan.furnitureArray = serializedFurniture;
 
-            planNodes.push({
+        //    WALLS
+        for (const wallNode of wallNodes.values()) {
+            const { leftNode, rightNode } = wallNode;
+
+            const planNode = {
                 a: {
                     x: leftNode.x / 100,
                     y: leftNode.y / 100,
@@ -211,24 +219,29 @@ export class Floor extends Container {
                     x: rightNode.x / 100,
                     y: rightNode.y / 100,
                 },
-                thickness: node.thickness,
-            });
+                thickness: wallNode.thickness,
+            };
+
+            if (withFurnitures) {
+                planNode.furnitures = plan.furnitureArray.filter((furniture) => {
+                    return furniture.wallUuid === wallNode.uuid;
+                }, []);
+            }
+
+            planNodes.push(planNode);
         }
 
         // wall node links
         plan.wallNodeLinks = Array.from(this.wallNodeSequence.getWallNodeLinks().entries());
 
-        // furniture
-        // const serializedFurniture = [];
-        // for (const furniture of this.furnitureArray.values()) {
-        //     serializedFurniture.push(furniture.serialize());
-        // }
-        // plan.furnitureArray = serializedFurniture;
-
-        return {
-            // ...plan,
+        const res = {
             wallNodes: this.shiftCoordinatesToOrigin(planNodes),
         };
+
+        if (withFurnitures) {
+        }
+
+        return res;
     }
 
     public serialize(): FloorSerializable {
@@ -321,6 +334,12 @@ export class Floor extends Container {
     public removeWall(wall: Wall) {
         const leftNode = wall.leftNode.getId();
         const rightNode = wall.rightNode.getId();
+
+        for (const child of wall.children) {
+            if (child instanceof Door || child instanceof WindowElement) {
+                this.removeFurniture(child.uuid);
+            }
+        }
 
         if (this.wallNodeSequence.contains(leftNode)) {
             this.wallNodeSequence.removeWall(leftNode, rightNode);

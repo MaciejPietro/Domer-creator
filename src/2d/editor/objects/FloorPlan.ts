@@ -80,8 +80,14 @@ export class FloorPlan extends Container {
         return floorPlan;
     }
 
-    public getPlan() {
-        const floorPlan = this.serializer.serializePlan(this.floors);
+    // public getPlan() {
+    //     const floorPlan = this.serializer.serializePlanForExport(this.floors);
+
+    //     return floorPlan;
+    // }
+
+    public getPlanForModel() {
+        const floorPlan = this.serializer.serializePlanForModel(this.floors);
 
         return floorPlan;
     }

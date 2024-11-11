@@ -1,12 +1,15 @@
 import { LoadAction } from '@/2d/editor/actions/LoadAction';
 import { ResetAction } from '@/2d/editor/actions/ResetAction';
 import { SaveAction } from '@/2d/editor/actions/SaveAction';
+import { ViewMode } from '@/2d/editor/constants';
+import { useStore } from '@/stores/EditorStore';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { Menu, Group } from '@mantine/core';
 import { useRef } from 'react';
 import { DeviceFloppy, Upload, Menu2, Rotate, BrandGithub, Heart } from 'tabler-icons-react';
 
 const DropdownMenu = () => {
+    const { setActiveMode } = useStore();
     const fileRef = useRef<HTMLInputElement | null>(null);
 
     const handleChange = async (e: any) => {
@@ -53,6 +56,7 @@ const DropdownMenu = () => {
                     <Menu.Item
                         leftSection={<Rotate size={16} />}
                         onClick={() => {
+                            setActiveMode(ViewMode.Edit);
                             const action = new ResetAction();
 
                             action.execute();
