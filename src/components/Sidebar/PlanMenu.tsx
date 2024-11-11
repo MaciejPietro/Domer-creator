@@ -98,8 +98,7 @@ const PlanMenu = () => {
                     setPlanOpened(false);
                 }}
                 title={t('Dodaj rzut')}
-                padding="xl"
-                size="lg"
+                size="xl"
                 centered
             >
                 <AddPlan

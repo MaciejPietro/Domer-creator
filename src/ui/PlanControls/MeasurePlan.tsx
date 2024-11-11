@@ -46,6 +46,8 @@ export default function MeasurePlan({ fileUrl, lengths, setLengths }: any) {
                 eventMode: 'static',
             };
 
+            console.log(viewportSettings);
+
             const measureMain = new MeasureMain(viewportSettings);
 
             measureMain.onSetLength = (length: number) => {
@@ -72,19 +74,6 @@ export default function MeasurePlan({ fileUrl, lengths, setLengths }: any) {
                     {fileUrl ? <img className="w-full object-cover" src={fileUrl} alt="" /> : null}
                     <div className="absolute top-0 left-0 w-full h-full" ref={ref} />
                 </div>
-            </div>
-
-            <div className="flex gap-2 items-center mt-4">
-                <p>Zaznaczony odcinek ma:</p>{' '}
-                <NumberInput
-                    className="w-44"
-                    disabled={!lengths.real}
-                    placeholder="Zaznacz odcinek na planie"
-                    value={length ?? undefined}
-                    hideControls
-                    onChange={(value) => setLengths({ ...lengths, plan: value })}
-                />
-                <p>cm</p>
             </div>
         </div>
     );
