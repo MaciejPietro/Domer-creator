@@ -199,9 +199,11 @@ export class Door extends BuildingElement {
         const focusedElement = useStore.getState().focusedElement;
 
         if (focusedElement === this) {
+            this.isFocused = true;
             this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
         }
         if (focusedElement !== this) {
+            this.isFocused = false;
             this.setBackground();
         }
     }

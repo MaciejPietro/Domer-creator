@@ -78,21 +78,6 @@ export class Main extends Viewport {
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
 
-        // if (ev.button === 2) {
-        //     this.pointer.setCursor('grab');
-
-        //     return;
-        // }
-
-        this.checkTools(ev);
-    }
-    private onPointerUp(ev: FederatedPointerEvent) {
-        // if (ev.button === 2) {
-        //     this.pointer.setCursor('default');
-
-        //     return;
-        // }
-
         const isLeftMouseButton = ev.button === 0;
 
         if (isLeftMouseButton && ev.target === this) {
@@ -100,6 +85,11 @@ export class Main extends Viewport {
 
             state.setFocusedElement(null);
         }
+
+        this.checkTools(ev);
+    }
+    private onPointerUp(ev: FederatedPointerEvent) {
+        document.body.style.cursor = 'default';
 
         this.updateEnd(ev);
     }

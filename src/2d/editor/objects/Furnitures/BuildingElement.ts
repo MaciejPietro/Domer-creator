@@ -1,7 +1,7 @@
 import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
 import { Tool } from '@/2d/editor/constants';
-import { useStore } from '@/stores/EditorStore';
+import { FocusedElement, useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';
 import { WindowElement } from './Window/Window';
@@ -20,8 +20,11 @@ export abstract class BuildingElement extends Container {
     clickStartTime: number;
     customParent: Wall | undefined;
     length = 0;
+    dragStartPosition: Point = { x: 0, y: 0 };
     public isTemporary = false;
     public isValid = false;
+    public isFocused = false;
+    private isDragging = false;
 
     constructor(config?: BuildingElementProps) {
         super();
@@ -30,14 +33,17 @@ export abstract class BuildingElement extends Container {
 
         if (config?.uuid) this.uuid = config.uuid;
         if (config?.parent) this.customParent = config.parent;
-        // if (config?.parent) this.parent = config.parent;
 
         this.background = new Graphics();
 
         this.watchStoreChanges();
 
+        this.on('pointerover', this.onElementMouseOver);
+        this.on('pointerleave', this.onElementMouseLeave);
+
         this.on('pointerdown', this.onElementMouseDown);
         this.on('pointerup', this.onElementMouseUp);
+        this.on('globalpointermove', this.onGlobalMouseMove);
 
         this.clickStartTime = 0;
     }
@@ -78,14 +84,28 @@ export abstract class BuildingElement extends Container {
         return false;
     }
 
+    private onElementMouseOver(ev: FederatedPointerEvent) {
+        if (!this.isDragging) document.body.style.cursor = 'pointer';
+    }
+
+    private onElementMouseLeave(ev: FederatedPointerEvent) {
+        if (!this.isDragging) document.body.style.cursor = 'default';
+    }
+
     private onElementMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
+        this.isDragging = true;
+
+        this.dragStartPosition = this.toLocal({ x: ev.x, y: ev.y });
 
         this.clickStartTime = Date.now();
     }
 
     private onElementMouseUp(ev: FederatedPointerEvent) {
         ev.stopPropagation();
+        this.isDragging = false;
+        this.dragStartPosition = this.toLocal({ x: 0, y: 0 });
+        document.body.style.cursor = 'pointer';
 
         const clickDuration = Date.now() - this.clickStartTime;
 
@@ -95,6 +115,35 @@ export abstract class BuildingElement extends Container {
 
         return;
     }
+
+    private onGlobalMouseMove(ev: FederatedPointerEvent) {
+        if (ev.buttons !== 1 || !this.isFocused || !this.isDragging || this.isTemporary || !this.customParent) return;
+
+        const state = useStore.getState();
+
+        if (state.activeTool !== Tool.Edit) return;
+
+        document.body.style.cursor = 'grabbing';
+
+        const newPos = this.parent.toLocal(ev.global);
+
+        const newX = newPos.x - this.dragStartPosition.x;
+
+        const boundedX = Math.max(0, Math.min(newX, this.customParent.length - this.length));
+
+        const updatedPosition = {
+            x: boundedX,
+            y: this.position.y,
+        };
+
+        const previousPosition = { x: this.position.x, y: this.position.y };
+
+        this.setPosition(updatedPosition);
+
+        if (this.isCollide()) this.setPosition(previousPosition);
+    }
+
+    public setPosition({ x, y }: Nullable<Point>) {}
 
     private onMouseClick() {
         const state = useStore.getState();

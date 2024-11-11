@@ -12,7 +12,7 @@ export enum ToolMode {
     ViewMode,
 }
 
-type FocusedElement = null | WallNode | Wall | Door | WindowElement;
+export type FocusedElement = null | WallNode | Wall | Door | WindowElement;
 
 export interface EditorStore {
     // mode: ToolMode;
