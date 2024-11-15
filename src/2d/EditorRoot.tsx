@@ -4,7 +4,6 @@ import { Application, Container } from 'pixi.js';
 import { IViewportOptions, Viewport } from 'pixi-viewport';
 import { useStore } from '../stores/EditorStore';
 import { COLOR_BACKGROUND, METER } from '@/2d/editor/constants';
-// import { InteractionManager } from '@pixi/interaction';
 import { extensions } from '@pixi/core';
 import { EventSystem } from '@pixi/events';
 import { InteractionManager } from '@pixi/interaction';

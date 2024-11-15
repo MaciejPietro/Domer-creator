@@ -7,7 +7,6 @@ import { useStore } from '../../../stores/EditorStore';
 import { snap } from '../../../helpers/ViewportCoordinates';
 import { Point } from '../../../helpers/Point';
 
-// Add node to FloorPlan. if clicked on screen, just add it. otherwise, add it to the wall.
 export class AddNodeAction implements Action {
     private wall: Wall;
     private coords: Point;
