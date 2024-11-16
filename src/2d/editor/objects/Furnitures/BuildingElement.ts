@@ -14,7 +14,7 @@ export type BuildingElementProps = {
     parent?: Wall;
 };
 
-export const DISTANCE_FROM_WALL = 25;
+export const DISTANCE_FROM_WALL = 20;
 
 export abstract class BuildingElement extends Container {
     uuid = uuidv4();
@@ -102,6 +102,8 @@ export abstract class BuildingElement extends Container {
         this.isDragging = true;
 
         this.dragStartPosition = this.toLocal({ x: ev.x, y: ev.y });
+
+        this.dragStartPosition = { x: Math.abs(this.dragStartPosition.x), y: this.dragStartPosition.y };
 
         this.clickStartTime = Date.now();
     }

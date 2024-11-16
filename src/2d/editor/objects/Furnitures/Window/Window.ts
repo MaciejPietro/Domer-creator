@@ -1,16 +1,15 @@
 import { Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
-import { COLOR_ACTIVE_ELEMENT_BORDER, COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
+import { COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
 import { WindowType } from './config';
 import { notifications } from '@mantine/notifications';
 import { Wall } from '../../Walls/Wall';
 import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 import { IWindowSerializable } from './IWindowSerializable';
-import { WINDOW_Z_INDEX } from './constants';
+import { WINDOW_ACTIVE_COLOR, WINDOW_COLOR, WINDOW_INVALID_COLOR, WINDOW_Z_INDEX } from './constants';
 
 // bg-blue-500 from tailwind.config.js
-const COLOR = '#1C7ED6';
 const WINDOW_WIDTH = 80;
 const WINDOW_HEIGHT = 140;
 const WINDOW_BOTTOM = 90;
@@ -75,10 +74,11 @@ export class WindowElement extends BuildingElement {
     public setValidity(isValid = true) {
         if (isValid) {
             this.isValid = true;
+            this.setStroke();
         } else {
             this.isValid = false;
+            this.setStroke(WINDOW_INVALID_COLOR);
         }
-        this.setBackground('transparent', this.isValid ? 'transparent' : '#ff000020');
     }
 
     public setType(type: WindowType) {
@@ -102,7 +102,7 @@ export class WindowElement extends BuildingElement {
         this.addChild(this.background);
     }
 
-    private setStroke() {
+    private setStroke(color = WINDOW_COLOR) {
         this.baseLine?.clear();
 
         const wallParentThickness = (this.customParent?.thickness || 0) + 1;
@@ -110,7 +110,7 @@ export class WindowElement extends BuildingElement {
         this.baseLine = new Graphics();
         const { x, y } = { x: 0, y: 0 };
 
-        const strokeSettings = { width: 2, color: COLOR };
+        const strokeSettings = { width: 2, color };
 
         // WALL GAP
         this.baseLine
@@ -162,11 +162,11 @@ export class WindowElement extends BuildingElement {
         const focusedElement = useStore.getState().focusedElement;
         if (focusedElement === this) {
             this.isFocused = true;
-            this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
+            this.setStroke(WINDOW_ACTIVE_COLOR);
         }
         if (focusedElement !== this) {
             this.isFocused = false;
-            this.setBackground();
+            this.setStroke();
         }
     }
 
@@ -192,7 +192,6 @@ export class WindowElement extends BuildingElement {
         }
 
         this.setStroke();
-        this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
     }
 
     public serialize() {

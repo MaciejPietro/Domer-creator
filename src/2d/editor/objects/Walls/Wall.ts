@@ -23,6 +23,14 @@ import { DashedLine } from '../Helpers/DashedLine';
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
 import { AddWallManager } from '../../actions/AddWallManager';
 import { DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
+import {
+    WALL_ACTIVE_STROKE_COLOR,
+    WALL_ACTIVE_Z_INDEX,
+    WALL_FILL_COLOR,
+    WALL_HOVER_FILL_COLOR,
+    WALL_INACTIVE_Z_INDEX,
+    WALL_STROKE_COLOR,
+} from './constants';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -55,7 +63,7 @@ export class Wall extends Graphics {
 
     tempFurniture: Door | WindowElement | null = null;
 
-    color = '#ffffff';
+    color = WALL_FILL_COLOR;
 
     leftNodePlaceholder: Graphics | undefined;
     rightNodePlaceholder: Graphics | undefined;
@@ -120,9 +128,15 @@ export class Wall extends Graphics {
 
         if (focusedElement === this) {
             this.focus();
+            console.log('xdxd in');
+
+            this.zIndex = WALL_ACTIVE_Z_INDEX;
         }
         if (focusedElement !== this) {
             this.blur();
+            console.log('xdxd out');
+
+            this.zIndex = WALL_INACTIVE_Z_INDEX;
         }
         this.setStyles();
     }
@@ -136,13 +150,13 @@ export class Wall extends Graphics {
 
     public setStyles() {
         // bg-blue-500 from tailwind.config.js
-        const strokeColor = this.focused ? '#1C7ED6' : '#1a1a1a';
+        const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : WALL_STROKE_COLOR;
 
         this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
     }
 
     private onMouseOver(ev: FederatedPointerEvent) {
-        this.color = '#f5f9ff';
+        this.color = WALL_HOVER_FILL_COLOR;
 
         if (this.isEditMode()) {
             this.setStyles();
@@ -182,7 +196,7 @@ export class Wall extends Graphics {
 
     private onMouseOut() {
         if (this.dragging) return;
-        this.color = '#fff';
+        this.color = WALL_FILL_COLOR;
 
         this.setStyles();
 
@@ -215,8 +229,6 @@ export class Wall extends Graphics {
 
         this.type = newType;
 
-        // this.zIndex = wallTypeConfig[this.type].zIndex;
-
         this.applySettings();
         this.drawLine();
         this.updateChildren();
@@ -226,6 +238,8 @@ export class Wall extends Graphics {
         for (const item of this.children) {
             if (item instanceof Door || item instanceof WindowElement) {
                 item.setPosition({ x: null, y: null });
+                item.setStroke();
+                item.setBackground();
             }
         }
     }
@@ -314,8 +328,6 @@ export class Wall extends Graphics {
 
         this.clear();
 
-        // testing fill end and start of the wall, previously was         this.rect(0, 0, this.length, this.thickness);
-        // this.rect(-this.thickness / 2, 0, this.length + this.thickness, this.thickness);
         this.rect(0, 0, this.length, this.thickness);
 
         this.setStyles();
@@ -397,6 +409,8 @@ export class Wall extends Graphics {
 
         switch (state.activeTool) {
             case Tool.Edit:
+                this.zIndex = WALL_ACTIVE_Z_INDEX;
+
                 state.setFocusedElement(this as unknown as WallNode);
 
                 this.focus();

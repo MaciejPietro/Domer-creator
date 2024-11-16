@@ -1,6 +1,6 @@
 import { Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
-import { COLOR_ACTIVE_ELEMENT_BORDER, COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
+import { COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,6 +10,7 @@ import { Wall } from '../../Walls/Wall';
 import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 import { INodeSerializable } from '@/2d/editor/persistence/INodeSerializable';
 import { IDoorSerializable } from './IDoorSerializable';
+import { DOOR_ACTIVE_COLOR, DOOR_COLOR, DOOR_INVALID_COLOR } from './constants';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -54,7 +55,7 @@ export class Door extends BuildingElement {
             }
         }
 
-        this.setBackground('transparent');
+        this.setBackground();
 
         this.setStroke();
     }
@@ -67,91 +68,82 @@ export class Door extends BuildingElement {
     public setValidity(isValid = true) {
         if (isValid) {
             this.isValid = true;
+            this.setStroke();
         } else {
             this.isValid = false;
+            this.setStroke(DOOR_INVALID_COLOR);
         }
-
-        this.setBackground('transparent', this.isValid ? 'transparent' : '#ff000020');
     }
 
     public setType(type: DoorType) {
         this.type = type;
 
         this.setStroke();
+        this.setBackground();
     }
 
-    private setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
-        const offset = 10;
+    public setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
+        const offset = 0;
 
         this.background.clear();
-        this.background.rect(-offset / 2, -offset / 2, this.length + offset, this.length + offset);
+        this.background.rect(-offset / 2, -offset / 2, this.length, this.length);
         this.background.fill(fillColor);
         this.background.stroke(strokeColor);
 
         this.addChild(this.background);
     }
 
-    private setStroke() {
+    public setStroke(color = DOOR_COLOR) {
         this.baseLine?.clear();
+        const offset = -1;
         const wallParentThickness = this.customParent?.thickness || 0;
 
         this.baseLine = new Graphics();
         const { x, y } = { x: 0, y: 0 };
 
-        const strokeSettings = { width: 2, color: COLOR };
+        const strokeSettings = { width: 2, color };
 
         // ARC
         this.baseLine
-            .arc(x, y, this.length, 0, 0.1)
+            .arc(x, y + offset, this.length, 0, 0.1)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 0.15, 0.25)
+            .arc(x, y + offset, this.length, 0.15, 0.25)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 0.3, 0.4)
+            .arc(x, y + offset, this.length, 0.3, 0.4)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 0.45, 0.55)
+            .arc(x, y + offset, this.length, 0.45, 0.55)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 0.6, 0.7)
+            .arc(x, y + offset, this.length, 0.6, 0.7)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 0.75, 0.85)
+            .arc(x, y + offset, this.length, 0.75, 0.85)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 0.9, 1.0)
+            .arc(x, y + offset, this.length, 0.9, 1.0)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 1.05, 1.15)
+            .arc(x, y + offset, this.length, 1.05, 1.15)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 1.2, 1.3)
+            .arc(x, y + offset, this.length, 1.2, 1.3)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 1.35, 1.45)
+            .arc(x, y + offset, this.length, 1.35, 1.45)
             .stroke(strokeSettings)
-            .arc(x, y, this.length, 1.5, 1.55)
+            .arc(x, y + offset, this.length, 1.5, 1.55)
             .stroke(strokeSettings);
 
         // WALL GAP
         this.baseLine
-            .rect(0, -wallParentThickness + 11, x + this.length, wallParentThickness)
+            .rect(-1, -wallParentThickness + offset, this.length + 2, wallParentThickness)
             .fill({ color: COLOR_BACKGROUND });
 
         // THICK LINE
-        this.baseLine.rect(0, 0, x + this.length, 10).fill({ color: COLOR });
+        this.baseLine.rect(-1, -9, x + this.length + 2, 10).fill({ color });
 
         // LINE
         this.baseLine
-            .moveTo(x, y)
+            .moveTo(x, y - 2)
             .lineTo(0, y + this.length)
             .stroke(strokeSettings);
 
-        // WALL GAP LINES
-        this.baseLine
-            .moveTo(x, y)
-            .lineTo(x, -wallParentThickness + 12)
-            .stroke({ width: 1, color: 'black' });
-
-        this.baseLine
-            .moveTo(x + this.length, y)
-            .lineTo(x + this.length, -wallParentThickness + 12)
-            .stroke({ width: 1, color: 'black' });
-
         if (this.orientation === DoorOrientation.West) {
-            this.position.y = (this.customParent?.thickness || 0) - 12;
+            this.position.y = this.customParent?.thickness || 0;
 
             this.scale.y = 1;
             this.scale.x = this.type === DoorType.Left ? 1 : -1;
@@ -169,7 +161,7 @@ export class Door extends BuildingElement {
 
         if (this.orientation === DoorOrientation.East) {
             this.scale.y = -1;
-            this.position.y = 10;
+            this.position.y = 0;
 
             if (this.type === DoorType.Left) {
                 this.scale.x = -1;
@@ -199,18 +191,18 @@ export class Door extends BuildingElement {
 
         if (focusedElement === this) {
             this.isFocused = true;
-            this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
+            this.setStroke(DOOR_ACTIVE_COLOR);
         }
         if (focusedElement !== this) {
             this.isFocused = false;
-            this.setBackground();
+            this.setStroke();
         }
     }
 
     public setPosition({ x, y }: Nullable<Point>) {
         const wallParentThickness = this.customParent?.thickness || 0;
 
-        const fixedY = this.orientation === DoorOrientation.West ? wallParentThickness - 12 : 10;
+        const fixedY = this.orientation === DoorOrientation.West ? wallParentThickness : 0;
 
         this.position = { x: x ?? this.position.x, y: fixedY };
     }
@@ -233,7 +225,6 @@ export class Door extends BuildingElement {
         }
 
         this.setStroke();
-        this.setBackground(COLOR_ACTIVE_ELEMENT_BORDER);
     }
 
     public setOrientation(orientation: DoorOrientation) {
