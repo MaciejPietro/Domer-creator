@@ -1,184 +1,44 @@
 {
   "floors": [
     {
-      "furnitureArray": [
-        {
-          "uuid": "bf752070-ddbc-438c-b3aa-962723fd2206",
-          "wallUuid": "20ae1c0e-9b31-4cb1-958e-1c64891366dd",
-          "x": 101.58550345613003,
-          "y": 28,
-          "length": 80,
-          "orientation": 0,
-          "type": 0,
-          "element": "door"
-        },
-        {
-          "uuid": "3bb126ad-93c8-4a15-9465-1450e2407394",
-          "wallUuid": "7232ce2b-b5fa-4264-bdc2-5e40ca597b65",
-          "x": 131.99595641467545,
-          "y": 28,
-          "length": 80,
-          "orientation": 0,
-          "type": 0,
-          "element": "door"
-        },
-        {
-          "uuid": "58b22d38-4c55-4f6b-ad99-de0e5cf9786f",
-          "wallUuid": "861377f2-e90f-487f-b5c5-a02f6e756d61",
-          "x": 173.27119109589285,
-          "y": 28,
-          "length": 80,
-          "orientation": 0,
-          "type": 0,
-          "element": "door"
-        },
-        {
-          "uuid": "33d0b2a1-ef8f-439e-afaf-49a4d795d978",
-          "wallUuid": "f282deb1-d706-4ef9-b608-667dfc9ac39d",
-          "x": 456.5336913881465,
-          "y": 28,
-          "length": 80,
-          "orientation": 0,
-          "type": 0,
-          "element": "door"
-        },
-        {
-          "uuid": "bcb3e255-2d83-4296-99c8-7e2e47b686f6",
-          "wallUuid": "01e8fb24-8176-4d75-b4b4-379d24f58936",
-          "x": 55.51481115242893,
-          "y": 19,
-          "length": 280,
-          "height": 140,
-          "bottom": 90,
-          "type": 2,
-          "element": "window"
-        },
-        {
-          "uuid": "7cc62934-c39b-4f5e-a18e-89102f1e1950",
-          "wallUuid": "f282deb1-d706-4ef9-b608-667dfc9ac39d",
-          "x": 185.2270134738162,
-          "y": 19,
-          "length": 80,
-          "height": 140,
-          "bottom": 90,
-          "type": 2,
-          "element": "window"
-        },
-        {
-          "uuid": "cb8eb64b-765f-4895-929f-8ae0c60c1890",
-          "wallUuid": "f282deb1-d706-4ef9-b608-667dfc9ac39d",
-          "x": 702.0834062093442,
-          "y": 19,
-          "length": 80,
-          "height": 140,
-          "bottom": 90,
-          "type": 2,
-          "element": "window"
-        },
-        {
-          "uuid": "19489d9d-fc90-404a-9a32-4319e05b348d",
-          "wallUuid": "e352d456-39ed-438c-8195-3735e569c914",
-          "x": 161.4573364750413,
-          "y": 19,
-          "length": 80,
-          "height": 140,
-          "bottom": 90,
-          "type": 2,
-          "element": "window"
-        }
-      ],
+      "furnitureArray": [],
       "wallNodes": [
         {
+          "id": 1,
+          "x": 2400,
+          "y": 2140
+        },
+        {
           "id": 2,
-          "x": 2200,
-          "y": 2800
+          "x": 2400,
+          "y": 1740
         },
         {
           "id": 3,
-          "x": 3200,
-          "y": 2800
-        },
-        {
-          "id": 4,
-          "x": 3200,
-          "y": 2400
-        },
-        {
-          "id": 5,
-          "x": 2800,
-          "y": 2400
-        },
-        {
-          "id": 7,
-          "x": 2220,
-          "y": 2400
-        },
-        {
-          "id": 8,
-          "x": 2200,
-          "y": 2400
-        },
-        {
-          "id": 10,
-          "x": 2500,
-          "y": 2400
+          "x": 2950,
+          "y": 1740
         }
       ],
       "wallNodeLinks": [
-        [1, []],
+        [
+          1,
+          [
+            {
+              "id": 2,
+              "wallUuid": "f91d1814-53d4-4cc4-9768-dab22a8cd43a"
+            }
+          ]
+        ],
         [
           2,
           [
             {
-              "id": 8,
-              "wallUuid": "01e8fb24-8176-4d75-b4b4-379d24f58936"
-            }
-          ]
-        ],
-        [
-          3,
-          [
-            {
-              "id": 2,
-              "wallUuid": "f282deb1-d706-4ef9-b608-667dfc9ac39d"
-            }
-          ]
-        ],
-        [
-          4,
-          [
-            {
               "id": 3,
-              "wallUuid": "e352d456-39ed-438c-8195-3735e569c914"
+              "wallUuid": "7a30b8fb-2140-484d-8b3b-2398f710d022"
             }
           ]
         ],
-        [
-          5,
-          [
-            {
-              "id": 4,
-              "wallUuid": "861377f2-e90f-487f-b5c5-a02f6e756d61"
-            },
-            {
-              "id": 10,
-              "wallUuid": "20ae1c0e-9b31-4cb1-958e-1c64891366dd"
-            }
-          ]
-        ],
-        [6, []],
-        [7, []],
-        [8, []],
-        [9, []],
-        [
-          10,
-          [
-            {
-              "id": 8,
-              "wallUuid": "7232ce2b-b5fa-4264-bdc2-5e40ca597b65"
-            }
-          ]
-        ]
+        [3, []]
       ]
     }
   ]

@@ -209,6 +209,21 @@ export class WallNodeSequence extends Container {
 
         return null;
     }
+
+    public getWallsByNodesIds(wallNodeIds: number[]) {
+        const connectedWalls: Wall[] = [];
+
+        for (const wallNodeId of wallNodeIds) {
+            for (const wall of this.walls) {
+                if (wall.leftNode.getId() === wallNodeId || wall.rightNode.getId() === wallNodeId) {
+                    connectedWalls.push(wall);
+                }
+            }
+        }
+
+        return connectedWalls;
+    }
+
     public drawWalls() {
         this.walls.forEach((wall) => {
             wall.drawLine('drawWalls');

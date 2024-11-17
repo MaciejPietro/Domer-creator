@@ -86,7 +86,7 @@ export class WindowElement extends BuildingElement {
         this.setStroke();
     }
 
-    private setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
+    public setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
         const wallParentThickness = this.customParent?.thickness || 0;
         const offset = 10;
 
@@ -102,7 +102,7 @@ export class WindowElement extends BuildingElement {
         this.addChild(this.background);
     }
 
-    private setStroke(color = WINDOW_COLOR) {
+    public setStroke(color = WINDOW_COLOR) {
         this.baseLine?.clear();
 
         const wallParentThickness = (this.customParent?.thickness || 0) + 1;

@@ -1929,6 +1929,11 @@
   resolved "https://registry.yarnpkg.com/@pixi/interaction/-/interaction-6.5.10.tgz#c477d42206f3a2ed11bf06f3147bcd3906a872fa"
   integrity sha512-v809pJmXA2B9dV/vdrDMUqJT+fBB/ARZli2YRmI2dPbEbkaYr8FNmxCAJnwT8o+ymTx044Ie820hn9tVrtMtfA==
 
+"@pixi/math-extras@^7.4.2":
+  version "7.4.2"
+  resolved "https://registry.yarnpkg.com/@pixi/math-extras/-/math-extras-7.4.2.tgz#5c4744877ab422828883a6a414c7a16a8ac381e2"
+  integrity sha512-Ufim8EJ4k6tgB8VYnJopSDMTIMEMZTwobEyNCWVbeYmoDFdkdQeRHnHrco6YKdU8THN9ankJ9sCbhKBbe7j5BA==
+
 "@pixi/math@7.4.2", "@pixi/math@^7.4.2":
   version "7.4.2"
   resolved "https://registry.yarnpkg.com/@pixi/math/-/math-7.4.2.tgz#473b400c89ac8fcdf6e09259ab097ce35cd8ac68"

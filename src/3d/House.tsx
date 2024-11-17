@@ -17,6 +17,7 @@ import Window from './elements/Window/Window';
 import { cmToM } from '@/utils/transform';
 import { WALL_HEIGHT } from './elements/Wall/constants';
 import { DOOR_HEIGHT } from '@/2d/editor/objects/Furnitures/Door/constants';
+import { createRandomColor } from './utils/helpers';
 
 const tri = new THREE.CylinderGeometry(1, 1, 2, 3);
 
@@ -26,17 +27,6 @@ const distance = (pointA: any, pointB: any, wallWidth: number) => {
 
     return Math.sqrt(Math.pow(pointB.x - pointA.x, 2) + Math.pow(pointB.y - pointA.y, 2)) + fillWallEdges;
 };
-
-function createRandomColor(length = 6) {
-    let color = '';
-    for (let i = 0; i < length; i += 2) {
-        // Generate a random value between 128 and 192 (inclusive) for each RGB channel
-        const randomValue = Math.floor(Math.random() * 65) + 128;
-        const hexValue = randomValue.toString(16).padStart(2, '0');
-        color += hexValue;
-    }
-    return '#' + color;
-}
 
 const midpoint = (pointA: any, pointB: any) => ({
     x: (pointA.x + pointB.x) / 2,

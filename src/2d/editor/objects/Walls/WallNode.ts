@@ -24,6 +24,7 @@ export class WallNode extends Container {
     private size = 20;
     public prevPosition = { x: 0, y: 0 };
     private isMouseOver = false;
+    background: any;
 
     constructor(x: number, y: number, nodeId: number) {
         super();
@@ -135,6 +136,22 @@ export class WallNode extends Container {
         // // background.stroke({ texture: Texture.WHITE, width: 1, color: 'black' });
         // background.zIndex = -1;
         // this.addChildAt(background, 0);
+
+        // this.background?.clear();
+        // this.background = new Graphics();
+        // this.background
+        //     .beginFill('blue')
+        //     .moveTo(-10, -20) // Start at top-left
+        //     .lineTo(20, -20) // Draw to top-right
+        //     .lineTo(20, 20) // Draw to bottom-right
+        //     .lineTo(-20, 20) // Draw to bottom-right
+        //     .lineTo(-20, -20)
+        //     .closePath()
+        //     .endFill();
+        // // this.background.scale.set(0.5);
+        // this.background.position.set(0, 0);
+        // // this.background.rotation = -degreesToRadians(this.angle) % 180;
+        // this.addChildAt(this.background, 1);
     }
 
     private onMouseOver() {

@@ -1,4 +1,5 @@
 import { Graphics, FederatedPointerEvent, Container } from 'pixi.js';
+import { lineIntersection, segmentIntersection } from '@pixi/math-extras';
 import { euclideanDistance } from '../../../../helpers/EuclideanDistance';
 import { Point } from '../../../../helpers/Point';
 import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
@@ -31,12 +32,23 @@ import {
     WALL_INACTIVE_Z_INDEX,
     WALL_STROKE_COLOR,
 } from './constants';
+import { WallNodeSequence } from './WallNodeSequence';
+import { createRandomColor } from '@/3d/utils/helpers';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
 export type WallSettings = {
     uuid?: string;
     type?: WallType;
+};
+
+const degreesToRadians = (degrees: number): number => {
+    return degrees * (Math.PI / 180);
+};
+
+// Function to convert radians to degrees
+const radiansToDegrees = (radians: number): number => {
+    return radians * (180 / Math.PI);
 };
 
 export class Wall extends Graphics {
@@ -46,6 +58,14 @@ export class Wall extends Graphics {
     length: number;
     measureLabel: MeasureLabel;
     children: Container[] = [];
+    lineHelper: Graphics;
+    dotHelperA: Graphics;
+    dotHelperB: Graphics;
+    dotHelperC: Graphics;
+    dotHelperD: Graphics;
+
+    // rightBackground: Graphics | undefined;
+    helpersContainer = new Container();
 
     focused = false;
 
@@ -79,6 +99,21 @@ export class Wall extends Graphics {
 
         // this.zIndex = wallTypeConfig[this.type].zIndex;
 
+        this.lineHelper = new Graphics();
+
+        this.dotHelperA = new Graphics();
+        this.dotHelperB = new Graphics();
+        this.dotHelperC = new Graphics();
+        this.dotHelperD = new Graphics();
+
+        this.helpersContainer.addChild(this.lineHelper);
+        this.helpersContainer.addChild(this.dotHelperA);
+        this.helpersContainer.addChild(this.dotHelperB);
+        this.helpersContainer.addChild(this.dotHelperC);
+        this.helpersContainer.addChild(this.dotHelperD);
+
+        this.addChild(this.helpersContainer);
+
         this.getNodesCords();
 
         this.measureLabel = new MeasureLabel(0);
@@ -99,8 +134,6 @@ export class Wall extends Graphics {
         if (settings?.uuid) this.uuid = settings.uuid;
 
         this.applySettings();
-
-        this.drawWallNodesPlaceholders();
 
         this.watchStoreChanges();
 
@@ -124,17 +157,15 @@ export class Wall extends Graphics {
     private checkVisibility() {
         const focusedElement = useStore.getState().focusedElement;
 
-        this.setStyles();
+        // this.setStyles();
 
         if (focusedElement === this) {
             this.focus();
-            console.log('xdxd in');
 
             this.zIndex = WALL_ACTIVE_Z_INDEX;
         }
         if (focusedElement !== this) {
             this.blur();
-            console.log('xdxd out');
 
             this.zIndex = WALL_INACTIVE_Z_INDEX;
         }
@@ -149,9 +180,137 @@ export class Wall extends Graphics {
     }
 
     public setStyles() {
-        // bg-blue-500 from tailwind.config.js
+        if (!this.parent) return;
         const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : WALL_STROKE_COLOR;
 
+        this.clear();
+
+        const parent = this.parent as WallNodeSequence;
+
+        const wallsLeft = parent.getWallsByNodesIds([this.leftNode.getId()]);
+        const wallsRight = parent.getWallsByNodesIds([this.rightNode.getId()]);
+
+        const siblingLeftWall = wallsLeft.find((wall) => wall !== this);
+        const siblingRightWall = wallsRight.find((wall) => wall !== this);
+
+        let pointA: Point = { x: 0, y: 0 };
+        let pointB: Point = { x: 0, y: 0 };
+        let pointC: Point = { x: 0, y: 0 };
+        let pointD: Point = { x: 0, y: 0 };
+
+        if (siblingLeftWall && wallsLeft.length === 2) {
+            // DDD
+            {
+                const x1 = -100;
+                const y1 = 0;
+                const x2 = this.length + 100;
+                const y2 = 0;
+
+                const x3 = -100;
+                const y3 = 0;
+                const x4 = siblingLeftWall.length + 100;
+                const y4 = 0;
+
+                const point1 = this.toGlobal({ x: x1, y: y1 });
+                const point2 = this.toGlobal({ x: x2, y: y2 });
+                const point3 = siblingLeftWall.toGlobal({ x: x3, y: y3 });
+                const point4 = siblingLeftWall.toGlobal({ x: x4, y: y4 });
+
+                pointD = this.toLocal(lineIntersection(point1, point2, point3, point4));
+            }
+
+            // AAA
+            {
+                const x1 = -100;
+                const y1 = this.thickness;
+                const x2 = this.length + 100;
+                const y2 = this.thickness;
+
+                const x3 = -100;
+                const y3 = siblingLeftWall.thickness;
+                const x4 = siblingLeftWall.length + 100;
+                const y4 = siblingLeftWall.thickness;
+
+                const point1 = this.toGlobal({ x: x1, y: y1 });
+                const point2 = this.toGlobal({ x: x2, y: y2 });
+                const point3 = siblingLeftWall.toGlobal({ x: x3, y: y3 });
+                const point4 = siblingLeftWall.toGlobal({ x: x4, y: y4 });
+
+                pointA = this.toLocal(lineIntersection(point1, point2, point3, point4));
+            }
+        } else {
+            pointD = { x: 0, y: 0 };
+            pointA = { x: 0, y: this.thickness };
+        }
+
+        if (siblingRightWall && wallsRight.length === 2) {
+            // CCC
+            {
+                const x1 = -100;
+                const y1 = 0;
+                const x2 = this.length + 100;
+                const y2 = 0;
+
+                const x3 = -100;
+                const y3 = 0;
+                const x4 = siblingRightWall.length + 100;
+                const y4 = 0;
+
+                const point1 = this.toGlobal({ x: x1, y: y1 });
+                const point2 = this.toGlobal({ x: x2, y: y2 });
+                const point3 = siblingRightWall.toGlobal({ x: x3, y: y3 });
+                const point4 = siblingRightWall.toGlobal({ x: x4, y: y4 });
+
+                pointC = this.toLocal(lineIntersection(point1, point2, point3, point4));
+            }
+
+            // BBB
+            {
+                const x1 = -100;
+                const y1 = this.thickness;
+                const x2 = this.length + 100;
+                const y2 = this.thickness;
+
+                const x3 = -100;
+                const y3 = siblingRightWall.thickness;
+                const x4 = siblingRightWall.length + 100;
+                const y4 = siblingRightWall.thickness;
+
+                const point1 = this.toGlobal({ x: x1, y: y1 });
+                const point2 = this.toGlobal({ x: x2, y: y2 });
+                const point3 = siblingRightWall.toGlobal({ x: x3, y: y3 });
+                const point4 = siblingRightWall.toGlobal({ x: x4, y: y4 });
+
+                pointB = this.toLocal(lineIntersection(point1, point2, point3, point4));
+            }
+        } else {
+            pointB = { x: this.length, y: this.thickness };
+            pointC = { x: this.length, y: 0 };
+        }
+
+        this.dotHelperA.clear();
+        this.dotHelperA.zIndex = 1001;
+        this.dotHelperA.circle(pointA.x, pointA.y, 3);
+        this.dotHelperA.stroke({ width: 1, color: 'red' });
+
+        this.dotHelperB.clear();
+        this.dotHelperB.zIndex = 1001;
+        this.dotHelperB.circle(pointB.x, pointB.y, 3);
+        this.dotHelperB.stroke({ width: 1, color: 'green' });
+
+        this.dotHelperC.clear();
+        this.dotHelperC.zIndex = 1001;
+        this.dotHelperC.circle(pointC.x, pointC.y, 3);
+        this.dotHelperC.stroke({ width: 1, color: 'blue' });
+
+        this.dotHelperD.clear();
+        this.dotHelperD.zIndex = 1001;
+        this.dotHelperD.circle(pointD.x, pointD.y, 3);
+        this.dotHelperD.stroke({ width: 1, color: 'purple' });
+
+        // WALLL
+
+        this.poly([pointA.x, pointA.y, pointB.x, pointB.y, pointC.x, pointC.y, pointD.x, pointD.y]);
         this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
     }
 
@@ -253,8 +412,8 @@ export class Wall extends Graphics {
         this.rightNodePlaceholder?.clear();
 
         const nodes = [
-            { x: 0, y: this.thickness / 2, el: this.leftNodePlaceholder },
-            { x: this.length, y: this.thickness / 2, el: this.rightNodePlaceholder },
+            { x: 0, y: this.thickness / 2, el: this.leftNodePlaceholder, node: this.leftNode },
+            { x: this.length, y: this.thickness / 2, el: this.rightNodePlaceholder, node: this.rightNode },
         ];
         nodes.forEach((node, idx) => {
             const isRight = idx;
@@ -285,7 +444,49 @@ export class Wall extends Graphics {
                 this.leftNodePlaceholder = nodeItem;
                 this.addChild(this.leftNodePlaceholder);
             }
+
+            if (isRight) {
+                // const point1 = { x: 0, y: 0 });
+                // const point2 = { x: -100, y: -100 });
+                // const point3 = { x: this.length, y: 0 });
+                // const point4 = { x: this.length + 100, y: -100 });
+                // const intersection = lineIntersection(point1, point2, point3, point4);
+                // this.helpBackground = new Graphics();
+                // this.helpBackground.circle(intersection.x, intersection.y, 5);
+                // this.helpBackground.fill('yellow');
+                // this.addChild(this.helpBackground);
+            }
         });
+
+        // this.lineHelper?.clear();
+        // this.lineHelper = new Graphics();
+        // this.lineHelper.moveTo(0, 0).lineTo(-100, 0).stroke({ width: 1, color: 'blue' });
+        // this.lineHelper.moveTo(0, 40).lineTo(-100, 40).stroke({ width: 1, color: 'blue' });
+
+        // this.addChild(this.lineHelper);
+
+        // this.rightBackground?.clear();
+        // this.rightBackground = new Graphics();
+        // this.rightBackground
+        //     .moveTo(this.length, 0)
+        //     .lineTo(this.length + 100, 0)
+        //     .stroke({ width: 1, color: 'red' });
+        // this.rightBackground
+        //     .moveTo(this.length, 40)
+        //     .lineTo(this.length + 100, 40)
+        //     .stroke({ width: 1, color: 'red' });
+
+        // this.addChild(this.rightBackground);
+
+        //     const point1 = { x: 0, y: 0 };
+        //     const point2 = { x: -100, y: 0 };
+        //     const point3 = { x: this.length, y: 0 };
+        //     const point4 = { x: this.length + 100, y: 0 };
+        //     const intersection = lineIntersection(point1, point2, point3, point4);
+        //     this.helpBackground = new Graphics();
+        //     this.helpBackground.circle(intersection.x, intersection.y, 5);
+        //     this.helpBackground.fill('yellow');
+        //     this.addChild(this.helpBackground);`
     }
 
     public drawLine() {
@@ -317,20 +518,17 @@ export class Wall extends Graphics {
             });
 
             this.drawLine();
+            // this.drawWallNodesPlaceholders();
 
             return;
         }
+
+        this.setStyles();
 
         let theta = Math.atan2(y2 - y1, x2 - x1);
 
         theta *= 180 / Math.PI;
         if (theta < 0) theta = 360 + theta;
-
-        this.clear();
-
-        this.rect(0, 0, this.length, this.thickness);
-
-        this.setStyles();
 
         this.position.set(x1, y1);
         this.angle = theta;
@@ -340,6 +538,7 @@ export class Wall extends Graphics {
 
         this.measureLabel.updateText(this.length, this.angle);
         this.measureLabel.updateLine(this.length);
+
         this.drawWallNodesPlaceholders();
     }
 
@@ -610,8 +809,6 @@ export class Wall extends Graphics {
         });
 
         occupiedSpots.sort((a, b) => a.start - b.start);
-
-        console.log(occupiedSpots);
 
         for (const { start, end } of occupiedSpots) {
             if (endX >= start && startX <= end) {
