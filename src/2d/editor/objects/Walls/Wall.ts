@@ -183,105 +183,138 @@ export class Wall extends Graphics {
         if (!this.parent) return;
         const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : WALL_STROKE_COLOR;
 
-        this.clear();
-
         const parent = this.parent as WallNodeSequence;
 
         const wallsLeft = parent.getWallsByNodesIds([this.leftNode.getId()]);
         const wallsRight = parent.getWallsByNodesIds([this.rightNode.getId()]);
 
-        const siblingLeftWall = wallsLeft.find((wall) => wall !== this);
-        const siblingRightWall = wallsRight.find((wall) => wall !== this);
+        const condition = (wall: Wall) =>
+            wall !== this &&
+            wall.leftNode &&
+            wall.rightNode &&
+            wall.rotation !== this.rotation &&
+            wall.type === this.type;
+
+        const siblingLeftWalls = wallsLeft.sort((a, b) => a.type - b.type).filter(condition);
+        const siblingRightWalls = wallsRight.sort((a, b) => a.type - b.type).filter(condition);
 
         let pointA: Point = { x: 0, y: 0 };
         let pointB: Point = { x: 0, y: 0 };
         let pointC: Point = { x: 0, y: 0 };
         let pointD: Point = { x: 0, y: 0 };
 
-        if (siblingLeftWall && wallsLeft.length === 2) {
+        if (siblingLeftWalls.length) {
             // DDD
             {
-                const x1 = -100;
+                const x1 = -10000;
                 const y1 = 0;
-                const x2 = this.length + 100;
+                const x2 = this.length + 10000;
                 const y2 = 0;
-
-                const x3 = -100;
-                const y3 = 0;
-                const x4 = siblingLeftWall.length + 100;
-                const y4 = 0;
 
                 const point1 = this.toGlobal({ x: x1, y: y1 });
                 const point2 = this.toGlobal({ x: x2, y: y2 });
-                const point3 = siblingLeftWall.toGlobal({ x: x3, y: y3 });
-                const point4 = siblingLeftWall.toGlobal({ x: x4, y: y4 });
 
-                pointD = this.toLocal(lineIntersection(point1, point2, point3, point4));
+                const intersectionPoints = siblingLeftWalls.reduce((acc, wall, idx) => {
+                    const x3 = -10000;
+                    const y3 = 0;
+                    const x4 = wall.length + 10000;
+                    const y4 = 0;
+
+                    const point3 = wall.toGlobal({ x: x3, y: y3 });
+                    const point4 = wall.toGlobal({ x: x4, y: y4 });
+
+                    const myPoint = this.toLocal(lineIntersection(point1, point2, point3, point4));
+
+                    return [...acc, myPoint];
+                }, [] as Point[]);
+
+                pointD = intersectionPoints[0];
             }
 
             // AAA
             {
-                const x1 = -100;
+                const x1 = -10000;
                 const y1 = this.thickness;
-                const x2 = this.length + 100;
+                const x2 = this.length + 10000;
                 const y2 = this.thickness;
-
-                const x3 = -100;
-                const y3 = siblingLeftWall.thickness;
-                const x4 = siblingLeftWall.length + 100;
-                const y4 = siblingLeftWall.thickness;
 
                 const point1 = this.toGlobal({ x: x1, y: y1 });
                 const point2 = this.toGlobal({ x: x2, y: y2 });
-                const point3 = siblingLeftWall.toGlobal({ x: x3, y: y3 });
-                const point4 = siblingLeftWall.toGlobal({ x: x4, y: y4 });
 
-                pointA = this.toLocal(lineIntersection(point1, point2, point3, point4));
+                const intersectionPoints = siblingLeftWalls.reduce((acc, wall, idx) => {
+                    const x3 = -10000;
+                    const y3 = wall.thickness;
+                    const x4 = wall.length + 10000;
+                    const y4 = wall.thickness;
+
+                    const point3 = wall.toGlobal({ x: x3, y: y3 });
+                    const point4 = wall.toGlobal({ x: x4, y: y4 });
+
+                    const myPoint = this.toLocal(lineIntersection(point1, point2, point3, point4));
+
+                    return [...acc, myPoint];
+                }, [] as Point[]);
+
+                pointA = intersectionPoints[0];
             }
         } else {
             pointD = { x: 0, y: 0 };
             pointA = { x: 0, y: this.thickness };
         }
 
-        if (siblingRightWall && wallsRight.length === 2) {
+        if (siblingRightWalls.length) {
             // CCC
             {
-                const x1 = -100;
+                const x1 = -10000;
                 const y1 = 0;
-                const x2 = this.length + 100;
+                const x2 = this.length + 10000;
                 const y2 = 0;
 
-                const x3 = -100;
-                const y3 = 0;
-                const x4 = siblingRightWall.length + 100;
-                const y4 = 0;
+                const intersectionPoints = siblingRightWalls.reduce((acc, wall, idx) => {
+                    const point1 = this.toGlobal({ x: x1, y: y1 });
+                    const point2 = this.toGlobal({ x: x2, y: y2 });
 
-                const point1 = this.toGlobal({ x: x1, y: y1 });
-                const point2 = this.toGlobal({ x: x2, y: y2 });
-                const point3 = siblingRightWall.toGlobal({ x: x3, y: y3 });
-                const point4 = siblingRightWall.toGlobal({ x: x4, y: y4 });
+                    const x3 = -10000;
+                    const y3 = 0;
+                    const x4 = wall.length + 10000;
+                    const y4 = 0;
 
-                pointC = this.toLocal(lineIntersection(point1, point2, point3, point4));
+                    const point3 = wall.toGlobal({ x: x3, y: y3 });
+                    const point4 = wall.toGlobal({ x: x4, y: y4 });
+
+                    const myPoint = this.toLocal(lineIntersection(point1, point2, point3, point4));
+
+                    return [...acc, myPoint];
+                }, [] as Point[]);
+
+                pointC = intersectionPoints[0];
             }
 
             // BBB
             {
-                const x1 = -100;
+                const x1 = -10000;
                 const y1 = this.thickness;
-                const x2 = this.length + 100;
+                const x2 = this.length + 10000;
                 const y2 = this.thickness;
-
-                const x3 = -100;
-                const y3 = siblingRightWall.thickness;
-                const x4 = siblingRightWall.length + 100;
-                const y4 = siblingRightWall.thickness;
 
                 const point1 = this.toGlobal({ x: x1, y: y1 });
                 const point2 = this.toGlobal({ x: x2, y: y2 });
-                const point3 = siblingRightWall.toGlobal({ x: x3, y: y3 });
-                const point4 = siblingRightWall.toGlobal({ x: x4, y: y4 });
 
-                pointB = this.toLocal(lineIntersection(point1, point2, point3, point4));
+                const intersectionPoints = siblingRightWalls.reduce((acc, wall, idx) => {
+                    const x3 = -10000;
+                    const y3 = wall.thickness;
+                    const x4 = wall.length + 10000;
+                    const y4 = wall.thickness;
+
+                    const point3 = wall.toGlobal({ x: x3, y: y3 });
+                    const point4 = wall.toGlobal({ x: x4, y: y4 });
+
+                    const myPoint = this.toLocal(lineIntersection(point1, point2, point3, point4));
+
+                    return [...acc, myPoint];
+                }, [] as Point[]);
+
+                pointB = intersectionPoints[0];
             }
         } else {
             pointB = { x: this.length, y: this.thickness };
@@ -310,7 +343,25 @@ export class Wall extends Graphics {
 
         // WALLL
 
-        this.poly([pointA.x, pointA.y, pointB.x, pointB.y, pointC.x, pointC.y, pointD.x, pointD.y]);
+        const middleEndPoint = { x: this.length, y: this.thickness / 2 };
+        const middleStartPoint = { x: 0, y: this.thickness / 2 };
+
+        this.clear();
+
+        this.poly([
+            pointA.x,
+            pointA.y,
+            pointB.x,
+            pointB.y,
+            // middleEndPoint.x,
+            // middleEndPoint.y,
+            pointC.x,
+            pointC.y,
+            pointD.x,
+            pointD.y,
+            // middleStartPoint.x,
+            // middleStartPoint.y,
+        ]);
         this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
     }
 
