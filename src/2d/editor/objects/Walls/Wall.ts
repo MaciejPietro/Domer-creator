@@ -87,6 +87,10 @@ export class Wall extends Graphics {
 
     leftNodePlaceholder: Graphics | undefined;
     rightNodePlaceholder: Graphics | undefined;
+    pointA: { x: number; y: number };
+    pointC: { x: number; y: number };
+    pointD: { x: number; y: number };
+    pointB: { x: number; y: number };
 
     constructor(leftNode: WallNode, rightNode: WallNode, settings?: WallSettings) {
         super();
@@ -179,139 +183,169 @@ export class Wall extends Graphics {
         this.pivot.set(0, wallThickness * 0.5);
     }
 
+    public updateCorners(
+        pointA: Point = { x: 0, y: 0 },
+        pointB: Point = { x: 0, y: 0 },
+        pointC: Point = { x: 0, y: 0 },
+        pointD: Point = { x: 0, y: 0 }
+    ) {
+        const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : WALL_STROKE_COLOR;
+
+        const middleEndPoint = { x: this.length, y: this.thickness / 2 };
+        const middleStartPoint = { x: 0, y: this.thickness / 2 };
+
+        this.clear();
+
+        this.poly([
+            pointA.x,
+            pointA.y,
+            pointB.x,
+            pointB.y,
+            middleEndPoint.x,
+            middleEndPoint.y,
+            pointC.x,
+            pointC.y,
+            pointD.x,
+            pointD.y,
+            middleStartPoint.x,
+            middleStartPoint.y,
+        ]);
+        this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
+    }
+
     public setStyles() {
         if (!this.parent) return;
-        const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : WALL_STROKE_COLOR;
 
         this.clear();
 
         const parent = this.parent as WallNodeSequence;
 
-        const wallsLeft = parent.getWallsByNodesIds([this.leftNode.getId()]);
-        const wallsRight = parent.getWallsByNodesIds([this.rightNode.getId()]);
+        this.pointA = { x: 0, y: 0 };
+        this.pointB = { x: 0, y: 0 };
+        this.pointC = { x: 0, y: 0 };
+        this.pointD = { x: 0, y: 0 };
 
-        const siblingLeftWall = wallsLeft.find((wall) => wall !== this);
-        const siblingRightWall = wallsRight.find((wall) => wall !== this);
+        const aCornerWall = parent.findFirstNeighbor(this.uuid, this.leftNode.getId(), true);
 
-        let pointA: Point = { x: 0, y: 0 };
-        let pointB: Point = { x: 0, y: 0 };
-        let pointC: Point = { x: 0, y: 0 };
-        let pointD: Point = { x: 0, y: 0 };
+        if (aCornerWall) {
+            const x1 = -100;
+            const y1 = this.thickness;
+            const x2 = this.length + 100;
+            const y2 = this.thickness;
 
-        if (siblingLeftWall && wallsLeft.length === 2) {
-            // DDD
-            {
-                const x1 = -100;
-                const y1 = 0;
-                const x2 = this.length + 100;
-                const y2 = 0;
+            const yPos = this.leftNode === aCornerWall.leftNode ? 0 : this.thickness;
 
-                const x3 = -100;
-                const y3 = 0;
-                const x4 = siblingLeftWall.length + 100;
-                const y4 = 0;
+            const x3 = -100;
+            const y3 = yPos;
+            const x4 = aCornerWall.length + 100;
+            const y4 = yPos;
 
-                const point1 = this.toGlobal({ x: x1, y: y1 });
-                const point2 = this.toGlobal({ x: x2, y: y2 });
-                const point3 = siblingLeftWall.toGlobal({ x: x3, y: y3 });
-                const point4 = siblingLeftWall.toGlobal({ x: x4, y: y4 });
+            const point1 = this.toGlobal({ x: x1, y: y1 });
+            const point2 = this.toGlobal({ x: x2, y: y2 });
+            const point3 = aCornerWall.toGlobal({ x: x3, y: y3 });
+            const point4 = aCornerWall.toGlobal({ x: x4, y: y4 });
 
-                pointD = this.toLocal(lineIntersection(point1, point2, point3, point4));
-            }
+            this.pointA = this.toLocal(lineIntersection(point1, point2, point3, point4));
 
-            // AAA
-            {
-                const x1 = -100;
-                const y1 = this.thickness;
-                const x2 = this.length + 100;
-                const y2 = this.thickness;
-
-                const x3 = -100;
-                const y3 = siblingLeftWall.thickness;
-                const x4 = siblingLeftWall.length + 100;
-                const y4 = siblingLeftWall.thickness;
-
-                const point1 = this.toGlobal({ x: x1, y: y1 });
-                const point2 = this.toGlobal({ x: x2, y: y2 });
-                const point3 = siblingLeftWall.toGlobal({ x: x3, y: y3 });
-                const point4 = siblingLeftWall.toGlobal({ x: x4, y: y4 });
-
-                pointA = this.toLocal(lineIntersection(point1, point2, point3, point4));
-            }
+            // aCornerWall.updateCorners(aCornerWall.pointA, aCornerWall.pointB, aCornerWall.pointC, aCornerWall.pointD);
         } else {
-            pointD = { x: 0, y: 0 };
-            pointA = { x: 0, y: this.thickness };
+            this.pointA = { x: 0, y: this.thickness };
         }
 
-        if (siblingRightWall && wallsRight.length === 2) {
-            // CCC
-            {
-                const x1 = -100;
-                const y1 = 0;
-                const x2 = this.length + 100;
-                const y2 = 0;
+        const dCornerWall = parent.findFirstNeighbor(this.uuid, this.leftNode.getId(), false);
+        if (dCornerWall) {
+            const x1 = -100;
+            const y1 = 0;
+            const x2 = this.length + 100;
+            const y2 = 0;
 
-                const x3 = -100;
-                const y3 = 0;
-                const x4 = siblingRightWall.length + 100;
-                const y4 = 0;
+            const yPos = this.leftNode === dCornerWall.leftNode ? this.thickness : 0;
 
-                const point1 = this.toGlobal({ x: x1, y: y1 });
-                const point2 = this.toGlobal({ x: x2, y: y2 });
-                const point3 = siblingRightWall.toGlobal({ x: x3, y: y3 });
-                const point4 = siblingRightWall.toGlobal({ x: x4, y: y4 });
+            const x3 = -100;
+            const y3 = yPos;
+            const x4 = dCornerWall.length + 100;
+            const y4 = yPos;
 
-                pointC = this.toLocal(lineIntersection(point1, point2, point3, point4));
-            }
+            const point1 = this.toGlobal({ x: x1, y: y1 });
+            const point2 = this.toGlobal({ x: x2, y: y2 });
+            const point3 = dCornerWall.toGlobal({ x: x3, y: y3 });
+            const point4 = dCornerWall.toGlobal({ x: x4, y: y4 });
 
-            // BBB
-            {
-                const x1 = -100;
-                const y1 = this.thickness;
-                const x2 = this.length + 100;
-                const y2 = this.thickness;
-
-                const x3 = -100;
-                const y3 = siblingRightWall.thickness;
-                const x4 = siblingRightWall.length + 100;
-                const y4 = siblingRightWall.thickness;
-
-                const point1 = this.toGlobal({ x: x1, y: y1 });
-                const point2 = this.toGlobal({ x: x2, y: y2 });
-                const point3 = siblingRightWall.toGlobal({ x: x3, y: y3 });
-                const point4 = siblingRightWall.toGlobal({ x: x4, y: y4 });
-
-                pointB = this.toLocal(lineIntersection(point1, point2, point3, point4));
-            }
+            this.pointD = this.toLocal(lineIntersection(point1, point2, point3, point4));
         } else {
-            pointB = { x: this.length, y: this.thickness };
-            pointC = { x: this.length, y: 0 };
+            this.pointD = { x: 0, y: 0 };
         }
 
-        this.dotHelperA.clear();
-        this.dotHelperA.zIndex = 1001;
-        this.dotHelperA.circle(pointA.x, pointA.y, 3);
-        this.dotHelperA.stroke({ width: 1, color: 'red' });
+        const cCornerWall = parent.findFirstNeighbor(this.uuid, this.rightNode.getId(), true);
+        if (cCornerWall) {
+            const x1 = -100;
+            const y1 = 0;
+            const x2 = this.length + 100;
+            const y2 = 0;
 
-        this.dotHelperB.clear();
-        this.dotHelperB.zIndex = 1001;
-        this.dotHelperB.circle(pointB.x, pointB.y, 3);
-        this.dotHelperB.stroke({ width: 1, color: 'green' });
+            const yPos = this.rightNode === cCornerWall.rightNode ? this.thickness : 0;
 
-        this.dotHelperC.clear();
-        this.dotHelperC.zIndex = 1001;
-        this.dotHelperC.circle(pointC.x, pointC.y, 3);
-        this.dotHelperC.stroke({ width: 1, color: 'blue' });
+            const x3 = -100;
+            const y3 = yPos;
+            const x4 = cCornerWall.length + 100;
+            const y4 = yPos;
 
-        this.dotHelperD.clear();
-        this.dotHelperD.zIndex = 1001;
-        this.dotHelperD.circle(pointD.x, pointD.y, 3);
-        this.dotHelperD.stroke({ width: 1, color: 'purple' });
+            const point1 = this.toGlobal({ x: x1, y: y1 });
+            const point2 = this.toGlobal({ x: x2, y: y2 });
+            const point3 = cCornerWall.toGlobal({ x: x3, y: y3 });
+            const point4 = cCornerWall.toGlobal({ x: x4, y: y4 });
 
-        // WALLL
+            this.pointC = this.toLocal(lineIntersection(point1, point2, point3, point4));
+        } else {
+            this.pointC = { x: this.length, y: 0 };
+        }
 
-        this.poly([pointA.x, pointA.y, pointB.x, pointB.y, pointC.x, pointC.y, pointD.x, pointD.y]);
-        this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
+        const bCornerWall = parent.findFirstNeighbor(this.uuid, this.rightNode.getId(), false);
+
+        if (bCornerWall) {
+            const x1 = -100;
+            const y1 = this.thickness;
+            const x2 = this.length + 100;
+            const y2 = this.thickness;
+
+            const yPos = this.rightNode === bCornerWall.rightNode ? 0 : this.thickness;
+
+            const x3 = -100;
+            const y3 = yPos;
+            const x4 = bCornerWall.length + 100;
+            const y4 = yPos;
+
+            const point1 = this.toGlobal({ x: x1, y: y1 });
+            const point2 = this.toGlobal({ x: x2, y: y2 });
+            const point3 = bCornerWall.toGlobal({ x: x3, y: y3 });
+            const point4 = bCornerWall.toGlobal({ x: x4, y: y4 });
+
+            this.pointB = this.toLocal(lineIntersection(point1, point2, point3, point4));
+        } else {
+            this.pointB = { x: this.length, y: this.thickness };
+        }
+
+        // this.dotHelperA.clear();
+        // this.dotHelperA.zIndex = 1001;
+        // this.dotHelperA.circle(this.pointA.x, this.pointA.y, 3);
+        // this.dotHelperA.stroke({ width: 1, color: 'red' });
+
+        // this.dotHelperB.clear();
+        // this.dotHelperB.zIndex = 1001;
+        // this.dotHelperB.circle(this.pointB.x, this.pointB.y, 3);
+        // this.dotHelperB.stroke({ width: 1, color: 'green' });
+
+        // this.dotHelperC.clear();
+        // this.dotHelperC.zIndex = 1001;
+        // this.dotHelperC.circle(this.pointC.x, this.pointC.y, 3);
+        // this.dotHelperC.stroke({ width: 1, color: 'blue' });
+
+        // this.dotHelperD.clear();
+        // this.dotHelperD.zIndex = 1001;
+        // this.dotHelperD.circle(this.pointD.x, this.pointD.y, 3);
+        // this.dotHelperD.stroke({ width: 1, color: 'purple' });
+
+        this.updateCorners(this.pointA, this.pointB, this.pointC, this.pointD);
     }
 
     private onMouseOver(ev: FederatedPointerEvent) {

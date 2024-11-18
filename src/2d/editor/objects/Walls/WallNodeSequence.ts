@@ -224,6 +224,48 @@ export class WallNodeSequence extends Container {
         return connectedWalls;
     }
 
+    public getWallByUuid(uuid: string) {
+        return this.walls.find((wall) => wall.uuid === uuid);
+    }
+
+    public findAllNeighbors(currentWallUuid: string, nodeId: number) {
+        return this.getWallsByNodesIds([nodeId]).filter((wall) => wall.uuid !== currentWallUuid);
+    }
+
+    public findFirstNeighbor(currentWallUuid: string, nodeId: number, clockwise: boolean = true) {
+        const walls = this.getWallsByNodesIds([nodeId]);
+        const currentWall = this.getWallByUuid(currentWallUuid);
+
+        if (!currentWall) return null;
+
+        // Determine if nodeId is the left or right node of current wall
+        const isLeftNode = currentWall.leftNode.getId() === nodeId;
+
+        const neighborWalls = walls
+            .filter((wall) => wall.uuid !== currentWallUuid)
+            .map((wall) => {
+                // Determine how the neighbor wall is connected
+                const neighborIsLeftNode = wall.leftNode.getId() === nodeId;
+
+                // Get base angles
+                let currentAngle = isLeftNode ? currentWall.angle : (currentWall.angle + 180) % 360;
+                let neighborAngle = neighborIsLeftNode ? wall.angle : (wall.angle + 180) % 360;
+
+                // Calculate relative angle
+                let angle = neighborAngle - currentAngle;
+
+                // Normalize to 0-360 range
+                if (angle < 0) angle += 360;
+
+                return { wall, angle };
+            });
+
+        // Sort by angle based on direction
+        neighborWalls.sort((a, b) => (clockwise ? a.angle - b.angle : b.angle - a.angle));
+
+        return neighborWalls[0]?.wall || null;
+    }
+
     public drawWalls() {
         this.walls.forEach((wall) => {
             wall.drawLine('drawWalls');
