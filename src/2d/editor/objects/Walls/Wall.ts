@@ -51,6 +51,26 @@ const radiansToDegrees = (radians: number): number => {
     return radians * (180 / Math.PI);
 };
 
+function findAngleBetweenLines(x1, y1, x2, y2, x3, y3, x4, y4) {
+    // Line1 and Line2 are arrays with two points each: [[x1, y1], [x2, y2]]
+
+    // Calculate the slopes of the two lines
+    let m1 = (y2 - y1) / (x2 - x1); // Slope of line1
+    let m2 = (y4 - y3) / (x4 - x3); // Slope of line2
+
+    // Handle vertical lines (infinite slope)
+    if (x2 - x1 === 0) m1 = Infinity;
+    if (x4 - x3 === 0) m2 = Infinity;
+
+    // Calculate the angle in radians
+    const angleRad = Math.atan(Math.abs((m2 - m1) / (1 + m1 * m2)));
+
+    // Convert to degrees if needed
+    const angleDeg = angleRad * (180 / Math.PI);
+
+    return angleDeg;
+}
+
 export class Wall extends Graphics {
     uuid = uuidv4();
     leftNode: WallNode;
@@ -215,8 +235,6 @@ export class Wall extends Graphics {
 
     public setStyles() {
         if (!this.parent) return;
-
-        this.clear();
 
         const parent = this.parent as WallNodeSequence;
 
