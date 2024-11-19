@@ -232,9 +232,9 @@ export class WallNodeSequence extends Container {
         return this.getWallsByNodesIds([nodeId]).filter((wall) => wall.uuid !== currentWallUuid);
     }
 
-    public findFirstNeighbor(currentWallUuid: string, nodeId: number, clockwise: boolean = true) {
+    public findFirstNeighbor(currentWall: Wall, nodeId: number, clockwise: boolean = true) {
         const walls = this.getWallsByNodesIds([nodeId]);
-        const currentWall = this.getWallByUuid(currentWallUuid);
+        const currentWallUuid = currentWall.uuid;
 
         if (!currentWall) return null;
 
@@ -258,17 +258,15 @@ export class WallNodeSequence extends Container {
                 if (angle < 0) angle += 360;
 
                 return { wall, angle };
-            });
-
-        // Sort by angle based on direction
-        neighborWalls.sort((a, b) => (clockwise ? a.angle - b.angle : b.angle - a.angle));
+            })
+            .sort((a, b) => (clockwise ? a.angle - b.angle : b.angle - a.angle));
 
         return neighborWalls[0]?.wall || null;
     }
 
     public drawWalls() {
         this.walls.forEach((wall) => {
-            wall.drawLine('drawWalls');
+            wall.drawLine();
         });
     }
 }

@@ -181,19 +181,19 @@ export class Wall extends Graphics {
     private checkVisibility() {
         const focusedElement = useStore.getState().focusedElement;
 
-        // this.setStyles();
-
         if (focusedElement === this) {
             this.focus();
 
             this.zIndex = WALL_ACTIVE_Z_INDEX;
+            this.stroke({ width: 1, color: WALL_ACTIVE_STROKE_COLOR });
         }
         if (focusedElement !== this) {
             this.blur();
 
             this.zIndex = WALL_INACTIVE_Z_INDEX;
+
+            this.stroke({ width: 1, color: WALL_STROKE_COLOR });
         }
-        this.setStyles();
     }
 
     private applySettings() {
@@ -238,12 +238,12 @@ export class Wall extends Graphics {
 
         const parent = this.parent as WallNodeSequence;
 
-        this.pointA = { x: 0, y: 0 };
-        this.pointB = { x: 0, y: 0 };
-        this.pointC = { x: 0, y: 0 };
+        this.pointA = { x: 0, y: this.thickness };
+        this.pointB = { x: this.length, y: this.thickness };
+        this.pointC = { x: this.length, y: 0 };
         this.pointD = { x: 0, y: 0 };
 
-        const aCornerWall = parent.findFirstNeighbor(this.uuid, this.leftNode.getId(), true);
+        const aCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), true);
 
         if (aCornerWall) {
             const x1 = -100;
@@ -266,11 +266,9 @@ export class Wall extends Graphics {
             this.pointA = this.toLocal(lineIntersection(point1, point2, point3, point4));
 
             // aCornerWall.updateCorners(aCornerWall.pointA, aCornerWall.pointB, aCornerWall.pointC, aCornerWall.pointD);
-        } else {
-            this.pointA = { x: 0, y: this.thickness };
         }
 
-        const dCornerWall = parent.findFirstNeighbor(this.uuid, this.leftNode.getId(), false);
+        const dCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), false);
         if (dCornerWall) {
             const x1 = -100;
             const y1 = 0;
@@ -290,11 +288,9 @@ export class Wall extends Graphics {
             const point4 = dCornerWall.toGlobal({ x: x4, y: y4 });
 
             this.pointD = this.toLocal(lineIntersection(point1, point2, point3, point4));
-        } else {
-            this.pointD = { x: 0, y: 0 };
         }
 
-        const cCornerWall = parent.findFirstNeighbor(this.uuid, this.rightNode.getId(), true);
+        const cCornerWall = parent.findFirstNeighbor(this, this.rightNode.getId(), true);
         if (cCornerWall) {
             const x1 = -100;
             const y1 = 0;
@@ -314,11 +310,9 @@ export class Wall extends Graphics {
             const point4 = cCornerWall.toGlobal({ x: x4, y: y4 });
 
             this.pointC = this.toLocal(lineIntersection(point1, point2, point3, point4));
-        } else {
-            this.pointC = { x: this.length, y: 0 };
         }
 
-        const bCornerWall = parent.findFirstNeighbor(this.uuid, this.rightNode.getId(), false);
+        const bCornerWall = parent.findFirstNeighbor(this, this.rightNode.getId(), false);
 
         if (bCornerWall) {
             const x1 = -100;
@@ -339,38 +333,40 @@ export class Wall extends Graphics {
             const point4 = bCornerWall.toGlobal({ x: x4, y: y4 });
 
             this.pointB = this.toLocal(lineIntersection(point1, point2, point3, point4));
-        } else {
-            this.pointB = { x: this.length, y: this.thickness };
         }
 
-        // this.dotHelperA.clear();
-        // this.dotHelperA.zIndex = 1001;
-        // this.dotHelperA.circle(this.pointA.x, this.pointA.y, 3);
-        // this.dotHelperA.stroke({ width: 1, color: 'red' });
-
-        // this.dotHelperB.clear();
-        // this.dotHelperB.zIndex = 1001;
-        // this.dotHelperB.circle(this.pointB.x, this.pointB.y, 3);
-        // this.dotHelperB.stroke({ width: 1, color: 'green' });
-
-        // this.dotHelperC.clear();
-        // this.dotHelperC.zIndex = 1001;
-        // this.dotHelperC.circle(this.pointC.x, this.pointC.y, 3);
-        // this.dotHelperC.stroke({ width: 1, color: 'blue' });
-
-        // this.dotHelperD.clear();
-        // this.dotHelperD.zIndex = 1001;
-        // this.dotHelperD.circle(this.pointD.x, this.pointD.y, 3);
-        // this.dotHelperD.stroke({ width: 1, color: 'purple' });
+        // this.updateDebugHelpers();
 
         this.updateCorners(this.pointA, this.pointB, this.pointC, this.pointD);
+    }
+
+    private updateDebugHelpers() {
+        this.dotHelperA.clear();
+        this.dotHelperA.zIndex = 1001;
+        this.dotHelperA.circle(this.pointA.x, this.pointA.y, 3);
+        this.dotHelperA.stroke({ width: 1, color: 'red' });
+
+        this.dotHelperB.clear();
+        this.dotHelperB.zIndex = 1001;
+        this.dotHelperB.circle(this.pointB.x, this.pointB.y, 3);
+        this.dotHelperB.stroke({ width: 1, color: 'green' });
+
+        this.dotHelperC.clear();
+        this.dotHelperC.zIndex = 1001;
+        this.dotHelperC.circle(this.pointC.x, this.pointC.y, 3);
+        this.dotHelperC.stroke({ width: 1, color: 'blue' });
+
+        this.dotHelperD.clear();
+        this.dotHelperD.zIndex = 1001;
+        this.dotHelperD.circle(this.pointD.x, this.pointD.y, 3);
+        this.dotHelperD.stroke({ width: 1, color: 'purple' });
     }
 
     private onMouseOver(ev: FederatedPointerEvent) {
         this.color = WALL_HOVER_FILL_COLOR;
 
         if (this.isEditMode()) {
-            this.setStyles();
+            this.fill({ color: WALL_HOVER_FILL_COLOR });
         }
 
         const state = useStore.getState();
@@ -407,9 +403,8 @@ export class Wall extends Graphics {
 
     private onMouseOut() {
         if (this.dragging) return;
-        this.color = WALL_FILL_COLOR;
 
-        this.setStyles();
+        this.fill({ color: WALL_FILL_COLOR });
 
         const state = useStore.getState();
 
@@ -496,49 +491,7 @@ export class Wall extends Graphics {
                 this.leftNodePlaceholder = nodeItem;
                 this.addChild(this.leftNodePlaceholder);
             }
-
-            if (isRight) {
-                // const point1 = { x: 0, y: 0 });
-                // const point2 = { x: -100, y: -100 });
-                // const point3 = { x: this.length, y: 0 });
-                // const point4 = { x: this.length + 100, y: -100 });
-                // const intersection = lineIntersection(point1, point2, point3, point4);
-                // this.helpBackground = new Graphics();
-                // this.helpBackground.circle(intersection.x, intersection.y, 5);
-                // this.helpBackground.fill('yellow');
-                // this.addChild(this.helpBackground);
-            }
         });
-
-        // this.lineHelper?.clear();
-        // this.lineHelper = new Graphics();
-        // this.lineHelper.moveTo(0, 0).lineTo(-100, 0).stroke({ width: 1, color: 'blue' });
-        // this.lineHelper.moveTo(0, 40).lineTo(-100, 40).stroke({ width: 1, color: 'blue' });
-
-        // this.addChild(this.lineHelper);
-
-        // this.rightBackground?.clear();
-        // this.rightBackground = new Graphics();
-        // this.rightBackground
-        //     .moveTo(this.length, 0)
-        //     .lineTo(this.length + 100, 0)
-        //     .stroke({ width: 1, color: 'red' });
-        // this.rightBackground
-        //     .moveTo(this.length, 40)
-        //     .lineTo(this.length + 100, 40)
-        //     .stroke({ width: 1, color: 'red' });
-
-        // this.addChild(this.rightBackground);
-
-        //     const point1 = { x: 0, y: 0 };
-        //     const point2 = { x: -100, y: 0 };
-        //     const point3 = { x: this.length, y: 0 };
-        //     const point4 = { x: this.length + 100, y: 0 };
-        //     const intersection = lineIntersection(point1, point2, point3, point4);
-        //     this.helpBackground = new Graphics();
-        //     this.helpBackground.circle(intersection.x, intersection.y, 5);
-        //     this.helpBackground.fill('yellow');
-        //     this.addChild(this.helpBackground);`
     }
 
     public drawLine() {
@@ -570,7 +523,6 @@ export class Wall extends Graphics {
             });
 
             this.drawLine();
-            // this.drawWallNodesPlaceholders();
 
             return;
         }
