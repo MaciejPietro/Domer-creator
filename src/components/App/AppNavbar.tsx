@@ -1,39 +1,9 @@
-import { AppShell, Group, Menu } from '@mantine/core';
+import { AppShell, Group } from '@mantine/core';
 import ModeMenu from '../Sidebar/ModeMenu';
 import { DetailsControls } from '@/ui/DetailsControls/DetailsControls';
 import AddMenu from '../Navbar/AddMenu';
 
-import {
-    Icon as TablerIcon,
-    Armchair,
-    BorderLeft,
-    BuildingWarehouse,
-    // ArrowBottomSquare,
-    DeviceFloppy,
-    Upload,
-    Ruler2,
-    StairsUp,
-    StairsDown,
-    Eye,
-    Pencil,
-    Eraser,
-    Window,
-    Door,
-    Plus,
-    Help,
-    SquareX,
-    Dimensions,
-    Printer,
-    Shape,
-    Shape3,
-    BrandWindows,
-    Table,
-    TableOff,
-    Tag,
-    Wall,
-} from 'tabler-icons-react';
-import { Tool, ToolMode, ViewMode } from '@/2d/editor/constants';
-import { NavbarLink } from '@/ui/NavbarLink';
+import { ViewMode } from '@/2d/editor/constants';
 import SelectMenu from '../Navbar/SelectMenu';
 import { useStore } from '@/stores/EditorStore';
 
