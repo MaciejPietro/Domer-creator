@@ -9,7 +9,13 @@ const LINE_STYLE = { width: 1, color: '#1C7ED6' };
 
 export class MeasureLabel extends Container {
     text: Text;
-    textStyle = new TextStyle({ fontSize: 14, fill: 0x000000, align: 'center' });
+    textStyle = new TextStyle({
+        fontSize: 14,
+        fill: 0x000000,
+        align: 'center',
+        fontFamily: 'Arial',
+        letterSpacing: 0,
+    });
     lineContainer = new Container();
     textContainer = new Container();
     lineGraphic: Graphics;
@@ -27,7 +33,7 @@ export class MeasureLabel extends Container {
 
         this.visible = false;
 
-        this.text = new Text({ text: '', style: this.textStyle });
+        this.text = new Text({ text: '', style: this.textStyle, resolution: 3 });
 
         this.textContainer.addChild(this.text);
         this.addChild(this.textContainer);
@@ -78,19 +84,19 @@ export class MeasureLabel extends Container {
         this.visible = false;
     }
 
-    public updateText(length: number, angle: number) {
+    public updateText(length: number, angle: number, offset: { x: number; y: number }) {
         if (angle <= 90 || angle >= 270) {
             this.textContainer.scale.y = 1;
             this.textContainer.scale.x = 1;
-            this.textContainer.position.x = length / 2 - 20;
-            this.textContainer.position.y = -20;
+            this.textContainer.position.x = offset.x + length / 2;
+            this.textContainer.position.y = offset.y;
         }
 
         if (angle > 90 && angle < 270) {
             this.textContainer.scale.y = -1;
             this.textContainer.scale.x = -1;
-            this.textContainer.position.x = length / 2 + 20;
-            this.textContainer.position.y = -6;
+            this.textContainer.position.x = offset.x + length / 2;
+            this.textContainer.position.y = offset.y;
         }
 
         this.textContainer.zIndex = 998;
@@ -98,11 +104,21 @@ export class MeasureLabel extends Container {
         this.text.text = this.toMeter(length);
     }
 
-    public updateLine(length: number) {
-        this.lineAGraphic.clear().moveTo(1, -6).lineTo(1, 6).stroke(LINE_STYLE);
-        this.lineBGraphic.clear().moveTo(length, -6).lineTo(length, 6).stroke(LINE_STYLE);
+    public updateLine(startX: number, endX: number, yOffset: number, containerYOffset: number) {
+        this.lineAGraphic
+            .clear()
+            .moveTo(startX, yOffset - 6)
+            .lineTo(startX, yOffset + 6)
+            .stroke(LINE_STYLE);
+        this.lineBGraphic
+            .clear()
+            .moveTo(endX, yOffset - 6)
+            .lineTo(endX, yOffset + 6)
+            .stroke(LINE_STYLE);
 
-        this.lineGraphic.clear().moveTo(1, 0).lineTo(length, 0).stroke(LINE_STYLE);
+        this.lineGraphic.clear().moveTo(startX, yOffset).lineTo(endX, yOffset).stroke(LINE_STYLE);
+
+        this.lineContainer.position.set(0, 8 + containerYOffset);
     }
 
     private toMeter(size: number) {

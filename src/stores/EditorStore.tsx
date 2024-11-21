@@ -48,9 +48,11 @@ export const useStore = create<EditorStore>((set, getState) => ({
     app: null,
     focusedElement: null,
     setFocusedElement: (element: FocusedElement) => {
-        set(() => ({
-            focusedElement: element,
-        }));
+        set(() => {
+            return {
+                focusedElement: element,
+            };
+        });
     },
     setHelpMode: (isActive: boolean) => {
         set(() => ({

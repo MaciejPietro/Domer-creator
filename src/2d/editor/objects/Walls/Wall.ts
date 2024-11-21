@@ -42,47 +42,20 @@ export type WallSettings = {
     type?: WallType;
 };
 
-const degreesToRadians = (degrees: number): number => {
-    return degrees * (Math.PI / 180);
-};
-
-// Function to convert radians to degrees
-const radiansToDegrees = (radians: number): number => {
-    return radians * (180 / Math.PI);
-};
-
-function findAngleBetweenLines(x1, y1, x2, y2, x3, y3, x4, y4) {
-    // Line1 and Line2 are arrays with two points each: [[x1, y1], [x2, y2]]
-
-    // Calculate the slopes of the two lines
-    let m1 = (y2 - y1) / (x2 - x1); // Slope of line1
-    let m2 = (y4 - y3) / (x4 - x3); // Slope of line2
-
-    // Handle vertical lines (infinite slope)
-    if (x2 - x1 === 0) m1 = Infinity;
-    if (x4 - x3 === 0) m2 = Infinity;
-
-    // Calculate the angle in radians
-    const angleRad = Math.atan(Math.abs((m2 - m1) / (1 + m1 * m2)));
-
-    // Convert to degrees if needed
-    const angleDeg = angleRad * (180 / Math.PI);
-
-    return angleDeg;
-}
-
 export class Wall extends Graphics {
     uuid = uuidv4();
     leftNode: WallNode;
     rightNode: WallNode;
     length: number;
-    measureLabel: MeasureLabel;
+    measureLabelTop: MeasureLabel;
+    measureLabelBottom: MeasureLabel;
     children: Container[] = [];
     lineHelper: Graphics;
     dotHelperA: Graphics;
     dotHelperB: Graphics;
     dotHelperC: Graphics;
     dotHelperD: Graphics;
+    graphic: Graphics;
 
     // rightBackground: Graphics | undefined;
     helpersContainer = new Container();
@@ -121,8 +94,6 @@ export class Wall extends Graphics {
         this.dragging = false;
         this.mouseStartPoint = { x: 0, y: 0 };
 
-        // this.zIndex = wallTypeConfig[this.type].zIndex;
-
         this.lineHelper = new Graphics();
 
         this.dotHelperA = new Graphics();
@@ -138,11 +109,17 @@ export class Wall extends Graphics {
 
         this.addChild(this.helpersContainer);
 
+        this.graphic = new Graphics();
+
+        this.addChild(this.graphic);
+
         this.getNodesCords();
 
-        this.measureLabel = new MeasureLabel(0);
+        this.measureLabelTop = new MeasureLabel(0);
+        this.measureLabelBottom = new MeasureLabel(0);
+        this.addChild(this.measureLabelTop);
+        this.addChild(this.measureLabelBottom);
 
-        this.addChild(this.measureLabel);
         this.drawLine();
 
         if (settings?.type !== undefined) {
@@ -159,8 +136,6 @@ export class Wall extends Graphics {
 
         this.applySettings();
 
-        this.watchStoreChanges();
-
         this.on('pointerdown', this.onMouseDown);
         this.on('pointerup', this.onMouseUp);
         this.on('globalpointermove', this.onMouseMove);
@@ -172,30 +147,6 @@ export class Wall extends Graphics {
         this.clickStartTime = 0;
     }
 
-    private watchStoreChanges() {
-        useStore.subscribe(() => {
-            if (this.context) this.checkVisibility();
-        });
-    }
-
-    private checkVisibility() {
-        const focusedElement = useStore.getState().focusedElement;
-
-        if (focusedElement === this) {
-            this.focus();
-
-            this.zIndex = WALL_ACTIVE_Z_INDEX;
-            this.stroke({ width: 1, color: WALL_ACTIVE_STROKE_COLOR });
-        }
-        if (focusedElement !== this) {
-            this.blur();
-
-            this.zIndex = WALL_INACTIVE_Z_INDEX;
-
-            this.stroke({ width: 1, color: WALL_STROKE_COLOR });
-        }
-    }
-
     private applySettings() {
         const wallThickness = wallTypeConfig[this.type].thickness;
 
@@ -203,34 +154,36 @@ export class Wall extends Graphics {
         this.pivot.set(0, wallThickness * 0.5);
     }
 
-    public updateCorners(
-        pointA: Point = { x: 0, y: 0 },
-        pointB: Point = { x: 0, y: 0 },
-        pointC: Point = { x: 0, y: 0 },
-        pointD: Point = { x: 0, y: 0 }
-    ) {
+    public updateCorners() {
+        const pointA = this.pointA;
+        const pointB = this.pointB;
+        const pointC = this.pointC;
+        const pointD = this.pointD;
+
         const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : WALL_STROKE_COLOR;
 
         const middleEndPoint = { x: this.length, y: this.thickness / 2 };
         const middleStartPoint = { x: 0, y: this.thickness / 2 };
 
-        this.clear();
+        this.graphic.clear();
 
-        this.poly([
-            pointA.x,
-            pointA.y,
-            pointB.x,
-            pointB.y,
-            middleEndPoint.x,
-            middleEndPoint.y,
-            pointC.x,
-            pointC.y,
-            pointD.x,
-            pointD.y,
-            middleStartPoint.x,
-            middleStartPoint.y,
-        ]);
-        this.fill({ color: this.color }).stroke({ width: 1, color: strokeColor });
+        this.graphic
+            .poly([
+                pointA.x,
+                pointA.y,
+                pointB.x,
+                pointB.y,
+                middleEndPoint.x,
+                middleEndPoint.y,
+                pointC.x,
+                pointC.y,
+                pointD.x,
+                pointD.y,
+                middleStartPoint.x,
+                middleStartPoint.y,
+            ])
+            .fill({ color: this.color })
+            .stroke({ width: 1, color: strokeColor });
     }
 
     public setStyles() {
@@ -335,9 +288,8 @@ export class Wall extends Graphics {
             this.pointB = this.toLocal(lineIntersection(point1, point2, point3, point4));
         }
 
-        // this.updateDebugHelpers();
-
-        this.updateCorners(this.pointA, this.pointB, this.pointC, this.pointD);
+        this.updateDebugHelpers();
+        this.updateCorners();
     }
 
     private updateDebugHelpers() {
@@ -540,8 +492,18 @@ export class Wall extends Graphics {
         this.leftNode.angle = theta;
         this.rightNode.angle = theta;
 
-        this.measureLabel.updateText(this.length, this.angle);
-        this.measureLabel.updateLine(this.length);
+        const pointA = this.pointA?.x || 0;
+        const pointB = this.pointB?.x || 0;
+        const pointC = this.pointC?.x || 0;
+        const pointD = this.pointD?.x || 0;
+
+        const topLength = Math.abs(pointD - pointC);
+        this.measureLabelTop.updateText(topLength, this.angle, { x: -30, y: -20 });
+        this.measureLabelTop.updateLine(pointC, pointD, 0, -10);
+
+        const bottomLength = Math.abs(pointB - pointA);
+        this.measureLabelBottom.updateText(bottomLength, this.angle, { x: 0, y: this.thickness + 20 });
+        this.measureLabelBottom.updateLine(pointA, pointB, this.thickness, 10);
 
         this.drawWallNodesPlaceholders();
     }
@@ -583,16 +545,26 @@ export class Wall extends Graphics {
 
     public blur() {
         this.focused = false;
-        this.leftNode.hide();
-        this.rightNode.hide();
-        this.measureLabel.hide();
+        this.leftNode.setVisibility(false);
+        this.rightNode.setVisibility(false);
+        this.measureLabelTop.hide();
+        this.measureLabelBottom.hide();
+        this.zIndex = WALL_INACTIVE_Z_INDEX;
+
+        this.updateCorners();
     }
 
     public focus() {
         this.focused = true;
-        this.leftNode.show();
-        this.rightNode.show();
-        this.measureLabel.show();
+
+        this.leftNode.setVisibility(true);
+        this.rightNode.setVisibility(true);
+        this.measureLabelTop.show();
+        this.measureLabelBottom.show();
+
+        this.zIndex = WALL_ACTIVE_Z_INDEX;
+
+        this.updateCorners();
     }
 
     private onMouseClick(ev: FederatedPointerEvent) {
@@ -612,11 +584,11 @@ export class Wall extends Graphics {
 
         switch (state.activeTool) {
             case Tool.Edit:
-                this.zIndex = WALL_ACTIVE_Z_INDEX;
-
-                state.setFocusedElement(this as unknown as WallNode);
-
+                const parent = this.parent as WallNodeSequence;
+                parent.blurAllElements(this.uuid);
                 this.focus();
+                state.setFocusedElement(this);
+
                 break;
             case Tool.FurnitureAddDoor:
             case Tool.FurnitureAddWindow:

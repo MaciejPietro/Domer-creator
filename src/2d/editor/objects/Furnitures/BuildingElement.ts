@@ -38,8 +38,6 @@ export abstract class BuildingElement extends Container {
 
         this.background = new Graphics();
 
-        this.watchStoreChanges();
-
         this.on('pointerover', this.onElementMouseOver);
         this.on('pointerleave', this.onElementMouseLeave);
 
@@ -49,14 +47,6 @@ export abstract class BuildingElement extends Container {
 
         this.clickStartTime = 0;
     }
-
-    private watchStoreChanges() {
-        useStore.subscribe(() => {
-            this.onStoreChange();
-        });
-    }
-
-    protected onStoreChange() {}
 
     public isCollide() {
         const endX = this.customParent?.length || Infinity;

@@ -15,6 +15,7 @@ import 'pixi.js/events';
 import { LoadAction } from './actions/LoadAction';
 import { Grid } from './basic/Grid';
 import plan from './plan.json';
+import { WallNodeSequence } from './objects/Walls/WallNodeSequence';
 
 export class Main extends Viewport {
     private floorPlan: FloorPlan;
@@ -82,6 +83,14 @@ export class Main extends Viewport {
 
         if (isLeftMouseButton && ev.target === this) {
             const state = useStore.getState();
+
+            this.floorPlan.children.forEach((floorPlan) => {
+                floorPlan.children.forEach((child) => {
+                    if (child instanceof WallNodeSequence) {
+                        child.blurAllElements();
+                    }
+                });
+            });
 
             state.setFocusedElement(null);
         }

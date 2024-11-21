@@ -269,4 +269,12 @@ export class WallNodeSequence extends Container {
             wall.drawLine();
         });
     }
+
+    public blurAllElements(exceptUuid?: string) {
+        this.walls.forEach((wall) => {
+            if (wall.uuid !== exceptUuid) {
+                wall.blur();
+            }
+        });
+    }
 }

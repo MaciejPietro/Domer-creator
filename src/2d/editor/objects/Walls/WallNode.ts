@@ -40,7 +40,7 @@ export class WallNode extends Container {
         this.prevPosition = { x, y };
         this.position.set(x, y);
         this.zIndex = 999;
-        this.dot.visible = false;
+        this.visible = false;
 
         this.watchStoreChanges();
 
@@ -95,11 +95,11 @@ export class WallNode extends Container {
     }
 
     public show() {
-        this.dot.visible = true;
+        this.visible = true;
     }
 
     public hide() {
-        this.dot.visible = false;
+        this.visible = false;
     }
 
     private setSettings() {
@@ -115,8 +115,8 @@ export class WallNode extends Container {
     }
 
     public setVisibility(visible: boolean) {
-        if (this.isMouseOver) return (this.dot.visible = true);
-        this.dot.visible = visible;
+        if (this.isMouseOver) return (this.visible = true);
+        this.visible = visible;
     }
 
     public setStyles({ color = 0x222222 }: { color?: string | number }) {
@@ -127,7 +127,7 @@ export class WallNode extends Container {
 
         this.addChild(this.dot);
 
-        this.dot.zIndex = 1;
+        // this.dot.zIndex = 30;
 
         // SQUARE IN PLACE OF WALL DOT
         // const background = new Graphics();
