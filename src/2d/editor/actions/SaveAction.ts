@@ -10,6 +10,7 @@ export class SaveAction implements Action {
 
     public execute() {
         const data = this.receiver.save();
+
         const jsonData = JSON.stringify(data, null, 2);
 
         const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8' });

@@ -130,7 +130,6 @@ export class FloorPlan extends Container {
     public restart() {
         this.reset();
 
-        this.floors = [];
         this.actions = [];
         this.floors.push(new Floor());
         this.addChild(this.floors[0]);

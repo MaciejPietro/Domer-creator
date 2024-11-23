@@ -197,7 +197,7 @@ export class Wall extends Graphics {
 
         const aCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), true);
 
-        if (aCornerWall) {
+        if (aCornerWall && aCornerWall.angle !== this.angle) {
             const x1 = -100;
             const y1 = this.thickness;
             const x2 = this.length + 100;
@@ -221,7 +221,7 @@ export class Wall extends Graphics {
         }
 
         const dCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), false);
-        if (dCornerWall) {
+        if (dCornerWall && dCornerWall.angle !== this.angle) {
             const x1 = -100;
             const y1 = 0;
             const x2 = this.length + 100;
@@ -243,7 +243,7 @@ export class Wall extends Graphics {
         }
 
         const cCornerWall = parent.findFirstNeighbor(this, this.rightNode.getId(), true);
-        if (cCornerWall) {
+        if (cCornerWall && cCornerWall.angle !== this.angle) {
             const x1 = -100;
             const y1 = 0;
             const x2 = this.length + 100;
@@ -266,7 +266,7 @@ export class Wall extends Graphics {
 
         const bCornerWall = parent.findFirstNeighbor(this, this.rightNode.getId(), false);
 
-        if (bCornerWall) {
+        if (bCornerWall && bCornerWall.angle !== this.angle) {
             const x1 = -100;
             const y1 = this.thickness;
             const x2 = this.length + 100;
@@ -315,6 +315,11 @@ export class Wall extends Graphics {
 
     private onMouseOver(ev: FederatedPointerEvent) {
         // this.color = WALL_HOVER_FILL_COLOR;
+
+        // console.log({
+        //     angle: this.angle,
+        //     calcAngle: this.angle > 180 ? this.angle - 180 : this.angle,
+        // });
 
         const state = useStore.getState();
 
