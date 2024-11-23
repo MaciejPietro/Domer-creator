@@ -32,14 +32,18 @@ import {
     WALL_STROKE_COLOR,
 } from './constants';
 import { WallNodeSequence } from './WallNodeSequence';
-import { createRandomColor } from '@/3d/utils/helpers';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
 export type WallSettings = {
     uuid?: string;
     type?: WallType;
+    thickness?: number;
 };
+
+const normalizeAngle = (angle: number) => (angle >= 180 ? angle - 180 : angle);
+
+const areAnglesDifferent = (angle1: number, angle2: number) => normalizeAngle(~angle1) !== normalizeAngle(~angle2);
 
 export class Wall extends Graphics {
     uuid = uuidv4();
@@ -119,8 +123,6 @@ export class Wall extends Graphics {
         this.addChild(this.measureLabelTop);
         this.addChild(this.measureLabelBottom);
 
-        this.drawLine();
-
         if (settings?.type !== undefined) {
             this.type = settings?.type;
         } else {
@@ -132,8 +134,12 @@ export class Wall extends Graphics {
         }
 
         if (settings?.uuid) this.uuid = settings.uuid;
+        if (settings?.thickness) this.thickness = settings.thickness;
 
-        this.applySettings();
+        this.applySettings(settings?.thickness);
+
+        this.drawLine();
+        this.pivot.set(0, this.thickness * 0.5);
 
         this.on('pointerdown', this.onMouseDown);
         this.on('pointerup', this.onMouseUp);
@@ -144,13 +150,12 @@ export class Wall extends Graphics {
         this.on('pointerout', this.onMouseOut);
 
         this.clickStartTime = 0;
+        this.zIndex = WALL_INACTIVE_Z_INDEX;
     }
 
-    private applySettings() {
-        const wallThickness = wallTypeConfig[this.type].thickness;
-
-        this.thickness = wallThickness;
-        this.pivot.set(0, wallThickness * 0.5);
+    private applySettings(thickness = wallTypeConfig[this.type].thickness) {
+        this.thickness = thickness;
+        this.pivot.set(0, thickness * 0.5);
     }
 
     public updateCorners() {
@@ -197,13 +202,13 @@ export class Wall extends Graphics {
 
         const aCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), true);
 
-        if (aCornerWall && aCornerWall.angle !== this.angle) {
+        if (aCornerWall && areAnglesDifferent(aCornerWall.angle, this.angle)) {
             const x1 = -100;
             const y1 = this.thickness;
             const x2 = this.length + 100;
             const y2 = this.thickness;
 
-            const yPos = this.leftNode === aCornerWall.leftNode ? 0 : this.thickness;
+            const yPos = this.leftNode === aCornerWall.leftNode ? 0 : aCornerWall.thickness;
 
             const x3 = -100;
             const y3 = yPos;
@@ -221,13 +226,13 @@ export class Wall extends Graphics {
         }
 
         const dCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), false);
-        if (dCornerWall && dCornerWall.angle !== this.angle) {
+        if (dCornerWall && areAnglesDifferent(dCornerWall.angle, this.angle)) {
             const x1 = -100;
             const y1 = 0;
             const x2 = this.length + 100;
             const y2 = 0;
 
-            const yPos = this.leftNode === dCornerWall.leftNode ? this.thickness : 0;
+            const yPos = this.leftNode === dCornerWall.leftNode ? dCornerWall.thickness : 0;
 
             const x3 = -100;
             const y3 = yPos;
@@ -243,13 +248,13 @@ export class Wall extends Graphics {
         }
 
         const cCornerWall = parent.findFirstNeighbor(this, this.rightNode.getId(), true);
-        if (cCornerWall && cCornerWall.angle !== this.angle) {
+        if (cCornerWall && areAnglesDifferent(cCornerWall.angle, this.angle)) {
             const x1 = -100;
             const y1 = 0;
             const x2 = this.length + 100;
             const y2 = 0;
 
-            const yPos = this.rightNode === cCornerWall.rightNode ? this.thickness : 0;
+            const yPos = this.rightNode === cCornerWall.rightNode ? cCornerWall.thickness : 0;
 
             const x3 = -100;
             const y3 = yPos;
@@ -266,13 +271,13 @@ export class Wall extends Graphics {
 
         const bCornerWall = parent.findFirstNeighbor(this, this.rightNode.getId(), false);
 
-        if (bCornerWall && bCornerWall.angle !== this.angle) {
+        if (bCornerWall && areAnglesDifferent(bCornerWall.angle, this.angle)) {
             const x1 = -100;
             const y1 = this.thickness;
             const x2 = this.length + 100;
             const y2 = this.thickness;
 
-            const yPos = this.rightNode === bCornerWall.rightNode ? 0 : this.thickness;
+            const yPos = this.rightNode === bCornerWall.rightNode ? 0 : bCornerWall.thickness;
 
             const x3 = -100;
             const y3 = yPos;
@@ -630,13 +635,13 @@ export class Wall extends Graphics {
 
                     const { x, y } = furniture.position;
 
-                    furniture.setTemporality(false);
-
-                    furniture.setValidity(true);
+                    // furniture.setValidity(true);
 
                     const action = new AddFurnitureAction(furniture, this, { x, y });
 
                     action.execute();
+
+                    this.removeTempFurniture();
                 }
 
                 break;

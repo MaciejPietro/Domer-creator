@@ -60,20 +60,6 @@ export class FloorPlan extends Container {
         this.addChild(this.floors[this.currentFloor]);
     }
 
-    public print() {
-        const opts: IRendererOptionsAuto = {
-            preserveDrawingBuffer: true,
-        };
-
-        const renderer = autoDetectRenderer(opts);
-        const image = renderer.plugins.extract.image(this);
-        const popup = window.open();
-
-        popup.document.body.appendChild(image);
-        popup.focus();
-        popup.print();
-    }
-
     public save() {
         const floorPlan = this.serializer.serialize(this.floors, this.furnitureId);
 
@@ -147,8 +133,6 @@ export class FloorPlan extends Container {
     }
 
     public addFurniture(object: Door | WindowElement, attachedTo: Wall, position: Point) {
-        object.setTemporality(false);
-
         this.floors[this.currentFloor].addFurniture({ object, attachedTo, position });
     }
 

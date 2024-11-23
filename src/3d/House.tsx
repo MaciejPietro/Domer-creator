@@ -52,8 +52,9 @@ const House = ({ plan }: any) => {
 
                 return (
                     <mesh key={wall.uuid} position={[mid.x, cmToM(WALL_HEIGHT) / 2, mid.y]} rotation={[0, -angle, 0]}>
-                        <meshStandardMaterial color={createRandomColor()} />
+                        {/* <meshStandardMaterial color={createRandomColor()} /> */}
 
+                        <meshStandardMaterial color={'gray'} />
                         <Geometry>
                             <>
                                 <Base name="base" visible={false}>

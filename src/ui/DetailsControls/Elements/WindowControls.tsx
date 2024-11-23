@@ -126,7 +126,7 @@ const WindowControls = ({}: any) => {
 
     return (
         <div>
-            <h2 className="text-base font-medium my-0 -mt-2">Drzwi</h2>
+            <h2 className="text-base font-medium my-0 -mt-2">Okno</h2>
 
             {/* <div className="mt-4">
                 <NumberInput

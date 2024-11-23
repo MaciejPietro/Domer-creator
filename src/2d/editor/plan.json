@@ -97,6 +97,16 @@
           "id": 19,
           "x": 2910,
           "y": 2580
+        },
+        {
+          "id": 20,
+          "x": 2410,
+          "y": 2800
+        },
+        {
+          "id": 21,
+          "x": 2410,
+          "y": 2500
         }
       ],
       "wallNodeLinks": [
@@ -105,7 +115,8 @@
           [
             {
               "id": 2,
-              "wallUuid": "7cea5608-7f34-458f-9491-da5d4a65da2b"
+              "wallUuid": "7cea5608-7f34-458f-9491-da5d4a65da2b",
+              "thickness": 40
             }
           ]
         ],
@@ -113,8 +124,9 @@
           2,
           [
             {
-              "id": 16,
-              "wallUuid": "d582fb20-e130-4a24-a2ef-5dc2c65d51d1"
+              "id": 20,
+              "wallUuid": "1c98bba9-0f27-46fb-bfc3-215d684e91c2",
+              "thickness": 40
             }
           ]
         ],
@@ -123,7 +135,8 @@
           [
             {
               "id": 4,
-              "wallUuid": "962edbbd-bf91-4c4d-99ed-e288a731f14a"
+              "wallUuid": "962edbbd-bf91-4c4d-99ed-e288a731f14a",
+              "thickness": 40
             }
           ]
         ],
@@ -132,7 +145,8 @@
           [
             {
               "id": 5,
-              "wallUuid": "cfe718ac-7aa0-420a-bf28-026f99bfab82"
+              "wallUuid": "cfe718ac-7aa0-420a-bf28-026f99bfab82",
+              "thickness": 40
             }
           ]
         ],
@@ -141,7 +155,8 @@
           [
             {
               "id": 1,
-              "wallUuid": "2d785296-466c-4546-a4d7-5e1fab9edb1a"
+              "wallUuid": "2d785296-466c-4546-a4d7-5e1fab9edb1a",
+              "thickness": 40
             }
           ]
         ],
@@ -150,7 +165,8 @@
           [
             {
               "id": 11,
-              "wallUuid": "e17adbea-2cee-4dcd-9c7b-7cb83f76e65e"
+              "wallUuid": "e17adbea-2cee-4dcd-9c7b-7cb83f76e65e",
+              "thickness": 40
             }
           ]
         ],
@@ -159,7 +175,8 @@
           [
             {
               "id": 13,
-              "wallUuid": "7cbc7693-9c9f-4fc6-a5e1-c8f29708b232"
+              "wallUuid": "7cbc7693-9c9f-4fc6-a5e1-c8f29708b232",
+              "thickness": 40
             }
           ]
         ],
@@ -168,7 +185,8 @@
           [
             {
               "id": 7,
-              "wallUuid": "a068d9d1-d0e4-4d51-baf7-8a793bc77117"
+              "wallUuid": "a068d9d1-d0e4-4d51-baf7-8a793bc77117",
+              "thickness": 40
             }
           ]
         ],
@@ -177,15 +195,18 @@
           [
             {
               "id": 8,
-              "wallUuid": "c811f530-1483-4888-b289-bcc73eb4920b"
+              "wallUuid": "c811f530-1483-4888-b289-bcc73eb4920b",
+              "thickness": 40
             },
             {
               "id": 12,
-              "wallUuid": "df67ebdf-0933-46bb-9167-91706c563253"
+              "wallUuid": "df67ebdf-0933-46bb-9167-91706c563253",
+              "thickness": 40
             },
             {
               "id": 15,
-              "wallUuid": "b8bae277-bb1b-46be-90e8-1ed12b5d6141"
+              "wallUuid": "b8bae277-bb1b-46be-90e8-1ed12b5d6141",
+              "thickness": 40
             }
           ]
         ],
@@ -194,7 +215,8 @@
           [
             {
               "id": 9,
-              "wallUuid": "4ffdb670-93ab-492e-b79e-30994a2b7ae9"
+              "wallUuid": "4ffdb670-93ab-492e-b79e-30994a2b7ae9",
+              "thickness": 40
             }
           ]
         ],
@@ -203,7 +225,8 @@
           [
             {
               "id": 15,
-              "wallUuid": "78ef35e1-fea3-4594-9129-55646185b2df"
+              "wallUuid": "78ef35e1-fea3-4594-9129-55646185b2df",
+              "thickness": 40
             }
           ]
         ],
@@ -212,7 +235,8 @@
           [
             {
               "id": 14,
-              "wallUuid": "54f87e2d-f764-4c34-aaa6-de526fc632ab"
+              "wallUuid": "54f87e2d-f764-4c34-aaa6-de526fc632ab",
+              "thickness": 40
             }
           ]
         ],
@@ -221,7 +245,8 @@
           [
             {
               "id": 6,
-              "wallUuid": "cacf319b-f057-4211-bbf4-052eb2539107"
+              "wallUuid": "cacf319b-f057-4211-bbf4-052eb2539107",
+              "thickness": 40
             }
           ]
         ],
@@ -230,11 +255,13 @@
           [
             {
               "id": 11,
-              "wallUuid": "e1c8d954-cd6f-4998-82dd-faf776301862"
+              "wallUuid": "e1c8d954-cd6f-4998-82dd-faf776301862",
+              "thickness": 40
             },
             {
               "id": 13,
-              "wallUuid": "c27c2384-ccde-4d24-8965-0a6fa63dff8c"
+              "wallUuid": "c27c2384-ccde-4d24-8965-0a6fa63dff8c",
+              "thickness": 40
             }
           ]
         ],
@@ -243,7 +270,8 @@
           [
             {
               "id": 10,
-              "wallUuid": "2d5c68ba-5064-439a-a7d4-2e3b7e217d26"
+              "wallUuid": "2d5c68ba-5064-439a-a7d4-2e3b7e217d26",
+              "thickness": 40
             }
           ]
         ],
@@ -252,11 +280,13 @@
           [
             {
               "id": 3,
-              "wallUuid": "b9099759-f3e2-435a-b33b-11f93916098f"
+              "wallUuid": "b9099759-f3e2-435a-b33b-11f93916098f",
+              "thickness": 40
             },
             {
               "id": 18,
-              "wallUuid": "a9a91a11-b6eb-4abb-bcbb-75a980bb36d8"
+              "wallUuid": "a9a91a11-b6eb-4abb-bcbb-75a980bb36d8",
+              "thickness": 40
             }
           ]
         ],
@@ -266,15 +296,37 @@
           [
             {
               "id": 17,
-              "wallUuid": "c12d9a06-362c-4319-b280-3b01ac376ccc"
+              "wallUuid": "c12d9a06-362c-4319-b280-3b01ac376ccc",
+              "thickness": 40
             },
             {
               "id": 19,
-              "wallUuid": "056b777d-020b-485d-b4b4-be270e631cd9"
+              "wallUuid": "056b777d-020b-485d-b4b4-be270e631cd9",
+              "thickness": 40
             }
           ]
         ],
-        [19, []]
+        [19, []],
+        [
+          20,
+          [
+            {
+              "id": 16,
+              "wallUuid": "950f86a6-d108-4bbe-a235-7c595e0b9f6d",
+              "thickness": 40
+            }
+          ]
+        ],
+        [
+          21,
+          [
+            {
+              "id": 20,
+              "wallUuid": "c1724bcf-e032-4244-9461-aad4c988c65d",
+              "thickness": 15
+            }
+          ]
+        ]
       ]
     }
   ]

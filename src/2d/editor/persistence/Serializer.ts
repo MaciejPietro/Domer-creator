@@ -39,8 +39,6 @@ export class Serializer {
             floorPlanSerializable.floors.push(floorSerializable);
         }
 
-        console.log(floorPlanSerializable.floors[0]);
-
         return floorPlanSerializable.floors[0];
     }
 }

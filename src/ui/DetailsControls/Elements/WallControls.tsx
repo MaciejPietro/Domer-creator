@@ -86,6 +86,10 @@ const WallControls = ({}: any) => {
             </div>
 
             <div className="mt-4">
+                <p>Kąt: {focusedElement?.angle}</p>
+            </div>
+
+            <div className="mt-4">
                 <div className="flex gap-2 items-center">
                     <ActionIcon onClick={handleRemove} size={32} variant="default" aria-label="ActionIcon with delete">
                         <Trash className="w-5 h-5 text-red-600" />

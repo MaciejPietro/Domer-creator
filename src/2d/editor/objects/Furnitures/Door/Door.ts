@@ -61,7 +61,6 @@ export class Door extends BuildingElement {
     }
 
     protected onStoreChange() {
-        this.checkVisibility();
         this.checkEventMode();
     }
 
@@ -186,17 +185,14 @@ export class Door extends BuildingElement {
         this.eventMode = activeTool === Tool.FurnitureAddDoor || activeTool === Tool.WallAdd ? 'none' : 'static';
     }
 
-    private checkVisibility() {
-        const focusedElement = useStore.getState().focusedElement;
+    public focus() {
+        this.isFocused = true;
+        this.setStroke(DOOR_ACTIVE_COLOR);
+    }
 
-        if (focusedElement === this) {
-            this.isFocused = true;
-            this.setStroke(DOOR_ACTIVE_COLOR);
-        }
-        if (focusedElement !== this) {
-            this.isFocused = false;
-            this.setStroke();
-        }
+    public blur() {
+        this.isFocused = false;
+        this.setStroke();
     }
 
     public setPosition({ x, y }: Nullable<Point>) {

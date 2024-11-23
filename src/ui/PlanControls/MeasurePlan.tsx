@@ -46,8 +46,6 @@ export default function MeasurePlan({ fileUrl, lengths, setLengths }: any) {
                 eventMode: 'static',
             };
 
-            console.log(viewportSettings);
-
             const measureMain = new MeasureMain(viewportSettings);
 
             measureMain.onSetLength = (length: number) => {

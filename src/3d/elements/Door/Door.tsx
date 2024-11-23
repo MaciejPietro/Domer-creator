@@ -24,8 +24,6 @@ function DoorModel({ length, ...props }: any) {
     let object = useLoader(OBJLoader, '/assets/furnitures/door/DoorOBJ.obj', (loader) => {
         materials.preload();
         loader.setMaterials(materials);
-
-        console.log(loader);
     });
 
     // Calculate position offset based on the door dimensions

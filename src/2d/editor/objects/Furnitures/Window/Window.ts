@@ -27,7 +27,6 @@ export class WindowElement extends BuildingElement {
 
     bottom = WINDOW_BOTTOM;
     type = WindowType.Single;
-    zIndex = WINDOW_Z_INDEX;
 
     constructor(config?: WindowProps & BuildingElementProps) {
         super({
@@ -67,7 +66,6 @@ export class WindowElement extends BuildingElement {
     }
 
     protected onStoreChange() {
-        this.checkVisibility();
         this.checkEventMode();
     }
 
@@ -158,16 +156,14 @@ export class WindowElement extends BuildingElement {
         this.eventMode = activeTool === Tool.FurnitureAddWindow || activeTool === Tool.WallAdd ? 'none' : 'static';
     }
 
-    private checkVisibility() {
-        const focusedElement = useStore.getState().focusedElement;
-        if (focusedElement === this) {
-            this.isFocused = true;
-            this.setStroke(WINDOW_ACTIVE_COLOR);
-        }
-        if (focusedElement !== this) {
-            this.isFocused = false;
-            this.setStroke();
-        }
+    public focus() {
+        this.isFocused = true;
+        this.setStroke(WINDOW_ACTIVE_COLOR);
+    }
+
+    public blur() {
+        this.isFocused = false;
+        this.setStroke();
     }
 
     public setPosition({ x, y }: Nullable<Point>) {

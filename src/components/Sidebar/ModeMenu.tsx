@@ -7,7 +7,6 @@ import { ChangeFloorAction } from '@/2d/editor/actions/ChangeFloorAction';
 import { LoadAction } from '@/2d/editor/actions/LoadAction';
 import { SaveAction } from '@/2d/editor/actions/SaveAction';
 import { Tool, ViewMode } from '@/2d/editor/constants';
-import { PrintAction } from '@/2d/editor/actions/PrintAction';
 import { ToggleLabelAction } from '@/2d/editor/actions/ToggleLabelAction';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { HelpDialog } from '@/ui/HelpDialog';

@@ -4,6 +4,7 @@ import { INodeSerializable } from '../../persistence/INodeSerializable';
 import { Wall, WallSettings } from './Wall';
 import { WallNode } from './WallNode';
 import { WallType } from './config';
+import { BuildingElement } from '../Furnitures/BuildingElement';
 
 export type NodeLinksWithWall = [
     number,
@@ -65,9 +66,12 @@ export class WallNodeSequence extends Container {
                     return leftMatch && rightMatch;
                 });
 
+                if (!foundWall) throw new Error('Wall not found');
+
                 return {
                     id: bNodeId,
-                    wallUuid: foundWall?.uuid || null,
+                    wallUuid: foundWall.uuid || null,
+                    thickness: foundWall.thickness || null,
                 };
             });
 
@@ -88,8 +92,8 @@ export class WallNodeSequence extends Container {
 
         for (const [src, dests] of nodeLinks) {
             for (const dest of dests) {
-                const { id, wallUuid } = dest;
-                this.addWall(id, src, { uuid: wallUuid });
+                const { id, wallUuid, thickness } = dest;
+                this.addWall(id, src, { uuid: wallUuid, thickness });
                 nodesIds.push(id);
                 nodesIds.push(src);
             }
@@ -275,6 +279,12 @@ export class WallNodeSequence extends Container {
             if (wall.uuid !== exceptUuid) {
                 wall.blur();
             }
+
+            wall.children.forEach((child) => {
+                if (child instanceof BuildingElement) {
+                    child.blur();
+                }
+            });
         });
     }
 }

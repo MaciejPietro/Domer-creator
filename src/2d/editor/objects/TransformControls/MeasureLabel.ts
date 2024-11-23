@@ -39,7 +39,7 @@ export class MeasureLabel extends Container {
         this.addChild(this.textContainer);
 
         this.pivot.set(this.width / 2, this.height / 2);
-        this.zIndex = 1001;
+        // this.zIndex = 1001;
 
         this.lineGraphic = new Graphics();
         this.lineAGraphic = new Graphics();

@@ -32,7 +32,6 @@ import {
     Help,
     SquareX,
     Dimensions,
-    Printer,
     Shape,
     Shape3,
     BrandWindows,

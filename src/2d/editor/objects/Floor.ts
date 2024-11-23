@@ -24,7 +24,7 @@ export class Floor extends Container {
         this.furnitureArray = new Map<string, Furniture>();
         this.wallNodeSequence = new WallNodeSequence();
         this.addChild(this.wallNodeSequence);
-        this.wallNodeSequence.zIndex = 1002;
+        // this.wallNodeSequence.zIndex = 1002;
         this.sortableChildren = true;
         if (floorData) {
             this.applyFloorData(floorData);

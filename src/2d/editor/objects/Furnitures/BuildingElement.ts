@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { WindowElement } from './Window/Window';
 import { Door } from './Door/Door';
 import { Wall } from '../Walls/Wall';
+import { WallNodeSequence } from '../Walls/WallNodeSequence';
 
 export type BuildingElementProps = {
     position?: Point;
@@ -15,6 +16,8 @@ export type BuildingElementProps = {
 };
 
 export const DISTANCE_FROM_WALL = 20;
+
+const BUILDING_ELEMENT_Z_INDEX = 40;
 
 export abstract class BuildingElement extends Container {
     uuid = uuidv4();
@@ -31,7 +34,7 @@ export abstract class BuildingElement extends Container {
     constructor(config?: BuildingElementProps) {
         super();
 
-        this.eventMode = 'none';
+        this.eventMode = 'static';
 
         if (config?.uuid) this.uuid = config.uuid;
         if (config?.parent) this.customParent = config.parent;
@@ -46,6 +49,8 @@ export abstract class BuildingElement extends Container {
         this.on('globalpointermove', this.onGlobalMouseMove);
 
         this.clickStartTime = 0;
+
+        this.zIndex = BUILDING_ELEMENT_Z_INDEX;
     }
 
     public isCollide() {
@@ -147,7 +152,12 @@ export abstract class BuildingElement extends Container {
 
         switch (state.activeTool) {
             case Tool.Edit:
+                console.log('xdxd this', this);
+
+                const parent = this.parent.parent as WallNodeSequence;
+                parent.blurAllElements(this.uuid);
                 state.setFocusedElement(this as any);
+                this.focus();
 
                 break;
 
@@ -156,6 +166,12 @@ export abstract class BuildingElement extends Container {
                 break;
         }
     }
+
+    private checkVisibility() {}
+
+    public blur() {}
+
+    public focus() {}
 
     public show() {
         this.visible = true;
@@ -169,6 +185,8 @@ export abstract class BuildingElement extends Container {
         }
         this.isTemporary = temporary;
         this.eventMode = temporary ? 'none' : 'static';
+
+        console.trace(this.eventMode);
     }
 
     public hide() {

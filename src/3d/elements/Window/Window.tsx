@@ -8,8 +8,6 @@ const windowBox = new BoxGeometry(2, 2, 2);
 const Window = ({ height, length, bottom, type, ...props }: any) => {
     const windowBox = new BoxGeometry(cmToM(length), cmToM(height), 1);
 
-    console.log('type', type);
-
     return (
         <Subtraction {...props}>
             <Geometry>

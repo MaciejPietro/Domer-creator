@@ -216,6 +216,7 @@ export class WallNode extends Container {
         this.x = x;
         this.y = y;
 
+        // TODO make this redraw only the walls that are affected
         FloorPlan.Instance.redrawWalls();
     }
 
