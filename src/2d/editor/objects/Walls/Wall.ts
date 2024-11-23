@@ -28,7 +28,6 @@ import {
     WALL_ACTIVE_STROKE_COLOR,
     WALL_ACTIVE_Z_INDEX,
     WALL_FILL_COLOR,
-    WALL_HOVER_FILL_COLOR,
     WALL_INACTIVE_Z_INDEX,
     WALL_STROKE_COLOR,
 } from './constants';
@@ -315,11 +314,7 @@ export class Wall extends Graphics {
     }
 
     private onMouseOver(ev: FederatedPointerEvent) {
-        this.color = WALL_HOVER_FILL_COLOR;
-
-        if (this.isEditMode()) {
-            this.fill({ color: WALL_HOVER_FILL_COLOR });
-        }
+        // this.color = WALL_HOVER_FILL_COLOR;
 
         const state = useStore.getState();
 
@@ -492,18 +487,7 @@ export class Wall extends Graphics {
         this.leftNode.angle = theta;
         this.rightNode.angle = theta;
 
-        const pointA = this.pointA?.x || 0;
-        const pointB = this.pointB?.x || 0;
-        const pointC = this.pointC?.x || 0;
-        const pointD = this.pointD?.x || 0;
-
-        const topLength = Math.abs(pointD - pointC);
-        this.measureLabelTop.updateText(topLength, this.angle, { x: -30, y: -20 });
-        this.measureLabelTop.updateLine(pointC, pointD, 0, -10);
-
-        const bottomLength = Math.abs(pointB - pointA);
-        this.measureLabelBottom.updateText(bottomLength, this.angle, { x: 0, y: this.thickness + 20 });
-        this.measureLabelBottom.updateLine(pointA, pointB, this.thickness, 10);
+        this.updateMeasureLabels();
 
         this.drawWallNodesPlaceholders();
     }
@@ -519,6 +503,33 @@ export class Wall extends Graphics {
             }
         });
         return parseInt(minLength.toString());
+    }
+
+    private updateMeasureLabels() {
+        const pointA = this.pointA?.x || 0;
+        const pointB = this.pointB?.x || 0;
+        const pointC = this.pointC?.x || 0;
+        const pointD = this.pointD?.x || 0;
+
+        const topLength = Math.abs(pointD - pointC);
+        this.measureLabelTop.update({
+            length: topLength,
+            angle: this.angle,
+            startX: pointC,
+            endX: pointD,
+            offsetY: -5,
+            thickness: this.thickness,
+        });
+
+        const bottomLength = Math.abs(pointB - pointA);
+        this.measureLabelBottom.update({
+            thickness: this.thickness,
+            length: bottomLength,
+            angle: this.angle,
+            startX: pointA,
+            endX: pointB,
+            offsetY: this.thickness + 20,
+        });
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
@@ -666,7 +677,7 @@ export class Wall extends Graphics {
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
 
-        if (!this.isEditMode()) return;
+        if (useStore.getState().activeMode !== ViewMode.Edit) return;
 
         this.clickStartTime = Date.now();
 
@@ -732,10 +743,6 @@ export class Wall extends Graphics {
         this.rightNode.setPosition(newRightX, newRightY);
 
         this.drawLine();
-    }
-
-    private isEditMode() {
-        return useStore.getState().activeMode === ViewMode.Edit;
     }
 
     private getXWithinWall(elementX: number): number {

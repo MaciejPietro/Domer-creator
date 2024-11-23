@@ -84,19 +84,19 @@ export class MeasureLabel extends Container {
         this.visible = false;
     }
 
-    public updateText(length: number, angle: number, offset: { x: number; y: number }) {
-        if (angle <= 90 || angle >= 270) {
+    private updateText(length: number, angle: number, position: { x: number; y: number }) {
+        const shouldFlip = angle <= 90 || angle >= 270;
+
+        if (shouldFlip) {
             this.textContainer.scale.y = 1;
             this.textContainer.scale.x = 1;
-            this.textContainer.position.x = offset.x + length / 2;
-            this.textContainer.position.y = offset.y;
-        }
-
-        if (angle > 90 && angle < 270) {
+            this.textContainer.position.x = position.x - this.textContainer.width / 2;
+            this.textContainer.position.y = position.y - 24;
+        } else {
             this.textContainer.scale.y = -1;
             this.textContainer.scale.x = -1;
-            this.textContainer.position.x = offset.x + length / 2;
-            this.textContainer.position.y = offset.y;
+            this.textContainer.position.x = position.x + this.textContainer.width / 2;
+            this.textContainer.position.y = position.y - 10;
         }
 
         this.textContainer.zIndex = 998;
@@ -104,21 +104,41 @@ export class MeasureLabel extends Container {
         this.text.text = this.toMeter(length);
     }
 
-    public updateLine(startX: number, endX: number, yOffset: number, containerYOffset: number) {
+    public update({
+        length,
+        angle,
+        thickness,
+        startX,
+        endX,
+        offsetY,
+    }: {
+        length: number;
+        angle: number;
+        thickness: number;
+        startX: number;
+        endX: number;
+        offsetY: number;
+    }) {
         this.lineAGraphic
             .clear()
-            .moveTo(startX, yOffset - 6)
-            .lineTo(startX, yOffset + 6)
+            .moveTo(startX, offsetY - 6)
+            .lineTo(startX, offsetY + 6)
             .stroke(LINE_STYLE);
+
         this.lineBGraphic
             .clear()
-            .moveTo(endX, yOffset - 6)
-            .lineTo(endX, yOffset + 6)
+            .moveTo(endX, offsetY - 6)
+            .lineTo(endX, offsetY + 6)
             .stroke(LINE_STYLE);
 
-        this.lineGraphic.clear().moveTo(startX, yOffset).lineTo(endX, yOffset).stroke(LINE_STYLE);
+        this.lineGraphic.clear().moveTo(startX, offsetY).lineTo(endX, offsetY).stroke(LINE_STYLE);
 
-        this.lineContainer.position.set(0, 8 + containerYOffset);
+        const isTopLine = offsetY < 0;
+
+        const textX = isTopLine ? endX + length / 2 : endX - length / 2;
+        const textY = isTopLine ? 0 : thickness + 48;
+
+        this.updateText(length, angle, { x: textX, y: textY });
     }
 
     private toMeter(size: number) {
