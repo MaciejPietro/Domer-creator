@@ -17,7 +17,6 @@ import {
     Armchair,
     BorderLeft,
     BuildingWarehouse,
-    // ArrowBottomSquare,
     DeviceFloppy,
     Upload,
     Ruler2,
