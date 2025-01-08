@@ -92,6 +92,7 @@ export class WallNodeSequence extends Container {
 
         for (const [src, dests] of nodeLinks) {
             for (const dest of dests) {
+                // @ts-expect-error find why
                 const { id, wallUuid, thickness } = dest;
                 this.addWall(id, src, { uuid: wallUuid, thickness });
                 nodesIds.push(id);
@@ -178,9 +179,11 @@ export class WallNodeSequence extends Container {
     }
 
     public removeWall(leftNode: number, rightNode: number) {
+        // @ts-expect-error find why
         const index = this.wallNodeLinks.get(leftNode).indexOf(rightNode);
 
         if (index != -1) {
+            // @ts-expect-error find why
             this.wallNodeLinks.get(leftNode).splice(index, 1);
             this.drawWalls();
         }

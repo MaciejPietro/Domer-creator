@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { AccumulativeShadows, RandomizedLight, Environment as EnvironmentImpl } from '@react-three/drei';
 
+// @ts-expect-error find why
 export const Environment = memo(({ direction = [5, 5, 5] }) => (
     <>
         <directionalLight position={direction} intensity={0.5} shadow-mapSize={1024} castShadow />

@@ -23,7 +23,6 @@ export class AddWallManager {
 
     public checkStep(coords: Point) {
         if (this.previousNode == undefined) {
-            // @ts-expect-error TODO enable iteration in ts
             for (const [id, node] of FloorPlan.Instance.getWallNodeSeq().getWallNodes()) {
                 if (euclideanDistance(coords.x, node.x, coords.y, node.y) < 0.3 * METER) {
                     return false;

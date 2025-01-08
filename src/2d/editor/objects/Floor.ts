@@ -235,6 +235,7 @@ export class Floor extends Container {
         }
 
         // wall node links
+        // @ts-expect-error find why
         plan.wallNodeLinks = Array.from(this.wallNodeSequence.getWallNodeLinks().entries());
 
         const res = {

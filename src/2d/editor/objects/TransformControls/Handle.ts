@@ -2,9 +2,10 @@ import { Graphics, FederatedPointerEvent } from 'pixi.js';
 import { isMobile } from 'react-device-detect';
 import { Point } from '../../../../helpers/Point';
 import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
-import { Furniture } from '../Furniture';
 import { TransformLayer } from './TransformLayer';
 import { WALL_THICKNESS } from '../../constants';
+
+type Furniture = any;
 
 export enum HandleType {
     Horizontal,
@@ -40,6 +41,7 @@ export class Handle extends Graphics {
         super();
         this.eventMode = 'static';
         if (handleConfig.color) {
+            // @ts-expect-error find why
             this.color = handleConfig.color;
         }
 

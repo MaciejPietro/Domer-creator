@@ -1,4 +1,4 @@
-import { autoDetectRenderer, Container, IRendererOptionsAuto } from 'pixi.js';
+import { Container } from 'pixi.js';
 import { FurnitureData } from '../../../stores/FurnitureStore';
 import { Wall } from './Walls/Wall';
 import { Floor } from './Floor';
@@ -54,7 +54,7 @@ export class FloorPlan extends Container {
 
         this.CurrentFloor += by;
         if (this.floors[this.currentFloor] == null) {
-            this.floors[this.currentFloor] = new Floor(null, this.floors[previousFloor]);
+            this.floors[this.currentFloor] = new Floor(undefined, this.floors[previousFloor]);
         }
         this.floors[this.currentFloor].setLabelVisibility(this.visibleLabels);
         this.addChild(this.floors[this.currentFloor]);

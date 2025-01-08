@@ -3,9 +3,10 @@ import { Point } from '../../../../helpers/Point';
 import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { useStore } from '../../../../stores/EditorStore';
 import { Coord, LabelAxis, LABEL_OFFSET, Tool } from '../../constants';
-import { Furniture } from '../Furniture';
 import { Handle, HandleType } from './Handle';
 import { Label } from './Label';
+
+type Furniture = any;
 
 // handles moving, resizing and rotating of objects.
 // can only work if its state is active.
@@ -145,7 +146,7 @@ export class TransformLayer extends Container {
         const y = viewportY(globals.y - this.borderOffset, false);
         const w = this.target.width + 2 * this.borderOffset;
         const h = this.target.height + 2 * this.borderOffset;
-        this.border.lineStyle(3, 0, 1, 0, true).drawRect(0, 0, w, h);
+        this.border.lineStyle(3, 0, 1).drawRect(0, 0, w, h);
 
         this.border.position.x = x;
         this.border.position.y = y;

@@ -1,15 +1,15 @@
-import {  Navbar, ScrollArea, Select, SimpleGrid } from "@mantine/core";
-import { useEffect, useState } from "react";
-import { FurnitureItem } from "./FurnitureItem";
-import { useFurnitureStore } from "../../../stores/FurnitureStore";
-import { showNotification } from "@mantine/notifications";
+import { ScrollArea, Select, SimpleGrid } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { FurnitureItem } from './FurnitureItem';
+import { useFurnitureStore } from '../../../stores/FurnitureStore';
+import { showNotification } from '@mantine/notifications';
 import { createStyles } from '@mantine/emotion';
 
 const useStyles = createStyles((theme) => ({
     mb: {
         marginTop: theme.spacing.xs,
-        marginBottom: theme.spacing.xs
-    }
+        marginBottom: theme.spacing.xs,
+    },
 }));
 
 export function FurnitureAddPanel() {
@@ -22,45 +22,47 @@ export function FurnitureAddPanel() {
     // when a category is selected by user, load its furniture elements from API
     useEffect(() => {
         if (category) {
-            getCurrentFurnitureData(category)
- 
+            getCurrentFurnitureData(category);
         }
-    }, [category])
+    }, [category]);
 
     // when furniture data is loaded from API, create cards and display to user
     useEffect(() => {
-        setCards(currentFurnitureData.map((item) =>
-        (
-            <FurnitureItem data={item} key={item._id}></FurnitureItem>
-        )
-        ))
-    }, [currentFurnitureData])
+        // @ts-expect-error find why
+        setCards(currentFurnitureData.map((item) => <FurnitureItem data={item} key={item._id}></FurnitureItem>));
+    }, [currentFurnitureData]);
 
     // on first load, select default category
     useEffect(() => {
-        if(categories && categories[0] && categories[0]._id) {
-            setCategory(categories[0]._id)
+        if (categories && categories[0] && categories[0]._id) {
+            setCategory(categories[0]._id);
         } else {
             showNotification({
-                "message":"Check your internet connection",
-                "color":"green"
-            })
+                message: 'Check your internet connection',
+                color: 'green',
+            });
         }
-    }, [categories])
+    }, [categories]);
 
-    return (<>
-        <Navbar.Section>
-            <Select className={classes.mb} value={category} onChange={setCategory} data={categories.map(cat => {
-                return { value: cat._id, label: cat.name };
-            })} />
-        </Navbar.Section>
-        <Navbar.Section style={{ height:"100%"}}grow mx="-xs" px="xs">
-            <ScrollArea style={{ width: "320", height:"90%"}}>
-                <SimpleGrid style={{ padding: 5 }} cols={2}>
-                    {cards}
-                </SimpleGrid>
-            </ScrollArea>
-
-        </Navbar.Section>
-    </>)
+    return (
+        <>
+            {/* <Navbar.Section>
+                <Select
+                    className={classes.mb}
+                    value={category}
+                    onChange={setCategory}
+                    data={categories.map((cat) => {
+                        return { value: cat._id, label: cat.name };
+                    })}
+                />
+            </Navbar.Section>
+            <Navbar.Section style={{ height: '100%' }} grow mx="-xs" px="xs">
+                <ScrollArea style={{ width: '320', height: '90%' }}>
+                    <SimpleGrid style={{ padding: 5 }} cols={2}>
+                        {cards}
+                    </SimpleGrid>
+                </ScrollArea>
+            </Navbar.Section> */}
+        </>
+    );
 }

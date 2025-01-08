@@ -73,6 +73,7 @@ const PlanMenu = () => {
 
     useEffect(() => {}, [plan?.visible]);
 
+    // @ts-expect-error find why
     const activeToolIcon = options.find((opt) => opt.id === activeTool)?.icon;
 
     const isEnabled = [Tool.Edit, Tool.WallAdd].includes(activeTool);

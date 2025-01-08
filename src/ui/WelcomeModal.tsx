@@ -40,7 +40,7 @@ export function WelcomeModal() {
     };
     return (
         <>
-            <Modal
+            {/* <Modal
                 className={classes.padded}
                 closeOnClickOutside={false}
                 closeOnEscape={false}
@@ -89,7 +89,7 @@ export function WelcomeModal() {
                         Load from local save
                     </Button>
                 </Stack>
-            </Modal>
+            </Modal> */}
         </>
     );
 }

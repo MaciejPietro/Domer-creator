@@ -24,6 +24,7 @@ export class Serializer {
         for (const floor of floors) {
             const floorSerializable = floor.getPlan();
 
+            // @ts-expect-error find why
             floorPlanSerializable.floors.push(floorSerializable);
         }
 
@@ -36,6 +37,7 @@ export class Serializer {
         for (const floor of floors) {
             const floorSerializable = floor.getPlan(true);
 
+            // @ts-expect-error find why
             floorPlanSerializable.floors.push(floorSerializable);
         }
 

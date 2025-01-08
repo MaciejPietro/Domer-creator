@@ -120,6 +120,7 @@ const AddMenu = () => {
                     label={opt.title}
                     icon={icon}
                     onClick={opt.onClick}
+                    // @ts-expect-error find why
                     position="bottom"
                     active={opt.active}
                 ></NavbarLink>

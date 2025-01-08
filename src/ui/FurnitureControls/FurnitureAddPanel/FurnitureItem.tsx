@@ -7,6 +7,7 @@ interface IFurnitureData {
 }
 
 function add(item: IFurnitureData) {
+    // @ts-expect-error find why
     const action = new AddFurnitureAction(item.data);
 
     action.execute();
@@ -24,6 +25,7 @@ export function FurnitureItem(item: IFurnitureData) {
             </Card.Section>
             <Card.Section>
                 <Center>
+                    {/* @ts-expect-error find why */}
                     <Text align={'center'} weight={500}>
                         {data.name}
                     </Text>

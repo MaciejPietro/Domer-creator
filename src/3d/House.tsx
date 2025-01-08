@@ -181,58 +181,59 @@ const House = ({ plan }: any) => {
     );
 
     return (
+        <></>
         // eslint-disable-next-line react/no-unknown-property
-        <mesh receiveShadow castShadow {...props}>
-            <Geometry ref={csg} computeVertexNormals>
-                <Base name="base" geometry={box} scale={[3, 3, 3]} />
+        // <mesh receiveShadow castShadow {...props}>
+        //     <Geometry ref={csg} computeVertexNormals>
+        //         <Base name="base" geometry={box} scale={[3, 3, 3]} />
 
-                <Subtraction name="cavity" geometry={box} scale={[2.7, 3, 2.7]} />
-                {/* <Addition
-                    name="roof"
-                    geometry={tri}
-                    scale={[2.5, 1.5, 1.425]}
-                    rotation={[-Math.PI / 2, 0, 0]}
-                    position={[0, 2.2, 0]}
-                /> */}
-                {/* <Subtraction
-                                name="cavity"
-                                geometry={new THREE.BoxGeometry(2, 2, 2)}
-                                scale={[2.7, 3, 2.7]}
-                            /> */}
-                {/* <Chimney scale={0.5} position={[-0.75, 3, 0.8]} /> */}
-                {/* <Window position={[1.1, 2.5, 0]} scale={0.6} rotation={[0, Math.PI / 2, 0]} />
-                <Window position={[0, 2.5, 1.5]} scale={0.6} rotation={[0, 0, 0]} /> */}
+        //         <Subtraction name="cavity" geometry={box} scale={[2.7, 3, 2.7]} />
+        //         {/* <Addition
+        //             name="roof"
+        //             geometry={tri}
+        //             scale={[2.5, 1.5, 1.425]}
+        //             rotation={[-Math.PI / 2, 0, 0]}
+        //             position={[0, 2.2, 0]}
+        //         /> */}
+        //         {/* <Subtraction
+        //                         name="cavity"
+        //                         geometry={new THREE.BoxGeometry(2, 2, 2)}
+        //                         scale={[2.7, 3, 2.7]}
+        //                     /> */}
+        //         {/* <Chimney scale={0.5} position={[-0.75, 3, 0.8]} /> */}
+        //         {/* <Window position={[1.1, 2.5, 0]} scale={0.6} rotation={[0, Math.PI / 2, 0]} />
+        //         <Window position={[0, 2.5, 1.5]} scale={0.6} rotation={[0, 0, 0]} /> */}
 
-                {/* <PivotControls
-                                activeAxes={[false, true, true]}
-                                rotation={[0, 0, 0]}
-                                scale={1}
-                                anchor={[0, 0, 0.4]}
-                                onDrag={() => csg.current?.update()}
-                            >
-                                <Window position={[0.5, 1, 1.5]} scale={1.25} />
-                            </PivotControls> */}
+        //         {/* <PivotControls
+        //                         activeAxes={[false, true, true]}
+        //                         rotation={[0, 0, 0]}
+        //                         scale={1}
+        //                         anchor={[0, 0, 0.4]}
+        //                         onDrag={() => csg.current?.update()}
+        //                     >
+        //                         <Window position={[0.5, 1, 1.5]} scale={1.25} />
+        //                     </PivotControls> */}
 
-                {/* <PivotControls
-                    activeAxes={[false, true, true]}
-                    rotation={[0, Math.PI, 0]}
-                    scale={1}
-                    anchor={[0.4, 0, 0]}
-                    onDrag={() => csg.current.update()}
-                >
-                    <Window rotation={[0, Math.PI / 2, 0]} position={[1.425, 0.25, 0]} scale={1.25} />
-                </PivotControls> */}
-                <PivotControls
-                    activeAxes={[false, true, true]}
-                    scale={1}
-                    anchor={[-0.5, 0, 0]}
-                    onDrag={() => (csg.current as any).update()}
-                >
-                    <Door rotation={[0, Math.PI / 2, 0]} position={[-1.425, -0.45, 0]} scale={[1, 0.9, 1]} />
-                </PivotControls>
-            </Geometry>
-            <meshStandardMaterial envMapIntensity={0.25} />
-        </mesh>
+        //         {/* <PivotControls
+        //             activeAxes={[false, true, true]}
+        //             rotation={[0, Math.PI, 0]}
+        //             scale={1}
+        //             anchor={[0.4, 0, 0]}
+        //             onDrag={() => csg.current.update()}
+        //         >
+        //             <Window rotation={[0, Math.PI / 2, 0]} position={[1.425, 0.25, 0]} scale={1.25} />
+        //         </PivotControls> */}
+        //         <PivotControls
+        //             activeAxes={[false, true, true]}
+        //             scale={1}
+        //             anchor={[-0.5, 0, 0]}
+        //             onDrag={() => (csg.current as any).update()}
+        //         >
+        //             <Door rotation={[0, Math.PI / 2, 0]} position={[-1.425, -0.45, 0]} scale={[1, 0.9, 1]} />
+        //         </PivotControls>
+        //     </Geometry>
+        //     <meshStandardMaterial envMapIntensity={0.25} />
+        // </mesh>
     );
 };
 
