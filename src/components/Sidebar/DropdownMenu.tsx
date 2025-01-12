@@ -1,6 +1,7 @@
 import { LoadAction } from '@/2d/editor/actions/LoadAction';
 import { ResetAction } from '@/2d/editor/actions/ResetAction';
 import { SaveAction } from '@/2d/editor/actions/SaveAction';
+import { SaveInProjectAction } from '@/2d/editor/actions/SaveInProjectAction';
 import { ViewMode } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
 import { NavbarLink } from '@/ui/NavbarLink';
@@ -36,10 +37,21 @@ const DropdownMenu = () => {
                     <Menu.Item
                         leftSection={<DeviceFloppy size={16} />}
                         onClick={() => {
+                            const action = new SaveInProjectAction();
+
+                            action.execute();
+                        }}
+                    >
+                        <span className="text-sm ">Zapisz w projekcie</span>
+                    </Menu.Item>
+                    <Menu.Item
+                        leftSection={<DeviceFloppy size={16} />}
+                        onClick={() => {
                             const action = new SaveAction();
 
                             action.execute();
                         }}
+                        rightSection={<span className="text-xs text-gray-300">.json</span>}
                     >
                         <span className="text-sm ">Zapisz</span>
                     </Menu.Item>

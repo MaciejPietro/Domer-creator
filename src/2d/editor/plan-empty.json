@@ -1,3 +1,9 @@
 {
-  "floors": []
+  "floors": [
+    {
+      "furnitureArray": [],
+      "wallNodes": [],
+      "wallNodeLinks": []
+    }
+  ]
 }

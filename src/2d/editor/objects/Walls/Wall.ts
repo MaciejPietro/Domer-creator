@@ -45,6 +45,7 @@ const normalizeAngle = (angle: number) => (angle >= 180 ? angle - 180 : angle);
 
 const areAnglesDifferent = (angle1: number, angle2: number) => normalizeAngle(~angle1) !== normalizeAngle(~angle2);
 
+const IS_DEBUG = false;
 export class Wall extends Graphics {
     uuid = uuidv4();
     leftNode: WallNode;
@@ -297,6 +298,8 @@ export class Wall extends Graphics {
     }
 
     private updateDebugHelpers() {
+        if (!IS_DEBUG) return;
+
         this.dotHelperA.clear();
         this.dotHelperA.zIndex = 1001;
         this.dotHelperA.circle(this.pointA.x, this.pointA.y, 3);

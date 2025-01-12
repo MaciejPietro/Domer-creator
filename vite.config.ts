@@ -19,6 +19,20 @@ export default defineConfig(({ mode }) => {
     return {
         base: '/',
         plugins: [react(), svgr()],
+        server: {
+            port: 3000,
+            proxy: {
+                '/iframe-app': {
+                    target: 'http://localhost:3000',
+                    changeOrigin: true,
+                    rewrite: (path) => path.replace(/^\/iframe-app/, ''),
+                },
+            },
+            cors: true,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
+        },
         resolve: {
             alias: {
                 '@': path.resolve(__dirname, './src'),
