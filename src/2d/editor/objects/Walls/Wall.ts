@@ -195,102 +195,66 @@ export class Wall extends Graphics {
 
         const parent = this.parent as WallNodeSequence;
 
+        // Initialize default corner points
         this.pointA = { x: 0, y: this.thickness };
         this.pointB = { x: this.length, y: this.thickness };
         this.pointC = { x: this.length, y: 0 };
         this.pointD = { x: 0, y: 0 };
 
-        const aCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), true);
+        // Define corner configurations
+        const corners = [
+            {
+                point: 'pointA',
+                nodeId: this.leftNode.getId(),
+                isClockwise: true,
+                y1: this.thickness,
+                getYPos: (cornerWall: Wall) => (this.leftNode === cornerWall.leftNode ? 0 : cornerWall.thickness),
+            },
+            {
+                point: 'pointD',
+                nodeId: this.leftNode.getId(),
+                isClockwise: false,
+                y1: 0,
+                getYPos: (cornerWall: Wall) => (this.leftNode === cornerWall.leftNode ? cornerWall.thickness : 0),
+            },
+            {
+                point: 'pointC',
+                nodeId: this.rightNode.getId(),
+                isClockwise: true,
+                y1: 0,
+                getYPos: (cornerWall: Wall) => (this.rightNode === cornerWall.rightNode ? cornerWall.thickness : 0),
+            },
+            {
+                point: 'pointB',
+                nodeId: this.rightNode.getId(),
+                isClockwise: false,
+                y1: this.thickness,
+                getYPos: (cornerWall: Wall) => (this.rightNode === cornerWall.rightNode ? 0 : cornerWall.thickness),
+            },
+        ];
 
-        if (aCornerWall && areAnglesDifferent(aCornerWall.angle, this.angle)) {
-            const x1 = -100;
-            const y1 = this.thickness;
-            const x2 = this.length + 100;
-            const y2 = this.thickness;
+        // Process each corner
+        corners.forEach(({ point, nodeId, isClockwise, y1, getYPos }) => {
+            const cornerWall = parent.findFirstNeighbor(this, nodeId, isClockwise);
 
-            const yPos = this.leftNode === aCornerWall.leftNode ? 0 : aCornerWall.thickness;
+            if (cornerWall && areAnglesDifferent(cornerWall.angle, this.angle)) {
+                const x1 = -100;
+                const x2 = this.length + 100;
+                const x3 = -100;
+                const x4 = cornerWall.length + 100;
 
-            const x3 = -100;
-            const y3 = yPos;
-            const x4 = aCornerWall.length + 100;
-            const y4 = yPos;
+                const yPos = getYPos(cornerWall);
 
-            const point1 = this.toGlobal({ x: x1, y: y1 });
-            const point2 = this.toGlobal({ x: x2, y: y2 });
-            const point3 = aCornerWall.toGlobal({ x: x3, y: y3 });
-            const point4 = aCornerWall.toGlobal({ x: x4, y: y4 });
+                const point1 = this.toGlobal({ x: x1, y: y1 });
+                const point2 = this.toGlobal({ x: x2, y: y1 });
+                const point3 = cornerWall.toGlobal({ x: x3, y: yPos });
+                const point4 = cornerWall.toGlobal({ x: x4, y: yPos });
 
-            this.pointA = this.toLocal(lineIntersection(point1, point2, point3, point4));
-        }
+                this[point] = this.toLocal(lineIntersection(point1, point2, point3, point4));
+            }
+        });
 
-        const dCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), false);
-        if (dCornerWall && areAnglesDifferent(dCornerWall.angle, this.angle)) {
-            const x1 = -100;
-            const y1 = 0;
-            const x2 = this.length + 100;
-            const y2 = 0;
-
-            const yPos = this.leftNode === dCornerWall.leftNode ? dCornerWall.thickness : 0;
-
-            const x3 = -100;
-            const y3 = yPos;
-            const x4 = dCornerWall.length + 100;
-            const y4 = yPos;
-
-            const point1 = this.toGlobal({ x: x1, y: y1 });
-            const point2 = this.toGlobal({ x: x2, y: y2 });
-            const point3 = dCornerWall.toGlobal({ x: x3, y: y3 });
-            const point4 = dCornerWall.toGlobal({ x: x4, y: y4 });
-
-            this.pointD = this.toLocal(lineIntersection(point1, point2, point3, point4));
-        }
-
-        const cCornerWall = parent.findFirstNeighbor(this, this.rightNode.getId(), true);
-        if (cCornerWall && areAnglesDifferent(cCornerWall.angle, this.angle)) {
-            const x1 = -100;
-            const y1 = 0;
-            const x2 = this.length + 100;
-            const y2 = 0;
-
-            const yPos = this.rightNode === cCornerWall.rightNode ? cCornerWall.thickness : 0;
-
-            const x3 = -100;
-            const y3 = yPos;
-            const x4 = cCornerWall.length + 100;
-            const y4 = yPos;
-
-            const point1 = this.toGlobal({ x: x1, y: y1 });
-            const point2 = this.toGlobal({ x: x2, y: y2 });
-            const point3 = cCornerWall.toGlobal({ x: x3, y: y3 });
-            const point4 = cCornerWall.toGlobal({ x: x4, y: y4 });
-
-            this.pointC = this.toLocal(lineIntersection(point1, point2, point3, point4));
-        }
-
-        const bCornerWall = parent.findFirstNeighbor(this, this.rightNode.getId(), false);
-
-        if (bCornerWall && areAnglesDifferent(bCornerWall.angle, this.angle)) {
-            const x1 = -100;
-            const y1 = this.thickness;
-            const x2 = this.length + 100;
-            const y2 = this.thickness;
-
-            const yPos = this.rightNode === bCornerWall.rightNode ? 0 : bCornerWall.thickness;
-
-            const x3 = -100;
-            const y3 = yPos;
-            const x4 = bCornerWall.length + 100;
-            const y4 = yPos;
-
-            const point1 = this.toGlobal({ x: x1, y: y1 });
-            const point2 = this.toGlobal({ x: x2, y: y2 });
-            const point3 = bCornerWall.toGlobal({ x: x3, y: y3 });
-            const point4 = bCornerWall.toGlobal({ x: x4, y: y4 });
-
-            this.pointB = this.toLocal(lineIntersection(point1, point2, point3, point4));
-        }
-
-        this.debugContainer?.update();
+        // this.debugContainer?.update();
         this.updateCorners();
     }
 
