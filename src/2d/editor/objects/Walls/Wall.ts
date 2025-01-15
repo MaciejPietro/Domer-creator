@@ -159,30 +159,25 @@ export class Wall extends Graphics {
     }
 
     public updateCorners() {
-        const pointA = this.pointA;
-        const pointB = this.pointB;
-        const pointC = this.pointC;
-        const pointD = this.pointD;
+        if (!this.graphic) return;
 
         const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : WALL_STROKE_COLOR;
-
         const middleEndPoint = { x: this.length, y: this.thickness / 2 };
         const middleStartPoint = { x: 0, y: this.thickness / 2 };
 
-        this.graphic.clear();
-
         this.graphic
+            .clear()
             .poly([
-                pointA.x,
-                pointA.y,
-                pointB.x,
-                pointB.y,
+                this.pointA.x,
+                this.pointA.y,
+                this.pointB.x,
+                this.pointB.y,
                 middleEndPoint.x,
                 middleEndPoint.y,
-                pointC.x,
-                pointC.y,
-                pointD.x,
-                pointD.y,
+                this.pointC.x,
+                this.pointC.y,
+                this.pointD.x,
+                this.pointD.y,
                 middleStartPoint.x,
                 middleStartPoint.y,
             ])
@@ -195,19 +190,27 @@ export class Wall extends Graphics {
 
         const parent = this.parent as WallNodeSequence;
 
-        // Initialize default corner points
-        this.pointA = { x: 0, y: this.thickness };
-        this.pointB = { x: this.length, y: this.thickness };
-        this.pointC = { x: this.length, y: 0 };
+        // Cache values that don't change during drag
+        const thickness = this.thickness;
+        const length = this.length;
+
+        // Initialize default corner points - moved outside of corners loop
+        this.pointA = { x: 0, y: thickness };
+        this.pointB = { x: length, y: thickness };
+        this.pointC = { x: length, y: 0 };
         this.pointD = { x: 0, y: 0 };
 
-        // Define corner configurations
+        // Cache angle calculations
+        const wallAngle = this.angle;
+        const normalizedWallAngle = normalizeAngle(wallAngle);
+
+        // Process corners only if we have neighbors
         const corners = [
             {
                 point: 'pointA',
                 nodeId: this.leftNode.getId(),
                 isClockwise: true,
-                y1: this.thickness,
+                y1: thickness,
                 getYPos: (cornerWall: Wall) => (this.leftNode === cornerWall.leftNode ? 0 : cornerWall.thickness),
             },
             {
@@ -228,23 +231,31 @@ export class Wall extends Graphics {
                 point: 'pointB',
                 nodeId: this.rightNode.getId(),
                 isClockwise: false,
-                y1: this.thickness,
+                y1: thickness,
                 getYPos: (cornerWall: Wall) => (this.rightNode === cornerWall.rightNode ? 0 : cornerWall.thickness),
             },
         ];
 
-        // Process each corner
+        // Process each corner only if there's a neighbor
         corners.forEach(({ point, nodeId, isClockwise, y1, getYPos }) => {
             const cornerWall = parent.findFirstNeighbor(this, nodeId, isClockwise);
 
-            if (cornerWall && areAnglesDifferent(cornerWall.angle, this.angle)) {
+            if (cornerWall) {
+                const cornerAngle = cornerWall.angle;
+
+                // Skip if angles are the same
+                if (!areAnglesDifferent(cornerAngle, wallAngle)) {
+                    return;
+                }
+
+                // Cache intersection calculation values
+                const yPos = getYPos(cornerWall);
                 const x1 = -100;
-                const x2 = this.length + 100;
+                const x2 = length + 100;
                 const x3 = -100;
                 const x4 = cornerWall.length + 100;
 
-                const yPos = getYPos(cornerWall);
-
+                // Calculate intersection only when necessary
                 const point1 = this.toGlobal({ x: x1, y: y1 });
                 const point2 = this.toGlobal({ x: x2, y: y1 });
                 const point3 = cornerWall.toGlobal({ x: x3, y: yPos });
@@ -254,7 +265,6 @@ export class Wall extends Graphics {
             }
         });
 
-        // this.debugContainer?.update();
         this.updateCorners();
     }
 
@@ -390,48 +400,27 @@ export class Wall extends Graphics {
         const x2 = this.rightNode.x;
         const y2 = this.rightNode.y;
 
+        // Cache length calculation
         this.length = Math.floor(euclideanDistance(x1, x2, y1, y2));
 
+        // Early return if length is invalid
         const minLength = this.getMinimumWallLength();
-
         if (this.length < minLength) {
-            this.leftNode.dragging = false;
-            this.rightNode.dragging = false;
-
-            this.leftNode.setToPrevPosition();
-            this.rightNode.setToPrevPosition();
-
-            this.leftNode.setStyles({});
-            this.rightNode.setStyles({});
-
-            notifications.clean();
-
-            notifications.show({
-                title: '🚪 Za krótka ściana',
-                message: 'Nie można zmniejszyć ściany. Usuń drzwi.',
-                color: 'red',
-            });
-
-            this.drawLine();
-
+            this.handleInvalidLength();
             return;
         }
 
-        this.setStyles();
+        // Cache angle calculation
+        const theta = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
+        this.angle = theta < 0 ? 360 + theta : theta;
 
-        let theta = Math.atan2(y2 - y1, x2 - x1);
-
-        theta *= 180 / Math.PI;
-        if (theta < 0) theta = 360 + theta;
-
+        // Batch position updates
         this.position.set(x1, y1);
-        this.angle = theta;
+        this.leftNode.angle = this.angle;
+        this.rightNode.angle = this.angle;
 
-        this.leftNode.angle = theta;
-        this.rightNode.angle = theta;
-
+        this.setStyles();
         this.updateMeasureLabels();
-
         this.drawWallNodesPlaceholders();
     }
 
