@@ -26,7 +26,6 @@ export default function SceneRoot() {
                 <Canvas style={{ height: '100vh' }} shadows camera={{ position: [-60, 40, 15], fov: 25 }}>
                     <axesHelper args={[10]} />
                     <gridHelper args={[200, 200, 0xff0000, 'teal']} />
-                    {/* @ts-expect-error find why */}
                     <House plan={plan} />
                     <Environment />
                     <OrbitControls makeDefault target={centerPoint} />

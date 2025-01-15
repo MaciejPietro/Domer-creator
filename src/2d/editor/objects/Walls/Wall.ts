@@ -32,6 +32,8 @@ import {
     WALL_STROKE_COLOR,
 } from './constants';
 import { WallNodeSequence } from './WallNodeSequence';
+import WallDebug from './WallDebug';
+import WallDebugContainer from './WallDebugContainer';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -55,11 +57,12 @@ export class Wall extends Graphics {
     measureLabelBottom: MeasureLabel;
     children: Container[] = [];
     lineHelper: Graphics;
-    dotHelperA: Graphics;
-    dotHelperB: Graphics;
-    dotHelperC: Graphics;
-    dotHelperD: Graphics;
+    // dotHelperA: Graphics;
+    // dotHelperB: Graphics;
+    // dotHelperC: Graphics;
+    // dotHelperD: Graphics;
     graphic: Graphics;
+    debugContainer: WallDebugContainer | null = null;
 
     // rightBackground: Graphics | undefined;
     helpersContainer = new Container();
@@ -84,10 +87,10 @@ export class Wall extends Graphics {
 
     leftNodePlaceholder: Graphics | undefined;
     rightNodePlaceholder: Graphics | undefined;
-    pointA: { x: number; y: number };
-    pointC: { x: number; y: number };
-    pointD: { x: number; y: number };
-    pointB: { x: number; y: number };
+    pointA: Point = { x: 0, y: 0 };
+    pointC: Point = { x: 0, y: 0 };
+    pointD: Point = { x: 0, y: 0 };
+    pointB: Point = { x: 0, y: 0 };
 
     constructor(leftNode: WallNode, rightNode: WallNode, settings?: WallSettings) {
         super();
@@ -100,18 +103,14 @@ export class Wall extends Graphics {
 
         this.lineHelper = new Graphics();
 
-        this.dotHelperA = new Graphics();
-        this.dotHelperB = new Graphics();
-        this.dotHelperC = new Graphics();
-        this.dotHelperD = new Graphics();
+        this.debugContainer = new WallDebugContainer({
+            a: this.pointA,
+            b: this.pointB,
+            c: this.pointC,
+            d: this.pointD,
+        });
 
-        this.helpersContainer.addChild(this.lineHelper);
-        this.helpersContainer.addChild(this.dotHelperA);
-        this.helpersContainer.addChild(this.dotHelperB);
-        this.helpersContainer.addChild(this.dotHelperC);
-        this.helpersContainer.addChild(this.dotHelperD);
-
-        this.addChild(this.helpersContainer);
+        this.addChild(this.debugContainer);
 
         this.graphic = new Graphics();
 
@@ -222,8 +221,6 @@ export class Wall extends Graphics {
             const point4 = aCornerWall.toGlobal({ x: x4, y: y4 });
 
             this.pointA = this.toLocal(lineIntersection(point1, point2, point3, point4));
-
-            // aCornerWall.updateCorners(aCornerWall.pointA, aCornerWall.pointB, aCornerWall.pointC, aCornerWall.pointD);
         }
 
         const dCornerWall = parent.findFirstNeighbor(this, this.leftNode.getId(), false);
@@ -293,42 +290,11 @@ export class Wall extends Graphics {
             this.pointB = this.toLocal(lineIntersection(point1, point2, point3, point4));
         }
 
-        this.updateDebugHelpers();
+        this.debugContainer?.update();
         this.updateCorners();
     }
 
-    private updateDebugHelpers() {
-        if (!IS_DEBUG) return;
-
-        this.dotHelperA.clear();
-        this.dotHelperA.zIndex = 1001;
-        this.dotHelperA.circle(this.pointA.x, this.pointA.y, 3);
-        this.dotHelperA.stroke({ width: 1, color: 'red' });
-
-        this.dotHelperB.clear();
-        this.dotHelperB.zIndex = 1001;
-        this.dotHelperB.circle(this.pointB.x, this.pointB.y, 3);
-        this.dotHelperB.stroke({ width: 1, color: 'green' });
-
-        this.dotHelperC.clear();
-        this.dotHelperC.zIndex = 1001;
-        this.dotHelperC.circle(this.pointC.x, this.pointC.y, 3);
-        this.dotHelperC.stroke({ width: 1, color: 'blue' });
-
-        this.dotHelperD.clear();
-        this.dotHelperD.zIndex = 1001;
-        this.dotHelperD.circle(this.pointD.x, this.pointD.y, 3);
-        this.dotHelperD.stroke({ width: 1, color: 'purple' });
-    }
-
     private onMouseOver(ev: FederatedPointerEvent) {
-        // this.color = WALL_HOVER_FILL_COLOR;
-
-        // console.log({
-        //     angle: this.angle,
-        //     calcAngle: this.angle > 180 ? this.angle - 180 : this.angle,
-        // });
-
         const state = useStore.getState();
 
         const localCoords = ev.getLocalPosition(this as unknown as Container);
