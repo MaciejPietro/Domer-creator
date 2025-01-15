@@ -152,8 +152,6 @@ export abstract class BuildingElement extends Container {
 
         switch (state.activeTool) {
             case Tool.Edit:
-                console.log('xdxd this', this);
-
                 const parent = this.parent.parent as WallNodeSequence;
                 parent.blurAllElements(this.uuid);
                 state.setFocusedElement(this as any);

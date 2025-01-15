@@ -14,7 +14,6 @@ import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { WallType, wallTypeConfig } from './config';
 import { v4 as uuidv4 } from 'uuid';
 
-import { MeasureLabel } from '../TransformControls/MeasureLabel';
 import { Door } from '../Furnitures/Door/Door';
 import { WindowElement } from '../Furnitures/Window/Window';
 
@@ -32,10 +31,12 @@ import {
     WALL_STROKE_COLOR,
 } from './constants';
 import { WallNodeSequence } from './WallNodeSequence';
-import WallDebug from './WallDebug';
 import WallDebugContainer from './WallDebugContainer';
+import WallMeasuresContainer from './WallMeasuresContainer';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
+
+export const MIN_WALL_LENGTH = 20;
 
 export type WallSettings = {
     uuid?: string;
@@ -47,24 +48,19 @@ const normalizeAngle = (angle: number) => (angle >= 180 ? angle - 180 : angle);
 
 const areAnglesDifferent = (angle1: number, angle2: number) => normalizeAngle(~angle1) !== normalizeAngle(~angle2);
 
-const IS_DEBUG = false;
 export class Wall extends Graphics {
     uuid = uuidv4();
     leftNode: WallNode;
     rightNode: WallNode;
     length: number;
-    measureLabelTop: MeasureLabel;
-    measureLabelBottom: MeasureLabel;
+    // measureLabelTop: MeasureLabel;
+    // measureLabelBottom: MeasureLabel;
     children: Container[] = [];
     lineHelper: Graphics;
-    // dotHelperA: Graphics;
-    // dotHelperB: Graphics;
-    // dotHelperC: Graphics;
-    // dotHelperD: Graphics;
+
     graphic: Graphics;
     debugContainer: WallDebugContainer | null = null;
-
-    // rightBackground: Graphics | undefined;
+    measuresContainer: WallMeasuresContainer | null = null;
     helpersContainer = new Container();
 
     focused = false;
@@ -103,25 +99,27 @@ export class Wall extends Graphics {
 
         this.lineHelper = new Graphics();
 
-        this.debugContainer = new WallDebugContainer({
+        const points = {
             a: this.pointA,
             b: this.pointB,
             c: this.pointC,
             d: this.pointD,
-        });
+        };
+
+        this.debugContainer = new WallDebugContainer(points);
+        this.measuresContainer = new WallMeasuresContainer(points);
 
         this.addChild(this.debugContainer);
+        this.addChild(this.measuresContainer);
 
         this.graphic = new Graphics();
 
         this.addChild(this.graphic);
 
-        this.getNodesCords();
-
-        this.measureLabelTop = new MeasureLabel(0);
-        this.measureLabelBottom = new MeasureLabel(0);
-        this.addChild(this.measureLabelTop);
-        this.addChild(this.measureLabelBottom);
+        // this.measureLabelTop = new MeasureLabel(0);
+        // this.measureLabelBottom = new MeasureLabel(0);
+        // this.addChild(this.measureLabelTop);
+        // this.addChild(this.measureLabelBottom);
 
         if (settings?.type !== undefined) {
             this.type = settings?.type;
@@ -138,7 +136,7 @@ export class Wall extends Graphics {
 
         this.applySettings(settings?.thickness);
 
-        this.drawLine();
+        this.drawWall();
         this.pivot.set(0, this.thickness * 0.5);
 
         this.on('pointerdown', this.onMouseDown);
@@ -185,7 +183,7 @@ export class Wall extends Graphics {
             .stroke({ width: 1, color: strokeColor });
     }
 
-    public setStyles() {
+    private calcCornersPositions() {
         if (!this.parent) return;
 
         const parent = this.parent as WallNodeSequence;
@@ -195,41 +193,50 @@ export class Wall extends Graphics {
         const length = this.length;
 
         // Initialize default corner points - moved outside of corners loop
-        this.pointA = { x: 0, y: thickness };
-        this.pointB = { x: length, y: thickness };
-        this.pointC = { x: length, y: 0 };
-        this.pointD = { x: 0, y: 0 };
+        this.pointA.x = 0;
+        this.pointA.y = this.thickness;
+
+        this.pointB.x = length;
+        this.pointB.y = this.thickness;
+
+        this.pointC.x = length;
+        this.pointC.y = 0;
+
+        this.pointD.x = 0;
+        this.pointD.y = 0;
 
         // Cache angle calculations
         const wallAngle = this.angle;
-        const normalizedWallAngle = normalizeAngle(wallAngle);
+
+        const leftNodeId = this.leftNode.getId();
+        const rightNodeId = this.rightNode.getId();
 
         // Process corners only if we have neighbors
         const corners = [
             {
                 point: 'pointA',
-                nodeId: this.leftNode.getId(),
+                nodeId: leftNodeId,
                 isClockwise: true,
                 y1: thickness,
                 getYPos: (cornerWall: Wall) => (this.leftNode === cornerWall.leftNode ? 0 : cornerWall.thickness),
             },
             {
                 point: 'pointD',
-                nodeId: this.leftNode.getId(),
+                nodeId: leftNodeId,
                 isClockwise: false,
                 y1: 0,
                 getYPos: (cornerWall: Wall) => (this.leftNode === cornerWall.leftNode ? cornerWall.thickness : 0),
             },
             {
                 point: 'pointC',
-                nodeId: this.rightNode.getId(),
+                nodeId: rightNodeId,
                 isClockwise: true,
                 y1: 0,
                 getYPos: (cornerWall: Wall) => (this.rightNode === cornerWall.rightNode ? cornerWall.thickness : 0),
             },
             {
                 point: 'pointB',
-                nodeId: this.rightNode.getId(),
+                nodeId: rightNodeId,
                 isClockwise: false,
                 y1: thickness,
                 getYPos: (cornerWall: Wall) => (this.rightNode === cornerWall.rightNode ? 0 : cornerWall.thickness),
@@ -261,11 +268,31 @@ export class Wall extends Graphics {
                 const point3 = cornerWall.toGlobal({ x: x3, y: yPos });
                 const point4 = cornerWall.toGlobal({ x: x4, y: yPos });
 
-                this[point] = this.toLocal(lineIntersection(point1, point2, point3, point4));
+                const { x, y } = this.toLocal(lineIntersection(point1, point2, point3, point4));
+
+                switch (point) {
+                    case 'pointA':
+                        this.pointA.x = x;
+                        this.pointA.y = y;
+                        break;
+
+                    case 'pointB':
+                        this.pointB.x = x;
+                        this.pointB.y = y;
+                        break;
+
+                    case 'pointC':
+                        this.pointC.x = x;
+                        this.pointC.y = y;
+                        break;
+
+                    case 'pointD':
+                        this.pointD.x = x;
+                        this.pointD.y = y;
+                        break;
+                }
             }
         });
-
-        this.updateCorners();
     }
 
     private onMouseOver(ev: FederatedPointerEvent) {
@@ -336,7 +363,7 @@ export class Wall extends Graphics {
         this.type = newType;
 
         this.applySettings();
-        this.drawLine();
+        this.drawWall();
         this.updateChildren();
     }
 
@@ -348,10 +375,6 @@ export class Wall extends Graphics {
                 item.setBackground();
             }
         }
-    }
-
-    public getNodesCords() {
-        return [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
     }
 
     private drawWallNodesPlaceholders() {
@@ -368,7 +391,7 @@ export class Wall extends Graphics {
             const nodeItem = new Graphics();
 
             nodeItem.circle(node.x, node.y, 5);
-            nodeItem.fill('transparent');
+            nodeItem.fill('red');
 
             nodeItem.eventMode = 'static';
 
@@ -394,7 +417,15 @@ export class Wall extends Graphics {
         });
     }
 
-    public drawLine() {
+    public handleInvalidLength() {
+        console.log('handleInvalidLength');
+    }
+
+    public isInvalidLength() {
+        return this.length > MIN_WALL_LENGTH;
+    }
+
+    public drawWall() {
         const x1 = this.leftNode.x;
         const y1 = this.leftNode.y;
         const x2 = this.rightNode.x;
@@ -402,13 +433,6 @@ export class Wall extends Graphics {
 
         // Cache length calculation
         this.length = Math.floor(euclideanDistance(x1, x2, y1, y2));
-
-        // Early return if length is invalid
-        const minLength = this.getMinimumWallLength();
-        if (this.length < minLength) {
-            this.handleInvalidLength();
-            return;
-        }
 
         // Cache angle calculation
         const theta = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
@@ -419,49 +443,14 @@ export class Wall extends Graphics {
         this.leftNode.angle = this.angle;
         this.rightNode.angle = this.angle;
 
-        this.setStyles();
-        this.updateMeasureLabels();
+        this.calcCornersPositions();
+        this.updateCorners();
         this.drawWallNodesPlaceholders();
-    }
 
-    private getMinimumWallLength(): number {
-        let minLength = 0;
-        this.children.forEach((child) => {
-            if (child instanceof Door || child instanceof WindowElement) {
-                const childEndX = child.position.x + child.length;
-                if (childEndX > minLength) {
-                    minLength = childEndX;
-                }
-            }
-        });
-        return parseInt(minLength.toString());
-    }
-
-    private updateMeasureLabels() {
-        const pointA = this.pointA?.x || 0;
-        const pointB = this.pointB?.x || 0;
-        const pointC = this.pointC?.x || 0;
-        const pointD = this.pointD?.x || 0;
-
-        const topLength = Math.abs(pointD - pointC);
-        this.measureLabelTop.update({
-            length: topLength,
-            angle: this.angle,
-            startX: pointC,
-            endX: pointD,
-            offsetY: -5,
-            thickness: this.thickness,
-        });
-
-        const bottomLength = Math.abs(pointB - pointA);
-        this.measureLabelBottom.update({
-            thickness: this.thickness,
-            length: bottomLength,
-            angle: this.angle,
-            startX: pointA,
-            endX: pointB,
-            offsetY: this.thickness + 20,
-        });
+        if (this.focused) {
+            this.debugContainer?.update();
+            this.measuresContainer?.update({ thickness: this.thickness, angle: this.angle });
+        }
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
@@ -483,15 +472,14 @@ export class Wall extends Graphics {
         this.leftNode.setPosition(this.x1 + x, this.y1 + y);
         this.rightNode.setPosition(this.x2 + x, this.y2 + y);
 
-        this.drawLine();
+        this.drawWall();
     }
 
     public blur() {
         this.focused = false;
         this.leftNode.setVisibility(false);
         this.rightNode.setVisibility(false);
-        this.measureLabelTop.hide();
-        this.measureLabelBottom.hide();
+        this.measuresContainer?.hide();
         this.zIndex = WALL_INACTIVE_Z_INDEX;
 
         this.updateCorners();
@@ -502,8 +490,8 @@ export class Wall extends Graphics {
 
         this.leftNode.setVisibility(true);
         this.rightNode.setVisibility(true);
-        this.measureLabelTop.show();
-        this.measureLabelBottom.show();
+
+        this.measuresContainer?.show();
 
         this.zIndex = WALL_ACTIVE_Z_INDEX;
 
@@ -660,7 +648,7 @@ export class Wall extends Graphics {
     }
 
     public setLength(newLength: number) {
-        const [x1, y1, x2, y2] = this.getNodesCords();
+        const [x1, y1, x2, y2] = [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
 
         const deltaX = x2 - x1;
         const deltaY = y2 - y1;
@@ -674,7 +662,7 @@ export class Wall extends Graphics {
 
         this.rightNode.setPosition(newRightX, newRightY);
 
-        this.drawLine();
+        this.drawWall();
     }
 
     private getXWithinWall(elementX: number): number {
@@ -686,8 +674,6 @@ export class Wall extends Graphics {
         const maxX = this.length;
 
         const wallOffset = 0;
-
-        let isBusy = false;
 
         const endX = elementX + furnitureHeight;
         const startX = elementX;

@@ -8,7 +8,7 @@ import { FloorPlan } from '../FloorPlan';
 import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { isMobile } from 'react-device-detect';
 import { WallType, wallTypeConfig } from './config';
-import { DEFAULT_WALL_TYPE, Wall } from './Wall';
+import { DEFAULT_WALL_TYPE, MIN_WALL_LENGTH, Wall } from './Wall';
 import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
 import { Building } from 'tabler-icons-react';
@@ -122,36 +122,9 @@ export class WallNode extends Container {
     public setStyles({ color = 0x222222 }: { color?: string | number }) {
         this.dot.clear();
         this.dot.circle(0, 0, this.size / 2);
-        // bg-blue-500 from tailwind.config.js
         this.dot.fill(this.dragging ? '#1C7ED6' : color);
 
         this.addChild(this.dot);
-
-        // this.dot.zIndex = 30;
-
-        // SQUARE IN PLACE OF WALL DOT
-        // const background = new Graphics();
-        // background.rect(-WALL_THICKNESS / 2 + 1, -WALL_THICKNESS / 2 + 2, WALL_THICKNESS - 1, WALL_THICKNESS - 2);
-        // background.fill('white');
-        // // background.stroke({ texture: Texture.WHITE, width: 1, color: 'black' });
-        // background.zIndex = -1;
-        // this.addChildAt(background, 0);
-
-        // this.background?.clear();
-        // this.background = new Graphics();
-        // this.background
-        //     .beginFill('blue')
-        //     .moveTo(-10, -20) // Start at top-left
-        //     .lineTo(20, -20) // Draw to top-right
-        //     .lineTo(20, 20) // Draw to bottom-right
-        //     .lineTo(-20, 20) // Draw to bottom-right
-        //     .lineTo(-20, -20)
-        //     .closePath()
-        //     .endFill();
-        // // this.background.scale.set(0.5);
-        // this.background.position.set(0, 0);
-        // // this.background.rotation = -degreesToRadians(this.angle) % 180;
-        // this.addChildAt(this.background, 1);
     }
 
     private onMouseOver() {
@@ -163,7 +136,6 @@ export class WallNode extends Container {
                 break;
 
             default:
-                // bg-blue-500 from tailwind.config.js
                 this.setStyles({ color: '#1C7ED6' });
                 break;
         }
@@ -195,7 +167,21 @@ export class WallNode extends Container {
         }
     }
 
+    private checkIfCanDragFurther() {
+        const parentWalls = this.parent.children.filter((child) => child instanceof Wall);
+
+        if (parentWalls.length && !parentWalls.every((wall) => wall.isInvalidLength())) {
+            parentWalls.forEach((wall) => {
+                if (wall.isInvalidLength()) return;
+                wall.setLength(MIN_WALL_LENGTH + 10);
+                this.dragging = false;
+            });
+        }
+    }
+
     private onMouseMove(ev: FederatedPointerEvent) {
+        this.checkIfCanDragFurther();
+
         if (!this.dragging) {
             return;
         }
