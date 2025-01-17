@@ -19,7 +19,7 @@ import { WindowElement } from '../Furnitures/Window/Window';
 
 import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 import { notifications } from '@mantine/notifications';
-import { DashedLine } from '../Helpers/DashedLine';
+
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
 import { AddWallManager } from '../../actions/AddWallManager';
 import { DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
@@ -33,6 +33,7 @@ import {
 import { WallNodeSequence } from './WallNodeSequence';
 import WallDebugContainer from './WallDebugContainer';
 import WallMeasuresContainer from './WallMeasuresContainer';
+import WallDashedLineContainer from './WallDashedLineContainer';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -53,14 +54,14 @@ export class Wall extends Graphics {
     leftNode: WallNode;
     rightNode: WallNode;
     length: number;
-    // measureLabelTop: MeasureLabel;
-    // measureLabelBottom: MeasureLabel;
     children: Container[] = [];
-    lineHelper: Graphics;
 
     graphic: Graphics;
+
     debugContainer: WallDebugContainer | null = null;
     measuresContainer: WallMeasuresContainer | null = null;
+    dashedLineContainer: WallDashedLineContainer | null = null;
+
     helpersContainer = new Container();
 
     focused = false;
@@ -97,29 +98,12 @@ export class Wall extends Graphics {
         this.dragging = false;
         this.mouseStartPoint = { x: 0, y: 0 };
 
-        this.lineHelper = new Graphics();
-
         const points = {
             a: this.pointA,
             b: this.pointB,
             c: this.pointC,
             d: this.pointD,
         };
-
-        this.debugContainer = new WallDebugContainer(points);
-        this.measuresContainer = new WallMeasuresContainer(points);
-
-        this.addChild(this.debugContainer);
-        this.addChild(this.measuresContainer);
-
-        this.graphic = new Graphics();
-
-        this.addChild(this.graphic);
-
-        // this.measureLabelTop = new MeasureLabel(0);
-        // this.measureLabelBottom = new MeasureLabel(0);
-        // this.addChild(this.measureLabelTop);
-        // this.addChild(this.measureLabelBottom);
 
         if (settings?.type !== undefined) {
             this.type = settings?.type;
@@ -135,6 +119,18 @@ export class Wall extends Graphics {
         if (settings?.thickness) this.thickness = settings.thickness;
 
         this.applySettings(settings?.thickness);
+
+        // this.debugContainer = new WallDebugContainer(points);
+        this.measuresContainer = new WallMeasuresContainer(points);
+        this.dashedLineContainer = new WallDashedLineContainer(this.thickness);
+
+        // this.addChild(this.debugContainer);
+        this.addChild(this.measuresContainer);
+        this.addChild(this.dashedLineContainer);
+
+        this.graphic = new Graphics();
+
+        this.addChild(this.graphic);
 
         this.drawWall();
         this.pivot.set(0, this.thickness * 0.5);
@@ -297,7 +293,6 @@ export class Wall extends Graphics {
 
     private onMouseOver(ev: FederatedPointerEvent) {
         const state = useStore.getState();
-
         const localCoords = ev.getLocalPosition(this as unknown as Container);
 
         switch (state.activeTool) {
@@ -316,13 +311,7 @@ export class Wall extends Graphics {
                 break;
 
             case Tool.WallAdd:
-                const lineWidth = this.thickness;
-                const line = new DashedLine(lineWidth);
-                line.rotation = Math.PI * 0.5;
-                this.addChild(line);
-
-                this.leftNode.setVisibility(true);
-                this.rightNode.setVisibility(true);
+                this.dashedLineContainer?.show();
 
                 break;
         }
@@ -330,8 +319,6 @@ export class Wall extends Graphics {
 
     private onMouseOut() {
         if (this.dragging) return;
-
-        this.fill({ color: WALL_FILL_COLOR });
 
         const state = useStore.getState();
 
@@ -343,16 +330,7 @@ export class Wall extends Graphics {
                 break;
 
             case Tool.WallAdd:
-                for (const child of this.children) {
-                    if (child instanceof DashedLine) {
-                        child.visible = false;
-                        // this.removeChild(child).destroy();
-                    }
-                }
-
-                this.leftNode.setVisibility(false);
-                this.rightNode.setVisibility(false);
-
+                this.dashedLineContainer?.hide();
                 break;
         }
     }
@@ -375,46 +353,6 @@ export class Wall extends Graphics {
                 item.setBackground();
             }
         }
-    }
-
-    private drawWallNodesPlaceholders() {
-        this.leftNodePlaceholder?.clear();
-        this.rightNodePlaceholder?.clear();
-
-        const nodes = [
-            { x: 0, y: this.thickness / 2, el: this.leftNodePlaceholder, node: this.leftNode },
-            { x: this.length, y: this.thickness / 2, el: this.rightNodePlaceholder, node: this.rightNode },
-        ];
-        nodes.forEach((node, idx) => {
-            const isRight = idx;
-
-            const nodeItem = new Graphics();
-
-            nodeItem.circle(node.x, node.y, 5);
-            nodeItem.fill('red');
-
-            nodeItem.eventMode = 'static';
-
-            nodeItem.on('pointerdown', () => {
-                switch (useStore.getState().activeTool) {
-                    case Tool.WallAdd:
-                        AddWallManager.Instance.step(isRight ? this.rightNode : this.leftNode);
-                        break;
-                }
-            });
-
-            node.el = nodeItem;
-
-            if (isRight) {
-                this.rightNodePlaceholder = nodeItem;
-                this.addChild(this.rightNodePlaceholder);
-            }
-
-            if (!isRight) {
-                this.leftNodePlaceholder = nodeItem;
-                this.addChild(this.leftNodePlaceholder);
-            }
-        });
     }
 
     public handleInvalidLength() {
@@ -445,7 +383,6 @@ export class Wall extends Graphics {
 
         this.calcCornersPositions();
         this.updateCorners();
-        this.drawWallNodesPlaceholders();
 
         if (this.focused) {
             this.debugContainer?.update();
@@ -505,14 +442,6 @@ export class Wall extends Graphics {
 
         const localCoords = ev.getLocalPosition(this as unknown as Container);
 
-        let helperLine = null;
-
-        for (const child of this.children) {
-            if (child instanceof DashedLine) {
-                helperLine = child;
-            }
-        }
-
         switch (state.activeTool) {
             case Tool.Edit:
                 const parent = this.parent as WallNodeSequence;
@@ -557,38 +486,28 @@ export class Wall extends Graphics {
                 break;
 
             case Tool.WallAdd:
-                const isOccupied = this.isOccupiedSpot(localCoords.x);
+                const hasChildren = this.children.some(
+                    (child) => child instanceof Door || child instanceof WindowElement
+                );
 
-                if (isOccupied) {
+                if (hasChildren) {
                     notifications.show({
-                        title: 'Nie można stworzyć ściany',
-                        message: 'Nie można stworzyć ściany w miejscu w którym znajdują się inne elementy.',
+                        title: 'Błędna pozycja',
+                        message: 'Nie można podzielić ściany na której znajdują się inne elementy.',
                         color: 'red',
                     });
-                } else {
-                    const hasChildren = this.children.some(
-                        (child) => child instanceof Door || child instanceof WindowElement
-                    );
-
-                    if (hasChildren) {
-                        notifications.show({
-                            title: 'Błędna pozycja',
-                            message: 'Nie można podzielić ściany na której znajdują się inne elementy.',
-                            color: 'red',
-                        });
-                        return;
-                    }
-
-                    const addNode = new AddNodeAction(
-                        this,
-                        getClosestPointOnLine(globalCords, [
-                            { x: this.leftNode.x, y: this.leftNode.y },
-                            { x: this.rightNode.x, y: this.rightNode.y },
-                        ])
-                    );
-
-                    addNode.execute();
+                    return;
                 }
+
+                const addNode = new AddNodeAction(
+                    this,
+                    getClosestPointOnLine(globalCords, [
+                        { x: this.leftNode.x, y: this.leftNode.y },
+                        { x: this.rightNode.x, y: this.rightNode.y },
+                    ])
+                );
+
+                addNode.execute();
 
                 break;
         }
@@ -723,6 +642,10 @@ export class Wall extends Graphics {
         return isOccupied;
     }
 
+    private hasElements() {
+        return this.children.some((child) => child instanceof Door || child instanceof WindowElement);
+    }
+
     private getPossibleCords({ x, y }: Point) {
         const newCords = { x, y };
 
@@ -769,18 +692,10 @@ export class Wall extends Graphics {
                 break;
 
             case Tool.WallAdd:
-                const isOccupied = this.isOccupiedSpot(localCoords.x);
-
-                for (const child of this.children) {
-                    if (child instanceof DashedLine) {
-                        const hasOccupiedElements = this.children.some(
-                            (el) => el instanceof Door || el instanceof WindowElement
-                        );
-
-                        child.setStroke(isOccupied ? 'red' : hasOccupiedElements ? 'orange' : undefined);
-                        child.setPosition({ x: localCoords.x, y: 0 });
-                    }
-                }
+                this.dashedLineContainer?.update({
+                    isOccupied: this.hasElements() || this.isOccupiedSpot(localCoords.x),
+                    localCoords,
+                });
 
                 break;
         }

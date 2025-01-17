@@ -2,24 +2,28 @@ import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
 import { Point } from '../../../../helpers/Point';
 import { useStore } from '@/stores/EditorStore';
 import { snap } from '@/helpers/ViewportCoordinates';
+import { WALL_DASHED_LINE_Z_INDEX } from './constants';
 
-// bg-blue-500 from tailwind.config.js
-const COLOR = '#1C7ED6';
+const VALID_COLOR = 'black';
+const INVALID_COLOR = 'red';
 
-export class DashedLine extends Container {
+export default class WallDashedLineContainer extends Container {
     baseLine: Graphics;
 
     constructor(private length: number) {
         super();
 
         this.eventMode = 'none';
-
         this.baseLine = new Graphics();
 
-        this.setStroke();
+        this.rotation = Math.PI * 0.5;
+
+        this.setStroke(VALID_COLOR);
+        this.visible = false;
+        this.zIndex = WALL_DASHED_LINE_Z_INDEX;
     }
 
-    public setStroke(color = COLOR) {
+    public setStroke(color: string) {
         this.baseLine = new Graphics();
 
         const num = Math.floor(this.length / 5.5);
@@ -46,6 +50,11 @@ export class DashedLine extends Container {
             y = snap(position.y);
         }
         this.position = { x, y: y + 3 };
+    }
+
+    public update({ isOccupied, localCoords }: { isOccupied: boolean; localCoords: Point }) {
+        this.setStroke(isOccupied ? INVALID_COLOR : VALID_COLOR);
+        this.setPosition({ x: localCoords.x, y: 0 });
     }
 
     public show() {

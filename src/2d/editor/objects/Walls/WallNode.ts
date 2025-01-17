@@ -28,7 +28,7 @@ export class WallNode extends Container {
 
     constructor(x: number, y: number, nodeId: number) {
         super();
-        this.eventMode = 'none';
+        this.eventMode = 'static';
         this.id = nodeId;
 
         this.setSettings();
@@ -83,15 +83,20 @@ export class WallNode extends Container {
 
     private checkEventMode() {
         switch (useStore.getState().activeTool) {
-            case Tool.Edit:
-                this.eventMode = 'static';
+            case Tool.WallAdd:
+                this.visible = true;
                 break;
-
             default:
-                this.eventMode = 'none';
-
                 break;
         }
+        // switch (useStore.getState().activeTool) {
+        //     case Tool.Edit:
+        //         this.eventMode = 'static';
+        //         break;
+        //     default:
+        //         this.eventMode = 'none';
+        //         break;
+        // }
     }
 
     public show() {
@@ -149,6 +154,7 @@ export class WallNode extends Container {
 
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
+        console.log('xdxd');
 
         // if (!this.isEditMode()) return;
 
@@ -220,6 +226,8 @@ export class WallNode extends Container {
     }
 
     private onMouseUp() {
+        console.log('xdxd test');
+
         this.dragging = false;
     }
 

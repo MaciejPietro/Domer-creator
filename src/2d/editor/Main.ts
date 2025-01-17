@@ -47,7 +47,7 @@ export class Main extends Viewport {
             .decelerate()
             .clampZoom({ minScale: 0.5, maxScale: 6 });
 
-        this.center = new Point(this.worldWidth / 2, this.worldHeight / 2);
+        // this.center = new Point(this.worldWidth / 2, this.worldHeight / 2);
 
         const planContainer = new Container();
 
