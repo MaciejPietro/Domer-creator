@@ -9,3 +9,4 @@ export const WALL_ACTIVE_STROKE_COLOR = '#1C7ED6';
 export const WALL_ACTIVE_Z_INDEX = 21;
 export const WALL_INACTIVE_Z_INDEX = 20;
 export const WALL_DASHED_LINE_Z_INDEX = 22;
+export const WALL_TEMP_FURNITURE_Z_INDEX = 25;

@@ -8,6 +8,7 @@ import { WindowElement } from './Window/Window';
 import { Door } from './Door/Door';
 import { Wall } from '../Walls/Wall';
 import { WallNodeSequence } from '../Walls/WallNodeSequence';
+import WallTempFurniture from '../Walls/WallTempFurniture';
 
 export type BuildingElementProps = {
     position?: Point;
@@ -64,9 +65,18 @@ export abstract class BuildingElement extends Container {
             { start: endX - DISTANCE_FROM_WALL, end: endX - DISTANCE_FROM_WALL },
         ];
 
-        for (const child of this.parent.children) {
-            if (child instanceof BuildingElement) {
-                occupiedSpots.push({ start: child.position.x, end: child.position.x + child.length });
+        for (const child of this.customParent!.children) {
+            // @ts-expect-error find better way to check if child is WallTempFurniture
+            if (child.className === 'WallTempFurniture') {
+                const element = child as WallTempFurniture;
+
+                const elChild = element.element!;
+
+                if (elChild.isTemporary) continue;
+
+                occupiedSpots.push({ start: child.position.x, end: elChild.position.x + elChild?.length || 0 });
+
+                console.log(occupiedSpots);
             }
         }
 

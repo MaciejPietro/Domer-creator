@@ -1,5 +1,5 @@
 import { Graphics, FederatedPointerEvent, Container } from 'pixi.js';
-import { lineIntersection, segmentIntersection } from '@pixi/math-extras';
+import { lineIntersection } from '@pixi/math-extras';
 import { euclideanDistance } from '../../../../helpers/EuclideanDistance';
 import { Point } from '../../../../helpers/Point';
 import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
@@ -7,7 +7,7 @@ import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordina
 import { useStore } from '../../../../stores/EditorStore';
 import { AddNodeAction } from '../../actions/AddNodeAction';
 import { DeleteWallAction } from '../../actions/DeleteWallAction';
-import { INTERIOR_WALL_THICKNESS, Tool, ToolMode, ViewMode, WALL_THICKNESS } from '../../constants';
+import { Tool, ViewMode } from '../../constants';
 import { WallNode } from './WallNode';
 import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
@@ -17,11 +17,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { Door } from '../Furnitures/Door/Door';
 import { WindowElement } from '../Furnitures/Window/Window';
 
-import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 import { notifications } from '@mantine/notifications';
 
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
-import { AddWallManager } from '../../actions/AddWallManager';
 import { DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
 import {
     WALL_ACTIVE_STROKE_COLOR,
@@ -34,6 +32,7 @@ import { WallNodeSequence } from './WallNodeSequence';
 import WallDebugContainer from './WallDebugContainer';
 import WallMeasuresContainer from './WallMeasuresContainer';
 import WallDashedLineContainer from './WallDashedLineContainer';
+import WallTempFurniture from './WallTempFurniture';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -61,6 +60,7 @@ export class Wall extends Graphics {
     debugContainer: WallDebugContainer | null = null;
     measuresContainer: WallMeasuresContainer | null = null;
     dashedLineContainer: WallDashedLineContainer | null = null;
+    tempFurniture: WallTempFurniture | null = null;
 
     helpersContainer = new Container();
 
@@ -77,8 +77,6 @@ export class Wall extends Graphics {
 
     dragging: boolean;
     mouseStartPoint: Point;
-
-    tempFurniture: Door | WindowElement | null = null;
 
     color = WALL_FILL_COLOR;
 
@@ -123,10 +121,12 @@ export class Wall extends Graphics {
         // this.debugContainer = new WallDebugContainer(points);
         this.measuresContainer = new WallMeasuresContainer(points);
         this.dashedLineContainer = new WallDashedLineContainer(this.thickness);
+        this.tempFurniture = new WallTempFurniture(this);
 
         // this.addChild(this.debugContainer);
         this.addChild(this.measuresContainer);
         this.addChild(this.dashedLineContainer);
+        this.addChild(this.tempFurniture);
 
         this.graphic = new Graphics();
 
@@ -293,20 +293,11 @@ export class Wall extends Graphics {
 
     private onMouseOver(ev: FederatedPointerEvent) {
         const state = useStore.getState();
-        const localCoords = ev.getLocalPosition(this as unknown as Container);
 
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
             case Tool.FurnitureAddWindow:
-                this.removeTempFurniture();
-
-                const Element = state.activeTool === Tool.FurnitureAddDoor ? Door : WindowElement;
-
-                this.tempFurniture = new Element({ parent: this });
-                this.tempFurniture.setTemporality(true);
-
-                this.addChild(this.tempFurniture);
-                this.updateFurniturePosition(localCoords);
+                this.tempFurniture?.create(state.activeTool, this).show();
 
                 break;
 
@@ -325,7 +316,7 @@ export class Wall extends Graphics {
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
             case Tool.FurnitureAddWindow:
-                this.removeTempFurniture();
+                this.tempFurniture?.hide();
 
                 break;
 
@@ -440,8 +431,6 @@ export class Wall extends Graphics {
 
         const globalCords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
 
-        const localCoords = ev.getLocalPosition(this as unknown as Container);
-
         switch (state.activeTool) {
             case Tool.Edit:
                 const parent = this.parent as WallNodeSequence;
@@ -452,36 +441,7 @@ export class Wall extends Graphics {
                 break;
             case Tool.FurnitureAddDoor:
             case Tool.FurnitureAddWindow:
-                if (this.tempFurniture) {
-                    const isDoor = state.activeTool === Tool.FurnitureAddDoor;
-                    const furniture = isDoor ? (this.tempFurniture as Door) : (this.tempFurniture as WindowElement);
-
-                    if (!furniture.isValid) {
-                        notifications.clean();
-
-                        const icon = isDoor ? '🚪' : '🪟';
-                        const message = isDoor
-                            ? 'Nie można dodać drzwi, które kolidują z innymi elementami'
-                            : 'Nie można dodać okna, które koliduje z innymi elementami';
-
-                        notifications.show({
-                            title: `${icon} Niewłaściwa pozycja`,
-                            message,
-                            color: 'red',
-                        });
-                        return;
-                    }
-
-                    const { x, y } = furniture.position;
-
-                    // furniture.setValidity(true);
-
-                    const action = new AddFurnitureAction(furniture, this, { x, y });
-
-                    action.execute();
-
-                    this.removeTempFurniture();
-                }
+                this.tempFurniture?.add();
 
                 break;
 
@@ -584,33 +544,8 @@ export class Wall extends Graphics {
         this.drawWall();
     }
 
-    private getXWithinWall(elementX: number): number {
-        // WALL BOUNDARIES
-        const furnitureHeight = this.tempFurniture?.length || 0;
-
-        let currentX = elementX;
-
-        const maxX = this.length;
-
-        const wallOffset = 0;
-
-        const endX = elementX + furnitureHeight;
-        const startX = elementX;
-
-        const isWallEnd = endX > maxX - wallOffset;
-        const isWallStart = startX < wallOffset;
-
-        if (isWallEnd) {
-            currentX = maxX - wallOffset - furnitureHeight;
-        } else if (isWallStart) {
-            currentX = wallOffset;
-        }
-
-        return currentX;
-    }
-
     private isOccupiedSpot(elementX: number): boolean {
-        const furnitureHeight = this.tempFurniture?.length || 0;
+        const furnitureHeight = this.tempFurniture?.element?.length || 0;
 
         if (furnitureHeight > this.length - DISTANCE_FROM_WALL) return true;
 
@@ -646,37 +581,6 @@ export class Wall extends Graphics {
         return this.children.some((child) => child instanceof Door || child instanceof WindowElement);
     }
 
-    private getPossibleCords({ x, y }: Point) {
-        const newCords = { x, y };
-
-        const currentX = this.getXWithinWall(newCords.x);
-
-        const isCoolide = this.tempFurniture?.isCollide();
-
-        this.tempFurniture?.setValidity(!isCoolide);
-
-        newCords.x = currentX;
-
-        return newCords;
-    }
-
-    private updateFurniturePosition(localCoords: Point) {
-        const furnitureHeight = this.tempFurniture?.length || 0;
-
-        const wallThickness = this.thickness;
-
-        const doorThickness = 12;
-
-        const fixedCords = {
-            x: localCoords.x - furnitureHeight / 2,
-            y: 0 + wallThickness - doorThickness,
-        };
-
-        const newCords = this.getPossibleCords(fixedCords);
-
-        this.tempFurniture?.setPosition(newCords);
-    }
-
     onWallMouseMove(ev: FederatedPointerEvent) {
         const state = useStore.getState();
 
@@ -685,9 +589,7 @@ export class Wall extends Graphics {
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
             case Tool.FurnitureAddWindow:
-                if (this.tempFurniture) {
-                    this.updateFurniturePosition(localCoords);
-                }
+                this.tempFurniture?.updatePosition(localCoords);
 
                 break;
 
@@ -699,11 +601,5 @@ export class Wall extends Graphics {
 
                 break;
         }
-    }
-
-    removeTempFurniture() {
-        this.removeChild(this.tempFurniture as Container);
-
-        this.tempFurniture = null;
     }
 }
