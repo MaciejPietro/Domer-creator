@@ -19,6 +19,8 @@ class WallTempFurniture extends Container {
     }
 
     create(activeTool: Tool, parent: Wall) {
+        this.removeChildren();
+
         const Element = activeTool === Tool.FurnitureAddDoor ? Door : WindowElement;
 
         this.element = new Element({ parent });
@@ -31,6 +33,8 @@ class WallTempFurniture extends Container {
 
     public add() {
         if (!this.element) return;
+
+        console.log(this.element.isValid);
 
         if (!this.element.isValid) {
             const isDoor = this.element instanceof Door;

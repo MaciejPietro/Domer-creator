@@ -84,6 +84,7 @@ const House = ({ plan }: any) => {
                                                 scale={1}
                                                 rotation={[0, 0, 0]}
                                                 length={furniture.length}
+                                                key={furniture.uuid}
                                             />
                                         );
 
@@ -115,6 +116,7 @@ const House = ({ plan }: any) => {
 
                                         return (
                                             <PivotControls
+                                                key={furniture.uuid}
                                                 activeAxes={[false, false, false]}
                                                 // rotation={[0, 0, 0]}
                                                 // scale={1}

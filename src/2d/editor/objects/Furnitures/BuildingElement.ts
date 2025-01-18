@@ -168,8 +168,6 @@ export abstract class BuildingElement extends Container {
         }
         this.isTemporary = temporary;
         this.eventMode = temporary ? 'none' : 'static';
-
-        console.trace(this.eventMode);
     }
 
     public hide() {

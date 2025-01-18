@@ -34,6 +34,7 @@ import WallMeasuresContainer from './WallMeasuresContainer';
 import WallDashedLineContainer from './WallDashedLineContainer';
 import WallTempFurniture from './WallTempFurniture';
 import { isDoor, isWindow } from '@/2d/helpers/objects';
+import { getDefaultSettings } from './helpers';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -50,11 +51,6 @@ export type WallSettings = {
 const normalizeAngle = (angle: number) => (angle >= 180 ? angle - 180 : angle);
 
 const areAnglesDifferent = (angle1: number, angle2: number) => normalizeAngle(~angle1) !== normalizeAngle(~angle2);
-
-const defaultSettings = {
-    type: DEFAULT_WALL_TYPE,
-    thickness: wallTypeConfig[DEFAULT_WALL_TYPE].thickness,
-};
 
 export class Wall extends Graphics {
     uuid = uuidv4();
@@ -96,7 +92,7 @@ export class Wall extends Graphics {
     constructor(
         public leftNode: WallNode,
         public rightNode: WallNode,
-        private settings: WallSettings = defaultSettings
+        private settings: WallSettings = getDefaultSettings()
     ) {
         super();
         this.sortableChildren = true;
@@ -108,6 +104,8 @@ export class Wall extends Graphics {
             c: this.pointC,
             d: this.pointD,
         };
+
+        console.log('t', this.settings);
 
         this.applySettings();
 
@@ -301,41 +299,6 @@ export class Wall extends Graphics {
         });
     }
 
-    private onMouseOver(ev: FederatedPointerEvent) {
-        const state = useStore.getState();
-
-        switch (state.activeTool) {
-            case Tool.FurnitureAddDoor:
-            case Tool.FurnitureAddWindow:
-                this.tempFurniture?.create(state.activeTool, this).show();
-
-                break;
-
-            case Tool.WallAdd:
-                this.dashedLineContainer?.show();
-
-                break;
-        }
-    }
-
-    private onMouseOut() {
-        if (this.dragging) return;
-
-        const state = useStore.getState();
-
-        switch (state.activeTool) {
-            case Tool.FurnitureAddDoor:
-            case Tool.FurnitureAddWindow:
-                this.tempFurniture?.hide();
-
-                break;
-
-            case Tool.WallAdd:
-                this.dashedLineContainer?.hide();
-                break;
-        }
-    }
-
     public setType(newType: WallType) {
         if (this.type === newType) return;
 
@@ -391,28 +354,6 @@ export class Wall extends Graphics {
         }
     }
 
-    private onMouseMove(ev: FederatedPointerEvent) {
-        if (!this.dragging) {
-            return;
-        }
-        const shouldSnap = useStore.getState().snap;
-
-        const currentPoint = ev.global;
-
-        let x = (currentPoint.x - this.mouseStartPoint.x) / main.scale.x;
-        let y = (currentPoint.y - this.mouseStartPoint.y) / main.scale.y;
-
-        if (shouldSnap) {
-            x = snap(x);
-            y = snap(y);
-        }
-
-        this.leftNode.setPosition(this.x1 + x, this.y1 + y);
-        this.rightNode.setPosition(this.x2 + x, this.y2 + y);
-
-        this.drawWall();
-    }
-
     public blur() {
         this.focused = false;
         this.leftNode.setVisibility(false);
@@ -437,12 +378,72 @@ export class Wall extends Graphics {
         this.updateCorners();
     }
 
+    private onMouseOver() {
+        const state = useStore.getState();
+
+        switch (state.activeTool) {
+            case Tool.FurnitureAddDoor:
+            case Tool.FurnitureAddWindow:
+                this.tempFurniture?.create(state.activeTool, this).show();
+
+                break;
+
+            case Tool.WallAdd:
+                this.dashedLineContainer?.show();
+
+                break;
+        }
+    }
+
+    private onMouseOut() {
+        if (this.dragging) return;
+
+        const state = useStore.getState();
+
+        switch (state.activeTool) {
+            case Tool.FurnitureAddDoor:
+            case Tool.FurnitureAddWindow:
+                this.tempFurniture?.hide();
+
+                break;
+
+            case Tool.WallAdd:
+                this.dashedLineContainer?.hide();
+                break;
+        }
+    }
+
+    private onMouseMove(ev: FederatedPointerEvent) {
+        if (!this.dragging) {
+            return;
+        }
+        const shouldSnap = useStore.getState().snap;
+
+        const currentPoint = ev.global;
+
+        let x = (currentPoint.x - this.mouseStartPoint.x) / main.scale.x;
+        let y = (currentPoint.y - this.mouseStartPoint.y) / main.scale.y;
+
+        if (shouldSnap) {
+            x = snap(x);
+            y = snap(y);
+        }
+
+        this.leftNode.setPosition(this.x1 + x, this.y1 + y);
+        this.rightNode.setPosition(this.x2 + x, this.y2 + y);
+
+        this.drawWall();
+    }
+
     private onMouseClick(ev: FederatedPointerEvent) {
         const state = useStore.getState();
 
         const globalCords = { x: viewportX(ev.global.x), y: viewportY(ev.global.y) };
 
         switch (state.activeTool) {
+            case Tool.Remove:
+                this.delete();
+                break;
             case Tool.Edit:
                 const parent = this.parent as WallNodeSequence;
                 parent.blurAllElements(this.uuid);
@@ -493,35 +494,24 @@ export class Wall extends Graphics {
 
         const state = useStore.getState();
 
-        switch (state.activeTool) {
-            case Tool.Edit:
-                if (this.dragging) return;
+        if (state.activeTool !== Tool.Edit) return;
+        if (this.dragging) return;
 
-                this.dragging = true;
-                this.mouseStartPoint.x = ev.global.x;
-                this.mouseStartPoint.y = ev.global.y;
+        this.dragging = true;
+        this.mouseStartPoint.x = ev.global.x;
+        this.mouseStartPoint.y = ev.global.y;
 
-                this.x1 = this.leftNode.position.x;
-                this.y1 = this.leftNode.position.y;
+        this.x1 = this.leftNode.position.x;
+        this.y1 = this.leftNode.position.y;
 
-                this.x2 = this.rightNode.position.x;
-                this.y2 = this.rightNode.position.y;
-                break;
-            case Tool.Remove:
-                this.delete();
-
-                break;
-            case Tool.FurnitureAddWindow:
-                break;
-        }
+        this.x2 = this.rightNode.position.x;
+        this.y2 = this.rightNode.position.y;
     }
 
     private onMouseUp(ev: FederatedPointerEvent) {
         const clickDuration = Date.now() - this.clickStartTime;
 
-        if (clickDuration < 200) {
-            this.onMouseClick(ev);
-        }
+        if (clickDuration < 200) this.onMouseClick(ev);
 
         this.dragging = false;
 
@@ -583,29 +573,15 @@ export class Wall extends Graphics {
         const startX = elementX;
         const endX = elementX + furnitureHeight;
 
-        let isOccupied = false;
-
-        const occupiedSpots: { start: number; end: number }[] = [];
-
-        this.children.forEach((child) => {
-            if ((child instanceof Door || child instanceof WindowElement) && !child.isTemporary) {
-                const x = child.position.x;
-                occupiedSpots.push({ start: x, end: x + child.length });
-            }
-        });
-
-        occupiedSpots.sort((a, b) => a.start - b.start);
+        const occupiedSpots = this.getOccupiedSpots();
 
         for (const { start, end } of occupiedSpots) {
             if (endX >= start && startX <= end) {
-                isOccupied = true;
-                break;
+                return true;
             }
-
-            isOccupied = false;
         }
 
-        return isOccupied;
+        return false;
     }
 
     private hasElements() {
@@ -625,8 +601,11 @@ export class Wall extends Graphics {
                 break;
 
             case Tool.WallAdd:
+                const tooCloseToEdge =
+                    localCoords.x < DISTANCE_FROM_WALL || localCoords.x > this.length - DISTANCE_FROM_WALL;
+
                 this.dashedLineContainer?.update({
-                    isOccupied: this.hasElements() || this.isOccupiedSpot(localCoords.x),
+                    isOccupied: tooCloseToEdge || this.hasElements() || this.isOccupiedSpot(localCoords.x),
                     localCoords,
                 });
 
