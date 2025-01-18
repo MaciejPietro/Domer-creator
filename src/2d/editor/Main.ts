@@ -47,14 +47,15 @@ export class Main extends Viewport {
             .decelerate()
             .clampZoom({ minScale: 0.5, maxScale: 6 });
 
-        // this.center = new Point(this.worldWidth / 2, this.worldHeight / 2);
-
         const planContainer = new Container();
 
         this.addChildAt(planContainer, 0);
 
         this.grid = new Grid(this.worldWidth, this.worldHeight);
         this.addChild(this.grid);
+
+        // Center the viewport on the grid
+        this.moveCenter(this.worldWidth / 2, this.worldHeight / 2);
 
         this.floorPlan = FloorPlan.Instance;
         this.addChild(this.floorPlan);
