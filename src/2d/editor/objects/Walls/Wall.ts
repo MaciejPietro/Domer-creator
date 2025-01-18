@@ -33,10 +33,13 @@ import WallDebugContainer from './WallDebugContainer';
 import WallMeasuresContainer from './WallMeasuresContainer';
 import WallDashedLineContainer from './WallDashedLineContainer';
 import WallTempFurniture from './WallTempFurniture';
+import { isDoor, isWindow } from '@/2d/helpers/objects';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
 export const MIN_WALL_LENGTH = 20;
+
+const DEBUG_MODE = false;
 
 export type WallSettings = {
     uuid?: string;
@@ -48,10 +51,13 @@ const normalizeAngle = (angle: number) => (angle >= 180 ? angle - 180 : angle);
 
 const areAnglesDifferent = (angle1: number, angle2: number) => normalizeAngle(~angle1) !== normalizeAngle(~angle2);
 
+const defaultSettings = {
+    type: DEFAULT_WALL_TYPE,
+    thickness: wallTypeConfig[DEFAULT_WALL_TYPE].thickness,
+};
+
 export class Wall extends Graphics {
     uuid = uuidv4();
-    leftNode: WallNode;
-    rightNode: WallNode;
     length: number;
     children: Container[] = [];
 
@@ -66,17 +72,17 @@ export class Wall extends Graphics {
 
     focused = false;
 
-    clickStartTime: number;
+    clickStartTime = 0;
 
     x1: number;
     x2: number;
     y1: number;
     y2: number;
     thickness: number;
-    type = WallType.Exterior;
+    type = DEFAULT_WALL_TYPE;
 
-    dragging: boolean;
-    mouseStartPoint: Point;
+    dragging: boolean = false;
+    mouseStartPoint: Point = { x: 0, y: 0 };
 
     color = WALL_FILL_COLOR;
 
@@ -87,14 +93,14 @@ export class Wall extends Graphics {
     pointD: Point = { x: 0, y: 0 };
     pointB: Point = { x: 0, y: 0 };
 
-    constructor(leftNode: WallNode, rightNode: WallNode, settings?: WallSettings) {
+    constructor(
+        public leftNode: WallNode,
+        public rightNode: WallNode,
+        private settings: WallSettings = defaultSettings
+    ) {
         super();
         this.sortableChildren = true;
         this.eventMode = 'dynamic';
-        this.leftNode = leftNode;
-        this.rightNode = rightNode;
-        this.dragging = false;
-        this.mouseStartPoint = { x: 0, y: 0 };
 
         const points = {
             a: this.pointA,
@@ -103,30 +109,20 @@ export class Wall extends Graphics {
             d: this.pointD,
         };
 
-        if (settings?.type !== undefined) {
-            this.type = settings?.type;
-        } else {
-            const state = useStore.getState();
+        this.applySettings();
 
-            const activeToolSettings = state.activeToolSettings;
-
-            this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
-        }
-
-        if (settings?.uuid) this.uuid = settings.uuid;
-        if (settings?.thickness) this.thickness = settings.thickness;
-
-        this.applySettings(settings?.thickness);
-
-        // this.debugContainer = new WallDebugContainer(points);
         this.measuresContainer = new WallMeasuresContainer(points);
         this.dashedLineContainer = new WallDashedLineContainer(this.thickness);
         this.tempFurniture = new WallTempFurniture(this);
 
-        // this.addChild(this.debugContainer);
         this.addChild(this.measuresContainer);
         this.addChild(this.dashedLineContainer);
         this.addChild(this.tempFurniture);
+
+        if (DEBUG_MODE) {
+            this.debugContainer = new WallDebugContainer(points);
+            this.addChild(this.debugContainer);
+        }
 
         this.graphic = new Graphics();
 
@@ -143,13 +139,27 @@ export class Wall extends Graphics {
         this.on('pointerover', this.onMouseOver);
         this.on('pointerout', this.onMouseOut);
 
-        this.clickStartTime = 0;
         this.zIndex = WALL_INACTIVE_Z_INDEX;
     }
 
-    private applySettings(thickness = wallTypeConfig[this.type].thickness) {
-        this.thickness = thickness;
-        this.pivot.set(0, thickness * 0.5);
+    private applySettings() {
+        const { type, uuid, thickness } = this.settings || {};
+
+        if (type !== undefined) {
+            this.type = type;
+        } else {
+            const state = useStore.getState();
+
+            const activeToolSettings = state.activeToolSettings;
+
+            this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
+        }
+
+        this.thickness = thickness || wallTypeConfig[this.type].thickness;
+
+        if (uuid) this.uuid = uuid;
+
+        this.pivot.set(0, this.thickness * 0.5);
     }
 
     public updateCorners() {
@@ -329,9 +339,11 @@ export class Wall extends Graphics {
     public setType(newType: WallType) {
         if (this.type === newType) return;
 
-        this.type = newType;
+        this.settings.type = newType;
+        this.settings.thickness = wallTypeConfig[newType].thickness;
 
         this.applySettings();
+
         this.drawWall();
         this.updateChildren();
     }
@@ -346,9 +358,7 @@ export class Wall extends Graphics {
         }
     }
 
-    public handleInvalidLength() {
-        console.log('handleInvalidLength');
-    }
+    public handleInvalidLength() {}
 
     public isInvalidLength() {
         return this.length > MIN_WALL_LENGTH;
@@ -420,6 +430,7 @@ export class Wall extends Graphics {
         this.rightNode.setVisibility(true);
 
         this.measuresContainer?.show();
+        this.measuresContainer?.update({ thickness: this.thickness, angle: this.angle });
 
         this.zIndex = WALL_ACTIVE_Z_INDEX;
 
@@ -544,6 +555,26 @@ export class Wall extends Graphics {
         this.drawWall();
     }
 
+    public getOccupiedSpots() {
+        const occupiedSpots: Array<{
+            start: number;
+            end: number;
+        }> = [
+            { start: DISTANCE_FROM_WALL, end: DISTANCE_FROM_WALL },
+            { start: this.length - DISTANCE_FROM_WALL, end: this.length - DISTANCE_FROM_WALL },
+        ];
+
+        for (const child of this.children) {
+            if (isDoor(child) || isWindow(child)) {
+                occupiedSpots.push({ start: child.position.x, end: child.position.x + child.length || 0 });
+            }
+        }
+
+        occupiedSpots.sort((a, b) => a.start - b.start);
+
+        return occupiedSpots;
+    }
+
     private isOccupiedSpot(elementX: number): boolean {
         const furnitureHeight = this.tempFurniture?.element?.length || 0;
 
@@ -581,7 +612,7 @@ export class Wall extends Graphics {
         return this.children.some((child) => child instanceof Door || child instanceof WindowElement);
     }
 
-    onWallMouseMove(ev: FederatedPointerEvent) {
+    private onWallMouseMove(ev: FederatedPointerEvent) {
         const state = useStore.getState();
 
         const localCoords = ev.getLocalPosition(this as unknown as Container);

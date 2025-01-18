@@ -37,7 +37,6 @@ class WallMeasuresContainer extends Container {
         const pointD = this.pointD?.x;
 
         const topLength = Math.abs(pointD - pointC);
-        console.log('xdxd upd', this.pointA);
         this.labelTop.update({
             length: topLength,
             angle: angle,

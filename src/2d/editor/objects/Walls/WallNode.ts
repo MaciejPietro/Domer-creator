@@ -154,7 +154,6 @@ export class WallNode extends Container {
 
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
-        console.log('xdxd');
 
         // if (!this.isEditMode()) return;
 
@@ -226,8 +225,6 @@ export class WallNode extends Container {
     }
 
     private onMouseUp() {
-        console.log('xdxd test');
-
         this.dragging = false;
     }
 

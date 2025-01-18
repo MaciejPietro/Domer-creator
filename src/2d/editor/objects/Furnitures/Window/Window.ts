@@ -85,7 +85,7 @@ export class WindowElement extends BuildingElement {
     }
 
     public setBackground(strokeColor = 'transparent', fillColor = 'transparent') {
-        const wallParentThickness = this.customParent?.thickness || 0;
+        const wallParentThickness = this.wallParent?.thickness || 0;
         const offset = 10;
 
         this.background.clear();
@@ -103,7 +103,7 @@ export class WindowElement extends BuildingElement {
     public setStroke(color = WINDOW_COLOR) {
         this.baseLine?.clear();
 
-        const wallParentThickness = (this.customParent?.thickness || 0) + 1;
+        const wallParentThickness = (this.wallParent?.thickness || 0) + 1;
 
         this.baseLine = new Graphics();
         const { x, y } = { x: 0, y: 0 };
@@ -167,7 +167,7 @@ export class WindowElement extends BuildingElement {
     }
 
     public setPosition({ x, y }: Nullable<Point>) {
-        const wallParentThickness = this.customParent?.thickness || 0;
+        const wallParentThickness = this.wallParent?.thickness || 0;
         // const fixedY = this.orientation === DoorOrientation.West ? wallParentThickness - 12 : 10;
         this.position = { x: x ?? this.position.x, y: wallParentThickness / 2 - 1 };
     }

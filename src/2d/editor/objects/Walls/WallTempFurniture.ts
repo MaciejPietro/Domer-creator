@@ -32,9 +32,8 @@ class WallTempFurniture extends Container {
     public add() {
         if (!this.element) return;
 
-        const isDoor = this.element instanceof Door;
-
         if (!this.element.isValid) {
+            const isDoor = this.element instanceof Door;
             notifications.clean();
             const icon = isDoor ? '🚪' : '🪟';
             const message = isDoor
@@ -45,11 +44,15 @@ class WallTempFurniture extends Container {
                 message,
                 color: 'red',
             });
+
             return;
         }
+
         const { x, y } = this.element.position;
+        this.element.setTemporality(false);
         const action = new AddFurnitureAction(this.element, this.parentWall, { x, y });
         action.execute();
+        this.removeChildren();
         this.hide();
     }
 
@@ -93,7 +96,6 @@ class WallTempFurniture extends Container {
     }
 
     private getXWithinWall(elementX: number): number {
-        // WALL BOUNDARIES
         const furnitureHeight = this.element?.length || 0;
 
         let currentX = elementX;

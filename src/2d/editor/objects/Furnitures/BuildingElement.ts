@@ -24,7 +24,7 @@ export abstract class BuildingElement extends Container {
     uuid = uuidv4();
     background: Graphics;
     clickStartTime: number;
-    customParent: Wall | undefined;
+    wallParent: Wall | undefined;
     length = 0;
     dragStartPosition: Point = { x: 0, y: 0 };
     public isTemporary = false;
@@ -38,7 +38,7 @@ export abstract class BuildingElement extends Container {
         this.eventMode = 'static';
 
         if (config?.uuid) this.uuid = config.uuid;
-        if (config?.parent) this.customParent = config.parent;
+        if (config?.parent) this.wallParent = config.parent;
 
         this.background = new Graphics();
 
@@ -55,40 +55,15 @@ export abstract class BuildingElement extends Container {
     }
 
     public isCollide() {
-        const endX = this.customParent?.length || Infinity;
+        const occupiedSpots = this.wallParent?.getOccupiedSpots();
 
-        const occupiedSpots: Array<{
-            start: number;
-            end: number;
-        }> = [
-            { start: DISTANCE_FROM_WALL, end: DISTANCE_FROM_WALL },
-            { start: endX - DISTANCE_FROM_WALL, end: endX - DISTANCE_FROM_WALL },
-        ];
+        if (!occupiedSpots) return false;
 
-        for (const child of this.customParent!.children) {
-            // @ts-expect-error find better way to check if child is WallTempFurniture
-            if (child.className === 'WallTempFurniture') {
-                const element = child as WallTempFurniture;
+        const elementStart = this.position.x;
+        const elementEnd = this.position.x + this.length;
 
-                const elChild = element.element!;
-
-                if (elChild.isTemporary) continue;
-
-                occupiedSpots.push({ start: child.position.x, end: elChild.position.x + elChild?.length || 0 });
-
-                console.log(occupiedSpots);
-            }
-        }
-
-        occupiedSpots.sort((a, b) => a.start - b.start);
-
-        for (const key in occupiedSpots) {
-            const current = occupiedSpots[key];
-            const next = occupiedSpots[+key + 1];
-
-            if (current.end > next?.start) {
-                return true;
-            }
+        for (const spot of occupiedSpots) {
+            if (elementStart < spot.end && spot.start < elementEnd) return true;
         }
 
         return false;
@@ -129,7 +104,7 @@ export abstract class BuildingElement extends Container {
     }
 
     private onGlobalMouseMove(ev: FederatedPointerEvent) {
-        if (ev.buttons !== 1 || !this.isFocused || !this.isDragging || this.isTemporary || !this.customParent) return;
+        if (ev.buttons !== 1 || !this.isFocused || !this.isDragging || this.isTemporary || !this.wallParent) return;
 
         const state = useStore.getState();
 
@@ -141,7 +116,7 @@ export abstract class BuildingElement extends Container {
 
         const newX = newPos.x - this.dragStartPosition.x;
 
-        const boundedX = Math.max(0, Math.min(newX, this.customParent.length - this.length));
+        const boundedX = Math.max(0, Math.min(newX, this.wallParent.length - this.length));
 
         const updatedPosition = {
             x: boundedX,

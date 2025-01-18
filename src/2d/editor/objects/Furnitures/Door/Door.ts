@@ -95,7 +95,7 @@ export class Door extends BuildingElement {
     public setStroke(color = DOOR_COLOR) {
         this.baseLine?.clear();
         const offset = -1;
-        const wallParentThickness = this.customParent?.thickness || 0;
+        const wallParentThickness = this.wallParent?.thickness || 0;
 
         this.baseLine = new Graphics();
         const { x, y } = { x: 0, y: 0 };
@@ -142,7 +142,7 @@ export class Door extends BuildingElement {
             .stroke(strokeSettings);
 
         if (this.orientation === DoorOrientation.West) {
-            this.position.y = this.customParent?.thickness || 0;
+            this.position.y = this.wallParent?.thickness || 0;
 
             this.scale.y = 1;
             this.scale.x = this.type === DoorType.Left ? 1 : -1;
@@ -196,7 +196,7 @@ export class Door extends BuildingElement {
     }
 
     public setPosition({ x, y }: Nullable<Point>) {
-        const wallParentThickness = this.customParent?.thickness || 0;
+        const wallParentThickness = this.wallParent?.thickness || 0;
 
         const fixedY = this.orientation === DoorOrientation.West ? wallParentThickness : 0;
 
