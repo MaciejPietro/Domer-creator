@@ -278,6 +278,8 @@ export class WallNodeSequence extends Container {
     }
 
     public blurAllElements(exceptUuid?: string) {
+        console.log('xdxd blurAll');
+
         this.walls.forEach((wall) => {
             if (wall.uuid !== exceptUuid) {
                 wall.blur();

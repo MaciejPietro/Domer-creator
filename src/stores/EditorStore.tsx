@@ -34,6 +34,7 @@ export interface EditorStore {
     setPlan: (snap: any) => void;
     setApp: (snap: any) => void;
     setFocusedElement: (element: FocusedElement) => void;
+    refreshFocusedElement: () => void;
 }
 
 export const useStore = create<EditorStore>((set, getState) => ({
@@ -47,6 +48,11 @@ export const useStore = create<EditorStore>((set, getState) => ({
     plan: null,
     app: null,
     focusedElement: null,
+    refreshFocusedElement: () => {
+        set(({ focusedElement }) => ({
+            focusedElement,
+        }));
+    },
     setFocusedElement: (element: FocusedElement) => {
         set(() => {
             return {
@@ -70,10 +76,16 @@ export const useStore = create<EditorStore>((set, getState) => ({
         }));
     },
     setTool: (tool: Tool) => {
-        set(() => ({
-            activeTool: tool,
-            focusedElement: null,
-        }));
+        set((state) => {
+            if (state.focusedElement instanceof Wall) {
+                state.focusedElement.blur();
+            }
+
+            return {
+                activeTool: tool,
+                focusedElement: null,
+            };
+        });
         AddWallManager.Instance.resetTools();
     },
     setToolSettings: (settings: any) => {

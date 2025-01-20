@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, NumberInput, Select } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
-import { Wall } from '@/2d/editor/objects/Walls/Wall';
+import { MIN_WALL_LENGTH, Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
 import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
+import { showCollisionError, showMinLengthError } from '@/2d/editor/objects/Walls/errors';
 
 const WallControls = ({ element }: { element: Wall }) => {
     const { setFocusedElement } = useStore();
@@ -41,10 +42,25 @@ const WallControls = ({ element }: { element: Wall }) => {
     }, [element.length]);
 
     const handleUpdate = (key: 'length' | 'depth', value: number) => {
-        setDetails((prevDetails) => ({ ...prevDetails, [key]: value || 0 }));
+        const backupLength = element.length;
 
-        if (key === 'length' && element instanceof Wall) {
-            element?.setLength(value);
+        if (key === 'length') {
+            if (value < MIN_WALL_LENGTH) return showMinLengthError();
+
+            element.setLength(value);
+
+            if (element.isColliding()) {
+                showCollisionError();
+
+                element.setLength(backupLength);
+                return;
+            }
+
+            setDetails((prevDetails) => ({ ...prevDetails, length: value || 0 }));
+        }
+
+        if (key === 'depth') {
+            setDetails((prevDetails) => ({ ...prevDetails, depth: value || 0 }));
         }
     };
 

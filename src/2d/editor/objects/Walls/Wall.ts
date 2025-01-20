@@ -323,7 +323,19 @@ export class Wall extends Graphics {
 
     public handleInvalidLength() {}
 
-    public isInvalidLength() {
+    public isColliding() {
+        const spots = this.getOccupiedSpots(false);
+
+        return spots.some(
+            (spot) =>
+                spot.start < DISTANCE_FROM_WALL ||
+                spot.end < DISTANCE_FROM_WALL ||
+                spot.start > this.length - DISTANCE_FROM_WALL ||
+                spot.end > this.length - DISTANCE_FROM_WALL
+        );
+    }
+
+    public isValidLength() {
         return this.length >= MIN_WALL_LENGTH;
     }
 
@@ -335,9 +347,6 @@ export class Wall extends Graphics {
 
         // Cache length calculation
         this.length = Math.floor(euclideanDistance(x1, x2, y1, y2));
-
-        // TODO find better way to force changes in WallControls
-        useStore.getState().setFocusedElement(this);
 
         // Cache angle calculation
         const theta = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
@@ -358,6 +367,8 @@ export class Wall extends Graphics {
     }
 
     public blur() {
+        console.log('xdxd blur');
+
         this.focused = false;
         this.leftNode.setVisibility(false);
         this.rightNode.setVisibility(false);
@@ -550,14 +561,16 @@ export class Wall extends Graphics {
         this.drawWall();
     }
 
-    public getOccupiedSpots() {
+    public getOccupiedSpots(withBorders = true) {
         const occupiedSpots: Array<{
             start: number;
             end: number;
-        }> = [
-            { start: DISTANCE_FROM_WALL, end: DISTANCE_FROM_WALL },
-            { start: this.length - DISTANCE_FROM_WALL, end: this.length - DISTANCE_FROM_WALL },
-        ];
+        }> = withBorders
+            ? [
+                  { start: DISTANCE_FROM_WALL, end: DISTANCE_FROM_WALL },
+                  { start: this.length - DISTANCE_FROM_WALL, end: this.length - DISTANCE_FROM_WALL },
+              ]
+            : [];
 
         for (const child of this.children) {
             if (isDoor(child) || isWindow(child)) {

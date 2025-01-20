@@ -14,6 +14,7 @@ import { Point } from '@/helpers/Point';
 import { Building } from 'tabler-icons-react';
 import { BuildingElement } from '../Furnitures/BuildingElement';
 import { notifications } from '@mantine/notifications';
+import { showCollisionError, showMinLengthError } from './errors';
 
 export class WallNode extends Container {
     public dragging: boolean;
@@ -21,8 +22,7 @@ export class WallNode extends Container {
     private dot = new Graphics();
     mouseStartPoint: Point;
 
-    private type: WallType = WallType.Partition;
-    private size = 20;
+    private size = 10;
     public prevPosition = { x: 0, y: 0 };
     private isMouseOver = false;
     background: any;
@@ -31,8 +31,6 @@ export class WallNode extends Container {
         super();
         this.eventMode = 'static';
         this.id = nodeId;
-
-        this.setSettings();
 
         this.setStyles({});
 
@@ -108,18 +106,6 @@ export class WallNode extends Container {
         this.visible = false;
     }
 
-    private setSettings() {
-        const state = useStore.getState();
-
-        const activeToolSettings = state.activeToolSettings;
-
-        this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
-
-        // const wallThickness = wallTypeConfig[this.type].thickness;
-        // this.size = Math.max(8, wallThickness / 3);
-        this.size = 10;
-    }
-
     public setVisibility(visible: boolean) {
         if (this.isMouseOver) return (this.visible = true);
         this.visible = visible;
@@ -178,16 +164,19 @@ export class WallNode extends Container {
 
         if (parentWalls.length) {
             parentWalls.forEach((wall) => {
-                if (wall.isInvalidLength()) return;
+                if (!wall.isValidLength()) {
+                    showMinLengthError();
 
-                notifications.show({
-                    title: 'Długość ściany',
-                    message: `Minimalna długość ściany to ${MIN_WALL_LENGTH} cm.`,
-                    color: 'red',
-                });
+                    wall.setLength(MIN_WALL_LENGTH + 10);
+                    this.dragging = false;
+                }
 
-                wall.setLength(MIN_WALL_LENGTH + 10);
-                this.dragging = false;
+                if (wall.isColliding()) {
+                    showCollisionError();
+                    wall.setLength(wall.length + 10);
+
+                    this.dragging = false;
+                }
             });
         }
     }
@@ -234,6 +223,8 @@ export class WallNode extends Container {
 
     private onMouseUp() {
         this.dragging = false;
+
+        useStore.getState().refreshFocusedElement();
     }
 
     private isEditMode() {
