@@ -4,7 +4,6 @@ import { MIN_WALL_LENGTH } from './Wall';
 export const showMinLengthError = () => {
     notifications.show({
         id: 'wall-min-length',
-        title: 'Długość ściany',
         message: `Minimalna długość ściany to ${MIN_WALL_LENGTH} cm.`,
         color: 'red',
     });
@@ -13,8 +12,17 @@ export const showMinLengthError = () => {
 export const showCollisionError = () => {
     notifications.show({
         id: 'wall-collision',
-        title: 'Długość ściany',
-        message: `Nie można zmienić długości ściany, ponieważ elementy zajmują miejsce.`,
+        title: 'Nie można zmienić długości ściany',
+        message: `Niektóre elementy są zbyt blisko krawędzi ściany.`,
+        color: 'red',
+    });
+};
+
+export const showCannotDivideWallError = () => {
+    notifications.show({
+        id: 'wall-cannot-divide',
+        // title: 'Nie można podzielić ściany',
+        message: 'Nie można podzielić ściany na której znajdują się inne elementy.',
         color: 'red',
     });
 };

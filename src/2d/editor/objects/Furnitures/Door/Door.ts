@@ -11,6 +11,7 @@ import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 import { INodeSerializable } from '@/2d/editor/persistence/INodeSerializable';
 import { IDoorSerializable } from './IDoorSerializable';
 import { DOOR_ACTIVE_COLOR, DOOR_COLOR, DOOR_INVALID_COLOR } from './constants';
+import { showCannotChangeWidthError } from './errors';
 
 // bg-blue-500 from tailwind.config.js
 const COLOR = '#1C7ED6';
@@ -212,11 +213,7 @@ export class Door extends BuildingElement {
 
             notifications.clean();
 
-            notifications.show({
-                title: '🚪 Nie można zmienić szerokości',
-                message: 'Elementy na ścianie nie mogą nachodzić na siebie',
-                color: 'red',
-            });
+            showCannotChangeWidthError();
             return;
         }
 

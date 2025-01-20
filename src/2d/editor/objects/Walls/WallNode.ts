@@ -7,13 +7,11 @@ import { INodeSerializable } from '../../persistence/INodeSerializable';
 import { FloorPlan } from '../FloorPlan';
 import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { isMobile } from 'react-device-detect';
-import { WallType, wallTypeConfig } from './config';
 import { DEFAULT_WALL_TYPE, MIN_WALL_LENGTH, Wall } from './Wall';
 import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
 import { Building } from 'tabler-icons-react';
 import { BuildingElement } from '../Furnitures/BuildingElement';
-import { notifications } from '@mantine/notifications';
 import { showCollisionError, showMinLengthError } from './errors';
 
 export class WallNode extends Container {

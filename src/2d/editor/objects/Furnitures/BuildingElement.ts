@@ -55,12 +55,14 @@ export abstract class BuildingElement extends Container {
     }
 
     public isCollide() {
-        const occupiedSpots = this.wallParent?.getOccupiedSpots();
+        const occupiedSpots = this.wallParent?.getOccupiedSpots(true, this);
 
         if (!occupiedSpots) return false;
 
         const elementStart = this.position.x;
         const elementEnd = this.position.x + this.length;
+
+        console.log('spots', { elementStart, elementEnd, occupiedSpots });
 
         for (const spot of occupiedSpots) {
             if (elementStart < spot.end && spot.start < elementEnd) return true;
@@ -122,6 +124,8 @@ export abstract class BuildingElement extends Container {
             x: boundedX,
             y: this.position.y,
         };
+
+        console.log(this.isCollide());
 
         const previousPosition = { x: this.position.x, y: this.position.y };
 

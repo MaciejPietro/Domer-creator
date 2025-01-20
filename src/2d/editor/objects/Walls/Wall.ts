@@ -17,10 +17,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Door } from '../Furnitures/Door/Door';
 import { WindowElement } from '../Furnitures/Window/Window';
 
-import { notifications } from '@mantine/notifications';
-
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
-import { DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
+import { BuildingElement, DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
 import {
     WALL_ACTIVE_STROKE_COLOR,
     WALL_ACTIVE_Z_INDEX,
@@ -35,6 +33,7 @@ import WallDashedLineContainer from './WallDashedLineContainer';
 import WallTempFurniture from './WallTempFurniture';
 import { isDoor, isWindow } from '@/2d/helpers/objects';
 import { getDefaultSettings } from './helpers';
+import { showCannotDivideWallError } from './errors';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -478,14 +477,7 @@ export class Wall extends Graphics {
                     (child) => child instanceof Door || child instanceof WindowElement
                 );
 
-                if (hasChildren) {
-                    notifications.show({
-                        title: 'Błędna pozycja',
-                        message: 'Nie można podzielić ściany na której znajdują się inne elementy.',
-                        color: 'red',
-                    });
-                    return;
-                }
+                if (hasChildren) return showCannotDivideWallError();
 
                 const addNode = new AddNodeAction(
                     this,
@@ -561,7 +553,7 @@ export class Wall extends Graphics {
         this.drawWall();
     }
 
-    public getOccupiedSpots(withBorders = true) {
+    public getOccupiedSpots(withBorders = true, exclude?: BuildingElement) {
         const occupiedSpots: Array<{
             start: number;
             end: number;
@@ -573,6 +565,8 @@ export class Wall extends Graphics {
             : [];
 
         for (const child of this.children) {
+            if (child === exclude) continue;
+
             if (isDoor(child) || isWindow(child)) {
                 occupiedSpots.push({ start: child.position.x, end: child.position.x + child.length || 0 });
             }

@@ -8,6 +8,7 @@ import { Wall } from '../../Walls/Wall';
 import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 import { IWindowSerializable } from './IWindowSerializable';
 import { WINDOW_ACTIVE_COLOR, WINDOW_COLOR, WINDOW_INVALID_COLOR, WINDOW_Z_INDEX } from './constants';
+import { showCannotChangeWidthError } from './errors';
 
 // bg-blue-500 from tailwind.config.js
 const WINDOW_WIDTH = 80;
@@ -168,7 +169,6 @@ export class WindowElement extends BuildingElement {
 
     public setPosition({ x, y }: Nullable<Point>) {
         const wallParentThickness = this.wallParent?.thickness || 0;
-        // const fixedY = this.orientation === DoorOrientation.West ? wallParentThickness - 12 : 10;
         this.position = { x: x ?? this.position.x, y: wallParentThickness / 2 - 1 };
     }
 
@@ -179,11 +179,7 @@ export class WindowElement extends BuildingElement {
         if (this.isCollide()) {
             this.length = prevLength;
             notifications.clean();
-            notifications.show({
-                title: '🪟 Nie można zmienić szerokości',
-                message: 'Elementy na ścianie nie mogą nachodzić na siebie',
-                color: 'red',
-            });
+            showCannotChangeWidthError();
             return;
         }
 
