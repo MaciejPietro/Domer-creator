@@ -62,10 +62,14 @@ class WallTempFurniture extends Container {
 
     public show() {
         this.element?.show();
+
+        return this;
     }
 
     public hide() {
         this.element?.hide();
+
+        return this;
     }
 
     public updatePosition(localCoords: Point) {

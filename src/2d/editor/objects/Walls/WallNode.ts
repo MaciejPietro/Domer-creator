@@ -13,6 +13,7 @@ import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
 import { Building } from 'tabler-icons-react';
 import { BuildingElement } from '../Furnitures/BuildingElement';
+import { notifications } from '@mantine/notifications';
 
 export class WallNode extends Container {
     public dragging: boolean;
@@ -175,9 +176,16 @@ export class WallNode extends Container {
     private checkIfCanDragFurther() {
         const parentWalls = this.parent.children.filter((child) => child instanceof Wall);
 
-        if (parentWalls.length && !parentWalls.every((wall) => wall.isInvalidLength())) {
+        if (parentWalls.length) {
             parentWalls.forEach((wall) => {
                 if (wall.isInvalidLength()) return;
+
+                notifications.show({
+                    title: 'Długość ściany',
+                    message: `Minimalna długość ściany to ${MIN_WALL_LENGTH} cm.`,
+                    color: 'red',
+                });
+
                 wall.setLength(MIN_WALL_LENGTH + 10);
                 this.dragging = false;
             });

@@ -5,16 +5,16 @@ import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
 import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 
-const WallControls = ({}: any) => {
-    const { focusedElement, setFocusedElement } = useStore();
+const WallControls = ({ element }: { element: Wall }) => {
+    const { setFocusedElement } = useStore();
 
     const [details, setDetails] = useState({
-        length: (focusedElement as any)?.length?.toFixed(2) || '0',
-        wallType: (focusedElement as any)?.type || WallType.Exterior,
+        length: parseFloat(element.length.toString()) || 0,
+        wallType: element.type || WallType.Exterior,
     });
 
     const handleRemove = () => {
-        focusedElement?.delete();
+        element.delete();
 
         setFocusedElement(null);
     };
@@ -29,24 +29,22 @@ const WallControls = ({}: any) => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [focusedElement]);
+    }, [element]);
 
     useEffect(() => {
-        if (focusedElement) {
-            const element = focusedElement as Wall;
-
-            const length = element.length?.toFixed(2) || '0';
+        if (element) {
+            const length = element.length || 0;
             const wallType = element?.type || WallType.Exterior;
 
-            setDetails((prevDetails) => ({ ...prevDetails, length: parseFloat(length), wallType }));
+            setDetails((prevDetails) => ({ ...prevDetails, length, wallType }));
         }
-    }, [focusedElement]);
+    }, [element.length]);
 
     const handleUpdate = (key: 'length' | 'depth', value: number) => {
         setDetails((prevDetails) => ({ ...prevDetails, [key]: value || 0 }));
 
-        if (key === 'length' && focusedElement instanceof Wall) {
-            focusedElement?.setLength(value);
+        if (key === 'length' && element instanceof Wall) {
+            element?.setLength(value);
         }
     };
 
@@ -56,8 +54,6 @@ const WallControls = ({}: any) => {
     }));
 
     const handleChangeWallType = (val: WallType) => {
-        const element = focusedElement as Wall;
-
         element?.setType(val);
         setDetails((prevDetails) => ({ ...prevDetails, wallType: val }));
     };
@@ -70,7 +66,7 @@ const WallControls = ({}: any) => {
                 <NumberInput
                     label="Długość"
                     description="Długość ściany (cm)"
-                    value={details.length}
+                    value={element.length}
                     onChange={(value) => handleUpdate('length', +value)}
                 />
             </div>
@@ -86,7 +82,7 @@ const WallControls = ({}: any) => {
             </div>
 
             <div className="mt-4">
-                <p>Kąt: {focusedElement?.angle}</p>
+                <p>Kąt: {element.angle}</p>
             </div>
 
             <div className="mt-4">

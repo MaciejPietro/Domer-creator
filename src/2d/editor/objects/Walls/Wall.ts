@@ -324,7 +324,7 @@ export class Wall extends Graphics {
     public handleInvalidLength() {}
 
     public isInvalidLength() {
-        return this.length > MIN_WALL_LENGTH;
+        return this.length >= MIN_WALL_LENGTH;
     }
 
     public drawWall() {
@@ -335,6 +335,9 @@ export class Wall extends Graphics {
 
         // Cache length calculation
         this.length = Math.floor(euclideanDistance(x1, x2, y1, y2));
+
+        // TODO find better way to force changes in WallControls
+        useStore.getState().setFocusedElement(this);
 
         // Cache angle calculation
         const theta = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
@@ -378,13 +381,15 @@ export class Wall extends Graphics {
         this.updateCorners();
     }
 
-    private onMouseOver() {
+    private onMouseOver(ev: FederatedPointerEvent) {
         const state = useStore.getState();
+
+        const localCoords = ev.getLocalPosition(this as unknown as Container);
 
         switch (state.activeTool) {
             case Tool.FurnitureAddDoor:
             case Tool.FurnitureAddWindow:
-                this.tempFurniture?.create(state.activeTool, this).show();
+                this.tempFurniture?.create(state.activeTool, this).show().updatePosition(localCoords);
 
                 break;
 

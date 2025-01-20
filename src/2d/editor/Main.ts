@@ -15,7 +15,7 @@ import 'pixi.js/events';
 import { LoadAction } from './actions/LoadAction';
 import { Grid } from './basic/Grid';
 // import plan from './plan.json';
-import plan from './plan-empty.json';
+import plan from './plan-simple.json';
 import { WallNodeSequence } from './objects/Walls/WallNodeSequence';
 
 export class Main extends Viewport {

@@ -63,7 +63,7 @@ export function DetailsControls() {
                 radius="md"
                 position={{ top: 64, right: 10 }}
             >
-                {focusedElement instanceof Wall ? <WallControls /> : null}
+                {focusedElement instanceof Wall ? <WallControls element={focusedElement} /> : null}
                 {focusedElement instanceof Door ? <DoorControls /> : null}
                 {focusedElement instanceof WindowElement ? <WindowControls /> : null}
             </Dialog>

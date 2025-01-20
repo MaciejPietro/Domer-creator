@@ -1,0 +1,32 @@
+{
+  "floors": [
+    {
+      "furnitureArray": [],
+      "wallNodes": [
+        {
+          "id": 1,
+          "x": 544,
+          "y": 70
+        },
+        {
+          "id": 2,
+          "x": 552,
+          "y": 784
+        }
+      ],
+      "wallNodeLinks": [
+        [
+          1,
+          [
+            {
+              "id": 2,
+              "wallUuid": "b403a281-e7ea-42e3-a6c7-e70c0162a6d8",
+              "thickness": 40
+            }
+          ]
+        ],
+        [2, []]
+      ]
+    }
+  ]
+}
