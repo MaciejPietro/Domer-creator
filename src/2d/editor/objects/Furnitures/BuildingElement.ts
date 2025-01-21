@@ -1,14 +1,11 @@
 import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
 import { Tool } from '@/2d/editor/constants';
-import { FocusedElement, useStore } from '@/stores/EditorStore';
+import { useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';
-import { WindowElement } from './Window/Window';
-import { Door } from './Door/Door';
 import { Wall } from '../Walls/Wall';
 import { WallNodeSequence } from '../Walls/WallNodeSequence';
-import WallTempFurniture from '../Walls/WallTempFurniture';
 
 export type BuildingElementProps = {
     position?: Point;
