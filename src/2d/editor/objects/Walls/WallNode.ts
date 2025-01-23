@@ -25,6 +25,7 @@ export class WallNode extends Container {
 
     private size = 10;
     public prevPosition = { x: 0, y: 0 };
+    private startDragPosition = { x: 0, y: 0 };
     private isMouseOver = false;
     background: any;
 
@@ -46,6 +47,8 @@ export class WallNode extends Container {
 
         this.on('pointerdown', this.onMouseDown);
         this.on('globalpointermove', this.onMouseMove);
+        this.on('globalpointerup', this.onMouseUp);
+
         this.on('pointerup', this.onMouseUp);
         this.on('pointerupoutside', this.onMouseUp);
 
@@ -142,6 +145,7 @@ export class WallNode extends Container {
 
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
+        this.startDragPosition = { x: this.x, y: this.y };
 
         // if (!this.isEditMode()) return;
 
@@ -167,28 +171,24 @@ export class WallNode extends Container {
             parentWalls.forEach((wall) => {
                 if (!wall.isValidLength()) {
                     showMinLengthError();
-
-                    wall.setLength(MIN_WALL_LENGTH + 10);
-                    this.dragging = false;
+                    this.setToStartDragPosition();
                 }
 
                 if (wall.isColliding()) {
                     showCollisionError();
-                    wall.setLength(wall.length + 10);
-
-                    this.dragging = false;
+                    this.setToStartDragPosition();
                 }
 
                 const connectedWalls = this.getConnectedWalls(wall);
 
-                connectedWalls.forEach((connectedWall) => {
-                    const angle = normalizeAngle(this.calculateAngleBetweenWalls(wall, connectedWall));
+                if (connectedWalls.length === 0) return;
 
-                    if (Math.ceil(angle) < MIN_WALL_ANGLE) {
-                        showAngleError();
-                        this.dragging = false;
-                    }
-                });
+                const angleDifference = this.calculateAngleBetweenWalls(wall, connectedWalls[0]);
+
+                if (angleDifference && Math.ceil(angleDifference) < MIN_WALL_ANGLE) {
+                    showAngleError();
+                    this.setToStartDragPosition();
+                }
             });
         }
     }
@@ -207,11 +207,26 @@ export class WallNode extends Container {
         }) as Wall[];
     }
 
-    private calculateAngleBetweenWalls(wall1: Wall, wall2: Wall): number {
+    private calculateAngleBetweenWalls(wall1: Wall, wall2: Wall): number | undefined {
         const angle1 = wall1.angle;
         const angle2 = wall2.angle;
         const angleDifference = Math.abs(angle1 - angle2);
-        return angleDifference;
+
+        if (wall1.rightNode === wall2.rightNode) {
+            return angleDifference;
+        }
+
+        if (wall1.leftNode === wall2.rightNode) {
+            return Math.abs(180 - angleDifference);
+        }
+
+        if (wall1.rightNode === wall2.leftNode) {
+            return Math.abs(180 - angleDifference);
+        }
+
+        if (wall1.leftNode === wall2.leftNode) {
+            return angleDifference;
+        }
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
@@ -220,9 +235,10 @@ export class WallNode extends Container {
         if (!this.dragging) {
             return;
         }
-        const shouldSnap = useStore.getState().snap;
 
         this.prevPosition = { x: this.x, y: this.y };
+
+        const shouldSnap = useStore.getState().snap;
 
         const currentPoint = ev.global;
 
@@ -239,6 +255,16 @@ export class WallNode extends Container {
 
         // TODO make this redraw only the walls that are affected
         FloorPlan.Instance.redrawWalls();
+    }
+
+    private setToStartDragPosition() {
+        this.dragging = false;
+
+        setTimeout(() => {
+            this.x = this.startDragPosition.x;
+            this.y = this.startDragPosition.y;
+            FloorPlan.Instance.redrawWalls();
+        }, 500);
     }
 
     public setToPrevPosition() {

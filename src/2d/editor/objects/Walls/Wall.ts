@@ -348,8 +348,8 @@ export class Wall extends Graphics {
 
         // Batch position updates
         this.position.set(x1, y1);
-        this.leftNode.angle = this.angle;
-        this.rightNode.angle = this.angle;
+        // this.leftNode.angle = this.angle;
+        // this.rightNode.angle = this.angle;
 
         this.calcCornersPositions();
         this.updateCorners();
