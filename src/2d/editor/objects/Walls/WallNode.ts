@@ -7,12 +7,15 @@ import { INodeSerializable } from '../../persistence/INodeSerializable';
 import { FloorPlan } from '../FloorPlan';
 import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { isMobile } from 'react-device-detect';
-import { DEFAULT_WALL_TYPE, MIN_WALL_LENGTH, Wall } from './Wall';
+import { DEFAULT_WALL_TYPE, Wall } from './Wall';
 import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
 import { Building } from 'tabler-icons-react';
 import { BuildingElement } from '../Furnitures/BuildingElement';
-import { showCollisionError, showMinLengthError } from './errors';
+import { showCollisionError, showMinLengthError, showAngleError } from './errors';
+import { isWall } from '@/2d/helpers/objects';
+import { normalizeAngle } from './helpers';
+import { MIN_WALL_ANGLE, MIN_WALL_LENGTH } from './constants';
 
 export class WallNode extends Container {
     public dragging: boolean;
@@ -175,8 +178,40 @@ export class WallNode extends Container {
 
                     this.dragging = false;
                 }
+
+                const connectedWalls = this.getConnectedWalls(wall);
+
+                connectedWalls.forEach((connectedWall) => {
+                    const angle = normalizeAngle(this.calculateAngleBetweenWalls(wall, connectedWall));
+
+                    if (Math.ceil(angle) < MIN_WALL_ANGLE) {
+                        showAngleError();
+                        this.dragging = false;
+                    }
+                });
             });
         }
+    }
+
+    private getConnectedWalls(currentWall: Wall): Wall[] {
+        return this.parent.children.filter((child) => {
+            if (!isWall(child)) return;
+            if (child === currentWall) return;
+
+            return (
+                child.leftNode === currentWall.leftNode ||
+                child.leftNode === currentWall.rightNode ||
+                child.rightNode === currentWall.leftNode ||
+                child.rightNode === currentWall.rightNode
+            );
+        }) as Wall[];
+    }
+
+    private calculateAngleBetweenWalls(wall1: Wall, wall2: Wall): number {
+        const angle1 = wall1.angle;
+        const angle2 = wall2.angle;
+        const angleDifference = Math.abs(angle1 - angle2);
+        return angleDifference;
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {

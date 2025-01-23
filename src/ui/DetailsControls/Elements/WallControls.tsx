@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, NumberInput, Select } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
-import { MIN_WALL_LENGTH, Wall } from '@/2d/editor/objects/Walls/Wall';
+import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
 import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 import { showCollisionError, showMinLengthError } from '@/2d/editor/objects/Walls/errors';
+import { MIN_WALL_LENGTH } from '@/2d/editor/objects/Walls/constants';
 
 const WallControls = ({ element }: { element: Wall }) => {
     const { setFocusedElement } = useStore();

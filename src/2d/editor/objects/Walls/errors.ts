@@ -1,5 +1,5 @@
 import { notifications } from '@mantine/notifications';
-import { MIN_WALL_LENGTH } from './Wall';
+import { MIN_WALL_LENGTH } from './constants';
 
 export const showMinLengthError = () => {
     notifications.show({
@@ -23,6 +23,14 @@ export const showCannotDivideWallError = () => {
         id: 'wall-cannot-divide',
         // title: 'Nie można podzielić ściany',
         message: 'Nie można podzielić ściany na której znajdują się inne elementy.',
+        color: 'red',
+    });
+};
+
+export const showAngleError = () => {
+    notifications.show({
+        id: 'wall-angle',
+        message: 'Kąt między ścianami jest mniejszy niż 30 stopni.',
         color: 'red',
     });
 };

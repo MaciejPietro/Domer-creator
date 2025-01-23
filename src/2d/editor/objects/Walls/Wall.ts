@@ -20,6 +20,7 @@ import { WindowElement } from '../Furnitures/Window/Window';
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
 import { BuildingElement, DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
 import {
+    MIN_WALL_LENGTH,
     WALL_ACTIVE_STROKE_COLOR,
     WALL_ACTIVE_Z_INDEX,
     WALL_FILL_COLOR,
@@ -32,12 +33,10 @@ import WallMeasuresContainer from './WallMeasuresContainer';
 import WallDashedLineContainer from './WallDashedLineContainer';
 import WallTempFurniture from './WallTempFurniture';
 import { isDoor, isWindow } from '@/2d/helpers/objects';
-import { getDefaultSettings } from './helpers';
+import { getDefaultSettings, normalizeAngle } from './helpers';
 import { showCannotDivideWallError } from './errors';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
-
-export const MIN_WALL_LENGTH = 20;
 
 const DEBUG_MODE = false;
 
@@ -46,8 +45,6 @@ export type WallSettings = {
     type?: WallType;
     thickness?: number;
 };
-
-const normalizeAngle = (angle: number) => (angle >= 180 ? angle - 180 : angle);
 
 const areAnglesDifferent = (angle1: number, angle2: number) => normalizeAngle(~angle1) !== normalizeAngle(~angle2);
 
@@ -103,8 +100,6 @@ export class Wall extends Graphics {
             c: this.pointC,
             d: this.pointD,
         };
-
-        console.log('t', this.settings);
 
         this.applySettings();
 

@@ -6,6 +6,10 @@ export const WALL_STROKE_COLOR = '#919191';
 
 export const WALL_ACTIVE_STROKE_COLOR = '#1C7ED6';
 
+export const MIN_WALL_LENGTH = 20;
+
+export const MIN_WALL_ANGLE = 30;
+
 export const WALL_ACTIVE_Z_INDEX = 21;
 export const WALL_INACTIVE_Z_INDEX = 20;
 export const WALL_DASHED_LINE_Z_INDEX = 22;

@@ -15,3 +15,5 @@ export const getDefaultSettings = () => {
         thickness,
     };
 };
+
+export const normalizeAngle = (angle: number) => (angle >= 180 ? angle - 180 : angle);
