@@ -1,8 +1,8 @@
 import { Container } from 'pixi.js';
-import { euclideanDistance } from '../../../helpers/EuclideanDistance';
-import { Point } from '../../../helpers/Point';
-import { getCorrespondingY } from '../../../helpers/Slope';
-import { FurnitureData } from '../../../stores/FurnitureStore';
+import { euclideanDistance } from '@/helpers/EuclideanDistance';
+import { Point } from '@/helpers/Point';
+import { getCorrespondingY } from '@/helpers/Slope';
+import { FurnitureData } from '@/stores/FurnitureStore';
 import { main } from '../../EditorRoot';
 import { METER } from '../constants';
 import { FloorSerializable, IFurnitureSerializable } from '../persistence/FloorSerializable';
