@@ -1,21 +1,17 @@
-import { Graphics, FederatedPointerEvent, Texture, Container } from 'pixi.js';
-import { WALL_NODE_THICKNESS, Tool, ViewMode, WALL_THICKNESS } from '../../constants';
+import { Graphics, FederatedPointerEvent, Container } from 'pixi.js';
+import { Tool, ViewMode } from '../../constants';
 import { useStore } from '../../../../stores/EditorStore';
 import { AddWallManager } from '../../actions/AddWallManager';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { INodeSerializable } from '../../persistence/INodeSerializable';
 import { FloorPlan } from '../FloorPlan';
-import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
-import { isMobile } from 'react-device-detect';
-import { DEFAULT_WALL_TYPE, Wall } from './Wall';
+import { snap } from '../../../../helpers/ViewportCoordinates';
+import { Wall } from './Wall';
 import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
-import { Building } from 'tabler-icons-react';
 import { BuildingElement } from '../Furnitures/BuildingElement';
 import { showCollisionError, showMinLengthError } from './errors';
 import { isWall } from '@/2d/helpers/objects';
-import { normalizeAngle } from './helpers';
-import { MIN_WALL_ANGLE, MIN_WALL_LENGTH } from './constants';
 
 export class WallNode extends Container {
     public dragging: boolean;

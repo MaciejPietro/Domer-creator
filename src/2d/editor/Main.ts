@@ -24,7 +24,7 @@ export class Main extends Viewport {
     public static app: Application;
     transformLayer: TransformLayer;
     addWallManager: AddWallManager;
-    grid: Container;
+    grid: Grid;
     public pointer: Pointer;
     public preview: Preview;
     constructor(options: IViewportOptions) {
@@ -36,6 +36,8 @@ export class Main extends Viewport {
         this.addChild(this.preview.getReference());
 
         // this.cursor = 'none';
+
+        this.on('zoomed', this.onZoomed);
     }
 
     private async setup() {
@@ -45,7 +47,7 @@ export class Main extends Viewport {
             .pinch()
             .wheel()
             .decelerate()
-            .clampZoom({ minScale: 0.5, maxScale: 6 });
+            .clampZoom({ minScale: 0.3, maxScale: 8 });
 
         const planContainer = new Container();
 
@@ -173,6 +175,16 @@ export class Main extends Viewport {
         const action = new LoadAction(JSON.stringify(plan));
 
         action.execute();
+    }
+
+    private onZoomed() {
+        const currentZoom = this.scale.x;
+
+        if (currentZoom <= 0.5) {
+            this.grid.hideCm();
+        } else {
+            this.grid.showCm();
+        }
     }
 }
 

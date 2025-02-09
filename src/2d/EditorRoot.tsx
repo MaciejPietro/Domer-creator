@@ -37,8 +37,8 @@ export function EditorRoot() {
             const viewportSettings = {
                 screenWidth: app.screen.width,
                 screenHeight: app.screen.height,
-                worldWidth: 12 * METER,
-                worldHeight: 12 * METER,
+                worldWidth: 50 * METER,
+                worldHeight: 80 * METER,
                 events: app.renderer.events,
                 eventMode: 'static',
             };
