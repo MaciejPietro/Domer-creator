@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container } from 'pixi.js';
 import { Point } from '@/helpers/Point';
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
 
@@ -23,11 +23,6 @@ class WallMeasuresContainer extends Container {
 
         this.addChild(this.labelTop);
         this.addChild(this.labelBottom);
-
-        // this.addChild(this.dotHelperA);
-        // this.addChild(this.dotHelperB);
-        // this.addChild(this.dotHelperC);
-        // this.addChild(this.dotHelperD);
     }
 
     public update({ thickness, angle }: { thickness: number; angle: number }) {

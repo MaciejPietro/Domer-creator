@@ -183,12 +183,12 @@ export class WallNode extends Container {
 
                 if (connectedWalls.length === 0) return;
 
-                const angleDifference = this.calculateAngleBetweenWalls(wall, connectedWalls[0]);
+                // const angleDifference = this.calculateAngleBetweenWalls(wall, connectedWalls[0]);
 
-                if (angleDifference && Math.ceil(angleDifference) < MIN_WALL_ANGLE) {
-                    showAngleError();
-                    this.setToStartDragPosition();
-                }
+                // if (angleDifference && Math.ceil(angleDifference) < MIN_WALL_ANGLE) {
+                //     showAngleError();
+                //     this.setToStartDragPosition();
+                // }
             });
         }
     }

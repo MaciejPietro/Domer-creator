@@ -38,7 +38,7 @@ import { showCannotDivideWallError } from './errors';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 
 export type WallSettings = {
     uuid?: string;
@@ -249,9 +249,14 @@ export class Wall extends Graphics {
                 const cornerAngle = cornerWall.angle;
 
                 // Skip if angles are the same
+                const angleDifference = Math.abs(normalizeAngle(cornerAngle) - normalizeAngle(wallAngle));
+                const wholeAngleDifference = Math.abs(cornerAngle - wallAngle);
+
                 if (!areAnglesDifferent(cornerAngle, wallAngle)) {
                     return;
                 }
+
+                console.log(Math.abs(cornerAngle - wallAngle));
 
                 // Cache intersection calculation values
                 const yPos = getYPos(cornerWall);
@@ -268,25 +273,41 @@ export class Wall extends Graphics {
 
                 const { x, y } = this.toLocal(lineIntersection(point1, point2, point3, point4));
 
+                const clampedX = Math.min(x, this.length);
+                const clampedXRight = Math.max(0, x);
+
+                const properAngle = Math.abs(180 - wholeAngleDifference) > 25;
+
                 switch (point) {
                     case 'pointA':
-                        this.pointA.x = x;
-                        this.pointA.y = y;
+                        if (clampedX > 0 || properAngle) {
+                            this.pointA.x = clampedX;
+                            this.pointA.y = 40;
+                        }
                         break;
 
                     case 'pointB':
-                        this.pointB.x = x;
-                        this.pointB.y = y;
+                        if (clampedXRight < this.length || properAngle) {
+                            this.pointB.x = clampedXRight;
+                            this.pointB.y = 40;
+                        }
+
                         break;
 
                     case 'pointC':
-                        this.pointC.x = x;
-                        this.pointC.y = y;
+                        if (clampedXRight < this.length || properAngle) {
+                            this.pointC.x = clampedXRight;
+                            this.pointC.y = 0;
+                        }
+
                         break;
 
                     case 'pointD':
-                        this.pointD.x = x;
-                        this.pointD.y = y;
+                        if (clampedX > 0 || properAngle) {
+                            this.pointD.x = clampedX;
+                            this.pointD.y = 0;
+                        }
+
                         break;
                 }
             }
