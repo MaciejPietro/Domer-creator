@@ -1,17 +1,13 @@
 import { Container } from 'pixi.js';
 import { euclideanDistance } from '@/helpers/EuclideanDistance';
 import { Point } from '@/helpers/Point';
-import { getCorrespondingY } from '@/helpers/Slope';
-import { FurnitureData } from '@/stores/FurnitureStore';
-import { main } from '../../EditorRoot';
+
 import { METER } from '../constants';
-import { FloorSerializable, IFurnitureSerializable } from '../persistence/FloorSerializable';
+import { FloorSerializable } from '../persistence/FloorSerializable';
 import { Wall } from './Walls/Wall';
-import { NodeLinksWithWall, WallNodeSequence } from './Walls/WallNodeSequence';
+import { WallNodeSequence } from './Walls/WallNodeSequence';
 import { Door } from './Furnitures/Door/Door';
-import { attach } from '@react-three/fiber/dist/declarations/src/core/utils';
 import { WindowElement } from './Furnitures/Window/Window';
-import { cmToM } from '@/utils/transform';
 
 type Furniture = WindowElement | Door;
 
