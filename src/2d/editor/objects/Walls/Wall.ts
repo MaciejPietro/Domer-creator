@@ -186,11 +186,9 @@ export class Wall extends Graphics {
 
         const parent = this.parent as WallNodeSequence;
 
-        // Cache values that don't change during drag
         const thickness = this.thickness;
         const length = this.length;
 
-        // Initialize default corner points - moved outside of corners loop
         this.pointA.x = 0;
         this.pointA.y = this.thickness;
 
@@ -203,13 +201,11 @@ export class Wall extends Graphics {
         this.pointD.x = 0;
         this.pointD.y = 0;
 
-        // Cache angle calculations
         const wallAngle = this.angle;
 
         const leftNodeId = this.leftNode.getId();
         const rightNodeId = this.rightNode.getId();
 
-        // Process corners only if we have neighbors
         const corners = [
             {
                 point: 'pointA',
@@ -241,40 +237,33 @@ export class Wall extends Graphics {
             },
         ];
 
-        // Process each corner only if there's a neighbor
         corners.forEach(({ point, nodeId, isClockwise, y1, getYPos }) => {
             const cornerWall = parent.findFirstNeighbor(this, nodeId, isClockwise);
 
             if (cornerWall) {
                 const cornerAngle = cornerWall.angle;
 
-                // Skip if angles are the same
-                const angleDifference = Math.abs(normalizeAngle(cornerAngle) - normalizeAngle(wallAngle));
-                const wholeAngleDifference = Math.abs(cornerAngle - wallAngle);
-
                 if (!areAnglesDifferent(cornerAngle, wallAngle)) {
                     return;
                 }
 
-                console.log(Math.abs(cornerAngle - wallAngle));
-
-                // Cache intersection calculation values
                 const yPos = getYPos(cornerWall);
                 const x1 = -100;
                 const x2 = length + 100;
                 const x3 = -100;
                 const x4 = cornerWall.length + 100;
 
-                // Calculate intersection only when necessary
                 const point1 = this.toGlobal({ x: x1, y: y1 });
                 const point2 = this.toGlobal({ x: x2, y: y1 });
                 const point3 = cornerWall.toGlobal({ x: x3, y: yPos });
                 const point4 = cornerWall.toGlobal({ x: x4, y: yPos });
 
-                const { x, y } = this.toLocal(lineIntersection(point1, point2, point3, point4));
+                const { x } = this.toLocal(lineIntersection(point1, point2, point3, point4));
 
                 const clampedX = Math.min(x, this.length);
                 const clampedXRight = Math.max(0, x);
+
+                const wholeAngleDifference = Math.abs(cornerAngle - wallAngle);
 
                 const properAngle = Math.abs(180 - wholeAngleDifference) > 25;
 
@@ -282,14 +271,14 @@ export class Wall extends Graphics {
                     case 'pointA':
                         if (clampedX > 0 || properAngle) {
                             this.pointA.x = clampedX;
-                            this.pointA.y = 40;
+                            this.pointA.y = this.thickness;
                         }
                         break;
 
                     case 'pointB':
                         if (clampedXRight < this.length || properAngle) {
                             this.pointB.x = clampedXRight;
-                            this.pointB.y = 40;
+                            this.pointB.y = this.thickness;
                         }
 
                         break;

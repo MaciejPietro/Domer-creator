@@ -12,7 +12,7 @@ import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
 import { Building } from 'tabler-icons-react';
 import { BuildingElement } from '../Furnitures/BuildingElement';
-import { showCollisionError, showMinLengthError, showAngleError } from './errors';
+import { showCollisionError, showMinLengthError } from './errors';
 import { isWall } from '@/2d/helpers/objects';
 import { normalizeAngle } from './helpers';
 import { MIN_WALL_ANGLE, MIN_WALL_LENGTH } from './constants';
@@ -182,13 +182,6 @@ export class WallNode extends Container {
                 const connectedWalls = this.getConnectedWalls(wall);
 
                 if (connectedWalls.length === 0) return;
-
-                // const angleDifference = this.calculateAngleBetweenWalls(wall, connectedWalls[0]);
-
-                // if (angleDifference && Math.ceil(angleDifference) < MIN_WALL_ANGLE) {
-                //     showAngleError();
-                //     this.setToStartDragPosition();
-                // }
             });
         }
     }

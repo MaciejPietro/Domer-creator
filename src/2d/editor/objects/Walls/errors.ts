@@ -26,11 +26,3 @@ export const showCannotDivideWallError = () => {
         color: 'red',
     });
 };
-
-export const showAngleError = () => {
-    notifications.show({
-        id: 'wall-angle',
-        message: 'Kąt między ścianami jest mniejszy niż 30 stopni.',
-        color: 'red',
-    });
-};
