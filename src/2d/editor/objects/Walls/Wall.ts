@@ -38,7 +38,7 @@ import { showCannotDivideWallError } from './errors';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 export type WallSettings = {
     uuid?: string;
