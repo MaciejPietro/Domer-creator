@@ -1,1 +1,5 @@
-Pixi.js and react-three-fiber home planner working as a subapp of Domer-client
+Pixi.js and react-three-fiber wall, window and doors editor
+
+## TODO
+
+1. Handle single WallNode remove

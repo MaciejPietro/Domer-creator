@@ -28,7 +28,8 @@ export default function SceneRoot() {
                     <gridHelper args={[200, 200, 0xff0000, 'teal']} />
                     <House plan={plan} />
                     <Environment />
-                    <OrbitControls makeDefault target={centerPoint} />
+                    <FlyControls autoForward={false} dragToLook={false} movementSpeed={1} rollSpeed={1} makeDefault />
+                    {/* <OrbitControls makeDefault target={centerPoint} /> */}
                 </Canvas>
             ) : (
                 <div className="w-full h-screen flex justify-center items-center gap-2 text-xl text-gray-800">

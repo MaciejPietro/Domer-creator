@@ -85,6 +85,9 @@ export class WallNode extends Container {
             case Tool.WallAdd:
                 this.visible = true;
                 break;
+            case Tool.Remove:
+                this.visible = true;
+                break;
             default:
                 break;
         }
@@ -126,7 +129,9 @@ export class WallNode extends Container {
         switch (useStore.getState().activeTool) {
             case Tool.WallAdd:
                 break;
-
+            case Tool.Remove:
+                this.setStyles({ color: '#FF0000' });
+                break;
             default:
                 this.setStyles({ color: '#1C7ED6' });
                 break;
@@ -280,9 +285,10 @@ export class WallNode extends Container {
     }
 
     public delete() {
-        const action = new DeleteWallNodeAction(this.id);
-
-        action.execute();
+        // TODO #1
+        // const action = new DeleteWallNodeAction(this.id);
+        // action.execute();
+        // this.parent.removeChild(this);
     }
 
     public serialize() {

@@ -6,7 +6,6 @@ import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordina
 
 import { useStore } from '../../../../stores/EditorStore';
 import { AddNodeAction } from '../../actions/AddNodeAction';
-import { DeleteWallAction } from '../../actions/DeleteWallAction';
 import { Tool, ViewMode } from '../../constants';
 import { WallNode } from './WallNode';
 import { main } from '@/2d/EditorRoot';
@@ -25,6 +24,8 @@ import {
     WALL_ACTIVE_Z_INDEX,
     WALL_FILL_COLOR,
     WALL_INACTIVE_Z_INDEX,
+    WALL_REMOVE_FILL_COLOR,
+    WALL_REMOVE_STROKE_COLOR,
     WALL_STROKE_COLOR,
 } from './constants';
 import { WallNodeSequence } from './WallNodeSequence';
@@ -36,6 +37,8 @@ import { isDoor, isWindow } from '@/2d/helpers/objects';
 import { getDefaultSettings, normalizeAngle } from './helpers';
 import { showCannotDivideWallError } from './errors';
 import { ObjectDisposer } from '../Common/ObjectDisposer';
+import { FloorPlan } from '../FloorPlan';
+import { ObjectEvents } from '../Common/ObjectEvents';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -61,6 +64,7 @@ export class Wall extends Graphics {
     dashedLineContainer: WallDashedLineContainer | null = null;
     tempFurniture: WallTempFurniture | null = null;
     disposer: ObjectDisposer;
+    private objectEvents: ObjectEvents;
 
     helpersContainer = new Container();
 
@@ -79,6 +83,7 @@ export class Wall extends Graphics {
     mouseStartPoint: Point = { x: 0, y: 0 };
 
     color = WALL_FILL_COLOR;
+    strokeColor = WALL_STROKE_COLOR;
 
     leftNodePlaceholder: Graphics | undefined;
     rightNodePlaceholder: Graphics | undefined;
@@ -109,6 +114,7 @@ export class Wall extends Graphics {
         this.dashedLineContainer = new WallDashedLineContainer(this.thickness);
         this.tempFurniture = new WallTempFurniture(this);
         this.disposer = new ObjectDisposer(this);
+        this.objectEvents = new ObjectEvents();
 
         this.addChild(this.measuresContainer);
         this.addChild(this.dashedLineContainer);
@@ -160,7 +166,7 @@ export class Wall extends Graphics {
     public updateCorners() {
         if (!this.graphic) return;
 
-        const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : WALL_STROKE_COLOR;
+        const strokeColor = this.focused ? WALL_ACTIVE_STROKE_COLOR : this.strokeColor;
         const middleEndPoint = { x: this.length, y: this.thickness / 2 };
         const middleStartPoint = { x: 0, y: this.thickness / 2 };
 
@@ -403,6 +409,11 @@ export class Wall extends Graphics {
         const localCoords = ev.getLocalPosition(this as unknown as Container);
 
         switch (state.activeTool) {
+            case Tool.Remove:
+                this.color = WALL_REMOVE_FILL_COLOR;
+                this.strokeColor = WALL_REMOVE_STROKE_COLOR;
+                this.updateCorners();
+                break;
             case Tool.FurnitureAddDoor:
             case Tool.FurnitureAddWindow:
                 this.tempFurniture?.create(state.activeTool, this).show().updatePosition(localCoords);
@@ -422,6 +433,11 @@ export class Wall extends Graphics {
         const state = useStore.getState();
 
         switch (state.activeTool) {
+            case Tool.Remove:
+                this.strokeColor = WALL_STROKE_COLOR;
+                this.color = WALL_FILL_COLOR;
+                this.updateCorners();
+                break;
             case Tool.FurnitureAddDoor:
             case Tool.FurnitureAddWindow:
                 this.tempFurniture?.hide();
@@ -432,6 +448,8 @@ export class Wall extends Graphics {
                 this.dashedLineContainer?.hide();
                 break;
         }
+
+        this.alpha = 1;
     }
 
     private onMouseMove(ev: FederatedPointerEvent) {
@@ -456,6 +474,11 @@ export class Wall extends Graphics {
         this.drawWall();
     }
 
+    public delete() {
+        this.disposer.destroyAllChildren().destroyObject().deleteAction();
+        FloorPlan.Instance.redrawWalls();
+    }
+
     private onMouseClick(ev: FederatedPointerEvent) {
         const state = useStore.getState();
 
@@ -463,7 +486,7 @@ export class Wall extends Graphics {
 
         switch (state.activeTool) {
             case Tool.Remove:
-                this.disposer.destroyAllChildren().destroyObject().deleteAction();
+                this.delete();
 
                 break;
             case Tool.Edit:
@@ -505,7 +528,7 @@ export class Wall extends Graphics {
 
         if (useStore.getState().activeMode !== ViewMode.Edit) return;
 
-        this.clickStartTime = Date.now();
+        this.objectEvents.onPointerDown();
 
         const state = useStore.getState();
 
@@ -524,23 +547,12 @@ export class Wall extends Graphics {
     }
 
     private onMouseUp(ev: FederatedPointerEvent) {
-        const clickDuration = Date.now() - this.clickStartTime;
-
-        if (clickDuration < 200) this.onMouseClick(ev);
+        if (this.objectEvents.isClick()) {
+            this.onMouseClick(ev);
+        }
 
         this.dragging = false;
-
-        return;
     }
-
-    // public delete() {
-    //     const action = new DeleteWallAction(this);
-
-    //     action.execute();
-
-    //     new DeleteWallNodeAction(this.leftNode.getId()).execute();
-    //     new DeleteWallNodeAction(this.rightNode.getId()).execute();
-    // }
 
     public setLength(newLength: number) {
         const [x1, y1, x2, y2] = [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];

@@ -140,6 +140,8 @@ export class WallNodeSequence extends Container {
             // remove links containing node TODO if implementing undo. remember these
             // this.wallNodeLinks[id].length = 0;
         }
+
+        this.drawWalls();
     }
 
     public getNewNodeId() {
@@ -184,12 +186,9 @@ export class WallNodeSequence extends Container {
         if (rightNodeIndex != -1) {
             // @ts-expect-error find why
             this.wallNodeLinks.get(leftNode).splice(rightNodeIndex, 1);
-            // this.drawWalls();
         }
 
         let toBeRemoved = -1;
-
-        console.log('xdx', toBeRemoved);
 
         for (let i = 0; i < this.walls.length; i++) {
             const wall = this.walls[i];
