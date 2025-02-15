@@ -1,7 +1,7 @@
 {
   "floors": [
     {
-      "furnitureArray": [],
+      "furnitureMap": [],
       "wallNodes": [],
       "wallNodeLinks": []
     }

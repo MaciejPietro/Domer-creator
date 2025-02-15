@@ -158,6 +158,10 @@ export class FloorPlan extends Container {
 
     public removeWall(wall: Wall) {
         this.floors[this.currentFloor].removeWall(wall);
+
+        for (const floor of this.floors) {
+            floor.removeWall(wall);
+        }
     }
 
     public addNodeToWall(wall: Wall, coords: Point) {

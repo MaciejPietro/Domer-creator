@@ -117,7 +117,7 @@ export class WallNodeSequence extends Container {
         WallNodeSequence.wallNodeId = 0;
     }
 
-    public remove(id: number) {
+    public removeNode(id: number) {
         // TODO only remove if connected to 2 points.
         let isolated = true;
         const links = this.wallNodeLinks.get(id);
@@ -179,15 +179,17 @@ export class WallNodeSequence extends Container {
     }
 
     public removeWall(leftNode: number, rightNode: number) {
-        // @ts-expect-error find why
-        const index = this.wallNodeLinks.get(leftNode).indexOf(rightNode);
+        const rightNodeIndex = this.wallNodeLinks.get(leftNode)?.indexOf(rightNode);
 
-        if (index != -1) {
+        if (rightNodeIndex != -1) {
             // @ts-expect-error find why
-            this.wallNodeLinks.get(leftNode).splice(index, 1);
-            this.drawWalls();
+            this.wallNodeLinks.get(leftNode).splice(rightNodeIndex, 1);
+            // this.drawWalls();
         }
+
         let toBeRemoved = -1;
+
+        console.log('xdx', toBeRemoved);
 
         for (let i = 0; i < this.walls.length; i++) {
             const wall = this.walls[i];
@@ -278,8 +280,6 @@ export class WallNodeSequence extends Container {
     }
 
     public blurAllElements(exceptUuid?: string) {
-        console.log('xdxd blurAll');
-
         this.walls.forEach((wall) => {
             if (wall.uuid !== exceptUuid) {
                 wall.blur();

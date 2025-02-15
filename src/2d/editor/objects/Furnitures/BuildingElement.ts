@@ -59,8 +59,6 @@ export abstract class BuildingElement extends Container {
         const elementStart = this.position.x;
         const elementEnd = this.position.x + this.length;
 
-        console.log('spots', { elementStart, elementEnd, occupiedSpots });
-
         for (const spot of occupiedSpots) {
             if (elementStart < spot.end && spot.start < elementEnd) return true;
         }
@@ -121,8 +119,6 @@ export abstract class BuildingElement extends Container {
             x: boundedX,
             y: this.position.y,
         };
-
-        console.log(this.isCollide());
 
         const previousPosition = { x: this.position.x, y: this.position.y };
 

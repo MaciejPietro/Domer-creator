@@ -5,7 +5,7 @@ import { INodeSerializable } from './INodeSerializable';
 export type IFurnitureSerializable = IDoorSerializable | IWindowSerializable;
 
 export class FloorSerializable {
-    public furnitureArray: IFurnitureSerializable[];
+    public furnitureMap: IFurnitureSerializable[];
     public wallNodes: INodeSerializable[];
     public wallNodeLinks: [
         number,
@@ -16,7 +16,7 @@ export class FloorSerializable {
     ][];
 
     public constructor() {
-        this.furnitureArray = [];
+        this.furnitureMap = [];
         this.wallNodes = [];
         this.wallNodeLinks = [];
     }

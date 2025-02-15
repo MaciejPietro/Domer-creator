@@ -1,5 +1,6 @@
 import { DeleteWallAction } from '../../actions/DeleteWallAction';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
+import { FloorPlan } from '../FloorPlan';
 import { Door } from '../Furnitures/Door/Door';
 import { WindowElement } from '../Furnitures/Window/Window';
 import { Wall } from '../Walls/Wall';
@@ -12,13 +13,19 @@ export class ObjectDisposer {
         this.object = object;
     }
 
-    public removeObject() {
+    public removeFromFloor() {
+        FloorPlan.Instance.removeWall(this.object);
+
+        return this;
+    }
+
+    public destroyObject() {
         this.object.destroy();
 
         return this;
     }
 
-    public removeAllChildren() {
+    public destroyAllChildren() {
         for (const child of this.object.children) {
             if (child instanceof Door || child instanceof WindowElement) {
                 child.destroy();
@@ -41,5 +48,11 @@ export class ObjectDisposer {
             default:
                 throw Error('Object type not supported');
         }
+    }
+
+    public destroy() {
+        this.destroyObject();
+        this.destroyAllChildren();
+        this.deleteAction();
     }
 }

@@ -12,12 +12,12 @@ import { WindowElement } from './Furnitures/Window/Window';
 type Furniture = WindowElement | Door;
 
 export class Floor extends Container {
-    public furnitureArray: Map<string, Furniture>;
+    public furnitureMap: Map<string, Furniture>;
     private wallNodeSequence: WallNodeSequence;
     constructor(floorData?: FloorSerializable, previousFloor?: Floor) {
         super();
 
-        this.furnitureArray = new Map<string, Furniture>();
+        this.furnitureMap = new Map<string, Furniture>();
         this.wallNodeSequence = new WallNodeSequence();
         this.addChild(this.wallNodeSequence);
         // this.wallNodeSequence.zIndex = 1002;
@@ -61,7 +61,7 @@ export class Floor extends Container {
     public applyFloorData(floorData: FloorSerializable) {
         this.wallNodeSequence.load(floorData.wallNodes, floorData.wallNodeLinks);
 
-        for (const item of floorData.furnitureArray) {
+        for (const item of floorData.furnitureMap) {
             if (item.element === 'door') {
                 const parent = this.wallNodeSequence.getWalls().find((wall) => wall.uuid === item.wallUuid);
 
@@ -79,7 +79,7 @@ export class Floor extends Container {
                     orientation: item.orientation,
                 });
 
-                this.furnitureArray.set(item.uuid, doorInstance);
+                this.furnitureMap.set(item.uuid, doorInstance);
 
                 parent.addChild(doorInstance);
             }
@@ -101,7 +101,7 @@ export class Floor extends Container {
                     bottom: item.bottom,
                 });
 
-                this.furnitureArray.set(item.uuid, windowInstance);
+                this.furnitureMap.set(item.uuid, windowInstance);
 
                 parent.addChild(windowInstance);
             }
@@ -125,7 +125,7 @@ export class Floor extends Container {
             //     fur.orientation
             // );
 
-            // this.furnitureArray.set(fur.id, object);
+            // this.furnitureMap.set(fur.id, object);
 
             // if (attachedTo != undefined) {
             //     attachedTo.addChild(object);
@@ -144,15 +144,15 @@ export class Floor extends Container {
     }
 
     public getFurniture() {
-        // return this.furnitureArray;
+        // return this.furnitureMap;
     }
 
     public reset() {
-        for (const id of this.furnitureArray.keys()) {
+        for (const id of this.furnitureMap.keys()) {
             this.removeFurniture(id);
         }
         this.wallNodeSequence.reset();
-        this.furnitureArray = new Map();
+        this.furnitureMap = new Map();
     }
 
     public getWallNodeSequence() {
@@ -198,10 +198,10 @@ export class Floor extends Container {
 
         // FURNITURES
         const serializedFurniture = [];
-        for (const furniture of this.furnitureArray.values()) {
+        for (const furniture of this.furnitureMap.values()) {
             serializedFurniture.push(furniture.serialize());
         }
-        plan.furnitureArray = serializedFurniture;
+        plan.furnitureMap = serializedFurniture;
 
         //    WALLS
         for (const wallNode of wallNodes.values()) {
@@ -220,7 +220,7 @@ export class Floor extends Container {
             };
 
             if (for3D) {
-                planNode.furnitures = plan.furnitureArray.filter((furniture) => {
+                planNode.furnitures = plan.furnitureMap.filter((furniture) => {
                     return furniture.wallUuid === wallNode.uuid;
                 }, []);
 
@@ -259,18 +259,18 @@ export class Floor extends Container {
         // FURNITURES
         const serializedFurniture = [];
 
-        for (const furniture of this.furnitureArray.values()) {
+        for (const furniture of this.furnitureMap.values()) {
             serializedFurniture.push(furniture.serialize());
         }
-        plan.furnitureArray = serializedFurniture;
+        plan.furnitureMap = serializedFurniture;
 
         return plan;
     }
 
     public setFurniturePosition(id: number, x: number, y: number, angle?: number) {
-        // this.furnitureArray.get(id.toString())?.position.set(x, y);
+        // this.furnitureMap.get(id.toString())?.position.set(x, y);
         // if (angle) {
-        //     this.furnitureArray.get(id).angle = angle;
+        //     this.furnitureMap.get(id).angle = angle;
         // }
     }
 
@@ -303,22 +303,22 @@ export class Floor extends Container {
 
         if (!elementInstance) throw Error('Element is not Door, nor Window');
 
-        this.furnitureArray.set(object.uuid, elementInstance as unknown as Furniture);
+        this.furnitureMap.set(object.uuid, elementInstance as unknown as Furniture);
 
         attachedTo.addChild(elementInstance);
     }
 
     public removeFurniture(uuid: string) {
-        const furniture = this.furnitureArray.get(uuid);
+        const furniture = this.furnitureMap.get(uuid);
 
         if (furniture) {
             furniture.parent.removeChild(furniture);
-            this.furnitureArray.delete(uuid);
+            this.furnitureMap.delete(uuid);
         }
     }
 
     public getObject(id: number) {
-        // return this.furnitureArray.get(id);
+        // return this.furnitureMap.get(id);
     }
 
     public redrawWalls() {
@@ -327,7 +327,7 @@ export class Floor extends Container {
 
     public removeWallNode(nodeId: number) {
         if (this.wallNodeSequence.contains(nodeId)) {
-            this.wallNodeSequence.remove(nodeId);
+            this.wallNodeSequence.removeNode(nodeId);
         }
     }
 

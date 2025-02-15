@@ -374,8 +374,6 @@ export class Wall extends Graphics {
     }
 
     public blur() {
-        console.log('xdxd blur');
-
         this.focused = false;
         this.leftNode.setVisibility(false);
         this.rightNode.setVisibility(false);
@@ -465,7 +463,7 @@ export class Wall extends Graphics {
 
         switch (state.activeTool) {
             case Tool.Remove:
-                this.disposer.removeAllChildren().removeObject().deleteAction();
+                this.disposer.destroyAllChildren().destroyObject().deleteAction();
 
                 break;
             case Tool.Edit:
