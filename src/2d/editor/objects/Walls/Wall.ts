@@ -35,6 +35,7 @@ import WallTempFurniture from './WallTempFurniture';
 import { isDoor, isWindow } from '@/2d/helpers/objects';
 import { getDefaultSettings, normalizeAngle } from './helpers';
 import { showCannotDivideWallError } from './errors';
+import { ObjectDisposer } from '../Common/ObjectDisposer';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
@@ -59,6 +60,7 @@ export class Wall extends Graphics {
     measuresContainer: WallMeasuresContainer | null = null;
     dashedLineContainer: WallDashedLineContainer | null = null;
     tempFurniture: WallTempFurniture | null = null;
+    disposer: ObjectDisposer;
 
     helpersContainer = new Container();
 
@@ -106,6 +108,7 @@ export class Wall extends Graphics {
         this.measuresContainer = new WallMeasuresContainer(points);
         this.dashedLineContainer = new WallDashedLineContainer(this.thickness);
         this.tempFurniture = new WallTempFurniture(this);
+        this.disposer = new ObjectDisposer(this);
 
         this.addChild(this.measuresContainer);
         this.addChild(this.dashedLineContainer);
@@ -462,7 +465,8 @@ export class Wall extends Graphics {
 
         switch (state.activeTool) {
             case Tool.Remove:
-                this.delete();
+                this.disposer.removeAllChildren().removeObject().deleteAction();
+
                 break;
             case Tool.Edit:
                 const parent = this.parent as WallNodeSequence;
@@ -531,14 +535,14 @@ export class Wall extends Graphics {
         return;
     }
 
-    public delete() {
-        const action = new DeleteWallAction(this);
+    // public delete() {
+    //     const action = new DeleteWallAction(this);
 
-        action.execute();
+    //     action.execute();
 
-        new DeleteWallNodeAction(this.leftNode.getId()).execute();
-        new DeleteWallNodeAction(this.rightNode.getId()).execute();
-    }
+    //     new DeleteWallNodeAction(this.leftNode.getId()).execute();
+    //     new DeleteWallNodeAction(this.rightNode.getId()).execute();
+    // }
 
     public setLength(newLength: number) {
         const [x1, y1, x2, y2] = [this.leftNode.x, this.leftNode.y, this.rightNode.x, this.rightNode.y];
