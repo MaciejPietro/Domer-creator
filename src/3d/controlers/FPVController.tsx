@@ -77,13 +77,10 @@ export default function FPScontrols() {
             mass={1}
             friction={0}
             restitution={0}
-            position={[0, 0.6, 0]}
-            enabledRotations={[false, false, false]} //prevent from falling sideways
+            position={[0, 1.2, 0]}
+            enabledRotations={[false, false, false]}
         >
-            {/**for the capsule, args={[halfCapsuleHeight-radius, radius]} 
-      think of (halfCapsuleHeight-radius) as the height of the straight vertical section only (cut in half)
-      */}
-            <CapsuleCollider args={[0.3, 0.25]} />
+            <CapsuleCollider args={[0.6, 0.5]} />
         </RigidBody>
     );
 }
