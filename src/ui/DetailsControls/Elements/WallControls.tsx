@@ -4,8 +4,7 @@ import { useStore } from '@/stores/EditorStore';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
 import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
-import { showCollisionError, showMinLengthError } from '@/2d/editor/objects/Walls/errors';
-import { MIN_WALL_LENGTH } from '@/2d/editor/objects/Walls/constants';
+import { showCollisionError } from '@/2d/editor/objects/Walls/errors';
 
 const WallControls = ({ element }: { element: Wall }) => {
     const { setFocusedElement } = useStore();
@@ -46,8 +45,6 @@ const WallControls = ({ element }: { element: Wall }) => {
         const backupLength = element.length;
 
         if (key === 'length') {
-            if (value < MIN_WALL_LENGTH) return showMinLengthError();
-
             element.setLength(value);
 
             if (element.isColliding()) {

@@ -10,7 +10,7 @@ import { Wall } from './Wall';
 import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
 import { BuildingElement } from '../Furnitures/BuildingElement';
-import { showCollisionError, showMinLengthError } from './errors';
+import { showCollisionError } from './errors';
 import { isWall } from '@/2d/helpers/objects';
 
 export class WallNode extends Container {
@@ -170,11 +170,6 @@ export class WallNode extends Container {
 
         if (parentWalls.length) {
             parentWalls.forEach((wall) => {
-                if (!wall.isValidLength()) {
-                    showMinLengthError();
-                    this.setToStartDragPosition();
-                }
-
                 if (wall.isColliding()) {
                     showCollisionError();
                     this.setToStartDragPosition();

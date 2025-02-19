@@ -1,14 +1,6 @@
 import { notifications } from '@mantine/notifications';
 import { MIN_WALL_LENGTH } from './constants';
 
-export const showMinLengthError = () => {
-    notifications.show({
-        id: 'wall-min-length',
-        message: `Minimalna długość ściany to ${MIN_WALL_LENGTH} cm.`,
-        color: 'red',
-    });
-};
-
 export const showCollisionError = () => {
     notifications.show({
         id: 'wall-collision',
