@@ -33,6 +33,10 @@ export class WallNodeSequence extends Container {
         WallNodeSequence.wallNodeId = id;
     }
 
+    public getWallNodeById(id: number) {
+        return this.wallNodes.get(id);
+    }
+
     public getWallNodeId() {
         return WallNodeSequence.wallNodeId;
     }

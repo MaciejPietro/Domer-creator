@@ -8,6 +8,7 @@ import { Wall } from './Walls/Wall';
 import { WallNodeSequence } from './Walls/WallNodeSequence';
 import { Door } from './Furnitures/Door/Door';
 import { WindowElement } from './Furnitures/Window/Window';
+import { WallNode } from './Walls/WallNode';
 
 type Furniture = WindowElement | Door;
 
@@ -326,8 +327,35 @@ export class Floor extends Container {
     }
 
     public removeWallNode(nodeId: number) {
+        const wallNode = this.wallNodeSequence.getWallNodeById(nodeId);
+
         if (this.wallNodeSequence.contains(nodeId)) {
-            this.wallNodeSequence.removeNode(nodeId);
+            const connectedWalls = this.wallNodeSequence.getWallsByNodesIds([nodeId]);
+
+            if (connectedWalls.length === 2) {
+                const [firstWall, secondWall] = connectedWalls;
+
+                // Remove the existing walls
+                this.wallNodeSequence.removeWall(firstWall.leftNode.getId(), firstWall.rightNode.getId());
+                this.wallNodeSequence.removeWall(secondWall.leftNode.getId(), secondWall.rightNode.getId());
+
+                const leftNodeId =
+                    firstWall.rightNode.getId() !== nodeId ? firstWall.rightNode.getId() : firstWall.leftNode.getId();
+                const rightNodeId =
+                    secondWall.leftNode.getId() !== nodeId ? secondWall.leftNode.getId() : secondWall.rightNode.getId();
+
+                this.wallNodeSequence.addWall(leftNodeId, rightNodeId, { type: firstWall.type });
+                wallNode?.parent.removeChild(wallNode);
+                return;
+            }
+
+            if (!connectedWalls.length) {
+                this.wallNodeSequence.removeNode(nodeId);
+                wallNode?.parent.removeChild(wallNode);
+                return;
+            }
+
+            WallNode.showDeleteError();
         }
     }
 
@@ -354,13 +382,6 @@ export class Floor extends Container {
         const leftNode = wall.leftNode.getId();
         const rightNode = wall.rightNode.getId();
 
-        // the equation of the line, get y equivalent to x
-        // TODO figure out why author need it, and why it brokes wall on wall behaviour
-        // if (wall.angle != 90) {
-        // coords.y = getCorrespondingY(coords.x, wall.leftNode.position, wall.rightNode.position);
-        // }
-
-        // prevent misclicks
         if (Math.abs(euclideanDistance(coords.x, wall.leftNode.x, coords.y, wall.leftNode.y)) < 0.2 * METER) {
             return;
         }

@@ -10,7 +10,7 @@ import { Wall } from './Wall';
 import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
 import { BuildingElement } from '../Furnitures/BuildingElement';
-import { showCollisionError } from './errors';
+import { showCollisionError, showDeleteError } from './errors';
 import { isWall } from '@/2d/helpers/objects';
 
 export class WallNode extends Container {
@@ -50,6 +50,10 @@ export class WallNode extends Container {
 
         this.on('pointerover', this.onMouseOver);
         this.on('pointerout', this.onPointerOut);
+    }
+
+    static showDeleteError() {
+        showDeleteError();
     }
 
     public getId() {
@@ -196,27 +200,27 @@ export class WallNode extends Container {
         }) as Wall[];
     }
 
-    private calculateAngleBetweenWalls(wall1: Wall, wall2: Wall): number | undefined {
-        const angle1 = wall1.angle;
-        const angle2 = wall2.angle;
-        const angleDifference = Math.abs(angle1 - angle2);
+    // private calculateAngleBetweenWalls(wall1: Wall, wall2: Wall): number | undefined {
+    //     const angle1 = wall1.angle;
+    //     const angle2 = wall2.angle;
+    //     const angleDifference = Math.abs(angle1 - angle2);
 
-        if (wall1.rightNode === wall2.rightNode) {
-            return angleDifference;
-        }
+    //     if (wall1.rightNode === wall2.rightNode) {
+    //         return angleDifference;
+    //     }
 
-        if (wall1.leftNode === wall2.rightNode) {
-            return Math.abs(180 - angleDifference);
-        }
+    //     if (wall1.leftNode === wall2.rightNode) {
+    //         return Math.abs(180 - angleDifference);
+    //     }
 
-        if (wall1.rightNode === wall2.leftNode) {
-            return Math.abs(180 - angleDifference);
-        }
+    //     if (wall1.rightNode === wall2.leftNode) {
+    //         return Math.abs(180 - angleDifference);
+    //     }
 
-        if (wall1.leftNode === wall2.leftNode) {
-            return angleDifference;
-        }
-    }
+    //     if (wall1.leftNode === wall2.leftNode) {
+    //         return angleDifference;
+    //     }
+    // }
 
     private onMouseMove(ev: FederatedPointerEvent) {
         this.checkIfCanDragFurther();
@@ -280,10 +284,8 @@ export class WallNode extends Container {
     }
 
     public delete() {
-        // TODO #1
-        // const action = new DeleteWallNodeAction(this.id);
-        // action.execute();
-        // this.parent.removeChild(this);
+        const action = new DeleteWallNodeAction(this.id);
+        action.execute();
     }
 
     public serialize() {

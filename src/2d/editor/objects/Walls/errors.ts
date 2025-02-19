@@ -18,3 +18,11 @@ export const showCannotDivideWallError = () => {
         color: 'red',
     });
 };
+
+export const showDeleteError = () => {
+    notifications.show({
+        id: 'wall-delete',
+        message: 'Nie można usunąć tego węzła.',
+        color: 'red',
+    });
+};
