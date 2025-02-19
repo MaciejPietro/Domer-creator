@@ -345,7 +345,7 @@ export class Floor extends Container {
                     secondWall.leftNode.getId() !== nodeId ? secondWall.leftNode.getId() : secondWall.rightNode.getId();
 
                 this.wallNodeSequence.addWall(leftNodeId, rightNodeId, { type: firstWall.type });
-                wallNode?.parent.removeChild(wallNode);
+                wallNode?.parent?.removeChild(wallNode);
                 return;
             }
 
