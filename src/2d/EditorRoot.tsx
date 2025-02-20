@@ -38,7 +38,7 @@ export function EditorRoot() {
                 screenWidth: app.screen.width,
                 screenHeight: app.screen.height,
                 worldWidth: 50 * METER,
-                worldHeight: 80 * METER,
+                worldHeight: 25 * METER,
                 events: app.renderer.events,
                 eventMode: 'static',
             };

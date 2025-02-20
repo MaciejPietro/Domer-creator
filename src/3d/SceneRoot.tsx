@@ -16,40 +16,52 @@ import { Physics } from '@react-three/rapier';
 import FPVController, { World } from './controlers/FPVController';
 
 export default function SceneRoot() {
+    const isFPV = false;
     const plan = FloorPlan.Instance.getPlanForModel();
 
     const { setActiveMode } = useStore();
 
     const centerPoint = calculateCenterPoint(plan.wallNodes);
 
+    const canvasOptions = isFPV
+        ? { camera: { position: [0, 1, 5] }, flat: true, shadows: true, dpr: [1, 2] }
+        : { camera: { position: [-60, 40, 15], fov: 25 } };
+
     return (
         <>
             {plan.wallNodes.length ? (
-                <Canvas style={{ height: '100vh' }} camera={{ position: [0, 1, 5] }} flat shadows dpr={[1, 2]}>
-                    {/* // <Canvas style={{ height: '100vh' }} shadows camera={{ position: [-60, 40, 15], fov: 25 }}> */}
+                <Canvas style={{ height: '100vh' }} {...canvasOptions}>
                     <axesHelper args={[10]} />
                     <gridHelper args={[200, 200, 0xff0000, 'teal']} />
                     <Environment />
-                    {/* <OrbitControls makeDefault target={centerPoint} /> */}
 
-                    <Physics>
-                        {/* <Debug /> */}
-                        <House plan={plan} />
-                        <World />
+                    {isFPV ? (
+                        <>
+                            <Physics>
+                                <House plan={plan} />
+                                <World />
 
-                        <KeyboardControls
-                            map={[
-                                { name: 'forwardKeyPressed', keys: ['ArrowUp', 'KeyW'] },
-                                { name: 'rightKeyPressed', keys: ['ArrowRight', 'KeyD'] },
-                                { name: 'backwardKeyPressed', keys: ['ArrowDown', 'KeyS'] },
-                                { name: 'leftKeyPressed', keys: ['ArrowLeft', 'KeyA'] },
-                            ]}
-                        >
-                            <FPVController />
-                        </KeyboardControls>
-                    </Physics>
+                                <KeyboardControls
+                                    map={[
+                                        { name: 'forwardKeyPressed', keys: ['ArrowUp', 'KeyW'] },
+                                        { name: 'rightKeyPressed', keys: ['ArrowRight', 'KeyD'] },
+                                        { name: 'backwardKeyPressed', keys: ['ArrowDown', 'KeyS'] },
+                                        { name: 'leftKeyPressed', keys: ['ArrowLeft', 'KeyA'] },
+                                    ]}
+                                >
+                                    <FPVController />
+                                </KeyboardControls>
+                            </Physics>
+                        </>
+                    ) : (
+                        <>
+                            <House plan={plan} />
 
-                    <PointerLockControls />
+                            <OrbitControls makeDefault target={centerPoint} />
+                        </>
+                    )}
+
+                    {isFPV ? <PointerLockControls /> : null}
                 </Canvas>
             ) : (
                 <div className="w-full h-screen flex justify-center items-center gap-2 text-xl text-gray-800">
