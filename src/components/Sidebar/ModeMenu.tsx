@@ -43,16 +43,6 @@ const ModeMenu = () => {
                             position="bottom"
                             onClick={() => {
                                 setActiveMode(mode.mode);
-                                // if (activeTool === Tool.Measure) {
-                                //     setTool(Tool.View);
-                                // } else {
-                                //     setTool(Tool.Measure);
-                                //     cleanNotifications();
-                                //     showNotification({
-                                //         title: '📐 Measure tool',
-                                //         message: 'Click and drag to measure areas',
-                                //     });
-                                // }
                             }}
                         />
                     ))}

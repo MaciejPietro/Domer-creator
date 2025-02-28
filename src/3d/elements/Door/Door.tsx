@@ -1,5 +1,5 @@
 import { DOOR_HEIGHT } from '@/2d/editor/objects/Furnitures/Door/constants';
-import { cmToM } from '@/utils/transform';
+import { cmToM } from '@/common/utils/transform';
 import { Geometry, Base, Subtraction } from '@react-three/csg';
 import { BoxGeometry, LoadingManager } from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';

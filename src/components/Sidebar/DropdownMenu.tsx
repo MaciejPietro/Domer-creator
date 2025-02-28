@@ -7,7 +7,7 @@ import { useStore } from '@/stores/EditorStore';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { Menu, Group } from '@mantine/core';
 import { useRef } from 'react';
-import { DeviceFloppy, Upload, Menu2, Rotate, BrandGithub, Heart } from 'tabler-icons-react';
+import { DeviceFloppy, Upload, Menu2, Rotate, BrandGithub, Heart, User, Logout, List } from 'tabler-icons-react';
 
 const DropdownMenu = () => {
     const { setActiveMode } = useStore();
@@ -63,8 +63,6 @@ const DropdownMenu = () => {
                         <span className="text-sm">Wczytaj</span>
                     </Menu.Item>
 
-                    <Menu.Divider />
-
                     <Menu.Item
                         leftSection={<Rotate size={16} />}
                         onClick={() => {
@@ -75,6 +73,20 @@ const DropdownMenu = () => {
                         }}
                     >
                         <span className="text-sm">Zacznij od nowa</span>
+                    </Menu.Item>
+
+                    <Menu.Divider />
+
+                    <Menu.Item leftSection={<List size={16} />} onClick={() => {}}>
+                        <span className="text-sm">Projekty</span>
+                    </Menu.Item>
+
+                    <Menu.Item leftSection={<User size={16} />} onClick={() => {}}>
+                        <span className="text-sm">Konto</span>
+                    </Menu.Item>
+
+                    <Menu.Item leftSection={<Logout size={16} />} onClick={() => {}}>
+                        <span className="text-sm">Wyloguj</span>
                     </Menu.Item>
 
                     <Menu.Divider />

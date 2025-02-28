@@ -4,8 +4,8 @@ import { WallNode } from '../objects/Walls/WallNode';
 import { Action } from './Action';
 import { AddWallManager } from './AddWallManager';
 import { useStore } from '../../../stores/EditorStore';
-import { snap } from '../../../helpers/ViewportCoordinates';
-import { Point } from '../../../helpers/Point';
+import { snap } from '@/common/utils/coordinates';
+import { Point } from '@/common/types/point';
 
 export class AddNodeAction implements Action {
     private wall: Wall;

@@ -1,5 +1,5 @@
 import { WindowType } from '@/2d/editor/objects/Furnitures/Window/config';
-import { cmToM } from '@/utils/transform';
+import { cmToM } from '@/common/utils/transform';
 import { Geometry, Base, Subtraction, Addition } from '@react-three/csg';
 import { BoxGeometry } from 'three';
 

@@ -1,5 +1,5 @@
 import { Container, Sprite, Text, TextStyle, Texture } from 'pixi.js';
-import { Point } from '../../../../helpers/Point';
+import { Point } from '@/common/types/point';
 import { METER } from '../../constants';
 
 export class Label extends Container {

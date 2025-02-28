@@ -1,8 +1,6 @@
 import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
-import { viewportX, viewportY } from '../../helpers/ViewportCoordinates';
+import { viewportX, viewportY } from '@/common/utils/coordinates';
 import { useStore } from '../../stores/EditorStore';
-import grabIcon from '../../assets/move-icon.svg';
-import { SVG } from 'pixi-svg';
 
 export class Pointer extends Container {
     private dot: Graphics;

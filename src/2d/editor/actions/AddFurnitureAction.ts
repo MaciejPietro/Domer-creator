@@ -1,5 +1,5 @@
 import { Container } from 'pixi.js';
-import { Point } from '../../../helpers/Point';
+import { Point } from '@/common/types/point';
 import { FurnitureData } from '../../../stores/FurnitureStore';
 import { FloorPlan } from '../objects/FloorPlan';
 import { Wall } from '../objects/Walls/Wall';

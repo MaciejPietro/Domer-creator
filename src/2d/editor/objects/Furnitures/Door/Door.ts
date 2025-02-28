@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js';
-import { Point } from '@/helpers/Point';
+import { Point } from '@/common/types/point';
 import { COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';

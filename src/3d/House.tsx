@@ -14,7 +14,7 @@ import { ViewMode } from '@/2d/editor/constants';
 import Door from './elements/Door/Door';
 import Window from './elements/Window/Window';
 
-import { cmToM } from '@/utils/transform';
+import { cmToM } from '@/common/utils/transform';
 import { WALL_HEIGHT } from './elements/Wall/constants';
 import { DOOR_HEIGHT } from '@/2d/editor/objects/Furnitures/Door/constants';
 import { createRandomColor } from './utils/helpers';

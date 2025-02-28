@@ -1,7 +1,7 @@
 import { Graphics, FederatedPointerEvent } from 'pixi.js';
 import { isMobile } from 'react-device-detect';
-import { Point } from '../../../../helpers/Point';
-import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
+import { Point } from '@/common/types/point';
+import { viewportX, viewportY } from '@/common/utils/coordinates';
 import { TransformLayer } from './TransformLayer';
 import { WALL_THICKNESS } from '../../constants';
 

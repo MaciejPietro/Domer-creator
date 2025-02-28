@@ -6,7 +6,8 @@ import { Serializer } from '../persistence/Serializer';
 import { FloorPlanSerializable } from '../persistence/FloorPlanSerializable';
 import { Action } from '../actions/Action';
 import { useStore } from '../../../stores/EditorStore';
-import { Point } from '../../../helpers/Point';
+import { Point } from '@/common/types/point';
+
 import { showNotification } from '@mantine/notifications';
 import { Door } from './Furnitures/Door/Door';
 import { WindowElement } from './Furnitures/Window/Window';

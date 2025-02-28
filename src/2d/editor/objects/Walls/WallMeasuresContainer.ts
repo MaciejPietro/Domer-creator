@@ -1,5 +1,5 @@
 import { Container } from 'pixi.js';
-import { Point } from '@/helpers/Point';
+import { Point } from '@/common/types/point';
 import { MeasureLabel } from '../TransformControls/MeasureLabel';
 
 class WallMeasuresContainer extends Container {

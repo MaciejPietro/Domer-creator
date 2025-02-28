@@ -1,5 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
-import { Point } from '@/helpers/Point';
+import { Point } from '@/common/types/point';
 
 class WallDebugContainer extends Container {
     dotHelperA = new Graphics();

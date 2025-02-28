@@ -1,7 +1,8 @@
 import { Graphics, FederatedPointerEvent, Texture, Container } from 'pixi.js';
-import { euclideanDistance } from '../../../helpers/EuclideanDistance';
-import { Point } from '../../../helpers/Point';
-import { viewportX, viewportY } from '../../../helpers/ViewportCoordinates';
+import { euclideanDistance } from '@/common/utils/measure';
+import { Point } from '@/common/types/point';
+
+import { viewportX, viewportY } from '@/common/utils/coordinates';
 import { Label } from '../objects/TransformControls/Label';
 import { Tool, WALL_THICKNESS } from '../constants';
 import { useStore } from '@/stores/EditorStore';

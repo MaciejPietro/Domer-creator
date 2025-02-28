@@ -6,7 +6,7 @@ import { TransformLayer } from './objects/TransformControls/TransformLayer';
 import { useStore } from '../../stores/EditorStore';
 import { AddNodeAction } from './actions/AddNodeAction';
 import { AddWallManager } from './actions/AddWallManager';
-import { viewportX, viewportY } from '../../helpers/ViewportCoordinates';
+import { viewportX, viewportY } from '@/common/utils/coordinates';
 import { Tool, ViewMode } from './constants';
 import { Pointer } from './Pointer';
 import { Preview } from './actions/MeasureToolManager';

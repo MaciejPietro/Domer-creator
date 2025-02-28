@@ -1,4 +1,4 @@
-import { Point } from '@/helpers/Point';
+import { Point } from '@/common/types/point';
 
 export const getClosestPointOnLine = (pointXZ: Point, linePoints: [Point, Point]) => {
     // Destructure the input points

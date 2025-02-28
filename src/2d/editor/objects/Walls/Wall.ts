@@ -1,8 +1,7 @@
-import { Graphics, FederatedPointerEvent, Container } from 'pixi.js';
 import { lineIntersection } from '@pixi/math-extras';
-import { euclideanDistance } from '../../../../helpers/EuclideanDistance';
-import { Point } from '../../../../helpers/Point';
-import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
+import { euclideanDistance } from '@/common/utils/measure';
+import { Point } from '@/common/types/point';
+import { snap, viewportX, viewportY } from '@/common/utils/coordinates';
 
 import { useStore } from '../../../../stores/EditorStore';
 import { AddNodeAction } from '../../actions/AddNodeAction';
@@ -39,6 +38,7 @@ import { showCannotDivideWallError } from './errors';
 import { ObjectDisposer } from '../Common/ObjectDisposer';
 import { FloorPlan } from '../FloorPlan';
 import { ObjectEvents } from '../Common/ObjectEvents';
+import { Graphics, Container, FederatedPointerEvent } from 'pixi.js';
 
 export const DEFAULT_WALL_TYPE = WallType.Exterior;
 

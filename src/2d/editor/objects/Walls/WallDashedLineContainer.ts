@@ -1,7 +1,7 @@
 import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
-import { Point } from '../../../../helpers/Point';
+import { Point } from '@/common/types/point';
 import { useStore } from '@/stores/EditorStore';
-import { snap } from '@/helpers/ViewportCoordinates';
+import { snap } from '@/common/utils/coordinates';
 import { WALL_DASHED_LINE_Z_INDEX } from './constants';
 
 const VALID_COLOR = 'black';

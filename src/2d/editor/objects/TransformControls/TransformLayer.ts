@@ -1,6 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
-import { Point } from '../../../../helpers/Point';
-import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
+import { Point } from '@/common/types/point';
+import { viewportX, viewportY } from '@/common/utils/coordinates';
 import { useStore } from '../../../../stores/EditorStore';
 import { Coord, LabelAxis, LABEL_OFFSET, Tool } from '../../constants';
 import { Handle, HandleType } from './Handle';

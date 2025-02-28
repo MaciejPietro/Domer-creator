@@ -1,6 +1,6 @@
-import { main } from '../2d/EditorRoot';
+import { main } from '@/2d/EditorRoot';
 
-import { useStore } from '../stores/EditorStore';
+import { useStore } from '@/stores/EditorStore';
 
 export function viewportX(x: number, customSnap?: any) {
     let newX = x / main.scale.x + main.corner.x;

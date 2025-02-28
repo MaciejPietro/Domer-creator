@@ -3,7 +3,7 @@ import { Tool } from '../../constants';
 import { WindowElement } from '../Furnitures/Window/Window';
 import { Door } from '../Furnitures/Door/Door';
 import { Wall } from './Wall';
-import { Point } from '@/helpers/Point';
+import { Point } from '@/common/types/point';
 import { WALL_TEMP_FURNITURE_Z_INDEX } from './constants';
 import { AddFurnitureAction } from '../../actions/AddFurnitureAction';
 import { notifications } from '@mantine/notifications';

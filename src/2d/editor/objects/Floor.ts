@@ -1,6 +1,6 @@
 import { Container } from 'pixi.js';
-import { euclideanDistance } from '@/helpers/EuclideanDistance';
-import { Point } from '@/helpers/Point';
+import { euclideanDistance } from '@/common/utils/measure';
+import { Point } from '@/common/types/point';
 
 import { METER } from '../constants';
 import { FloorSerializable } from '../persistence/FloorSerializable';
