@@ -16,7 +16,7 @@ const ModeMenu = () => {
     return (
         <>
             <AppShellSection grow>
-                <Group className="flex gap-2 pr-4" align="center">
+                <Group className="flex gap-2" align="center">
                     {modes.map((mode) => (
                         <NavbarLink
                             key={mode.label}

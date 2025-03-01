@@ -6,10 +6,12 @@ import { ViewMode } from '@/2d/editor/constants';
 import { useStore } from '@/stores/EditorStore';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { Menu, Group } from '@mantine/core';
+import { useNavigate } from '@tanstack/react-router';
 import { useRef } from 'react';
 import { DeviceFloppy, Upload, Menu2, Rotate, BrandGithub, Heart, User, Logout, List } from 'tabler-icons-react';
 
 const DropdownMenu = () => {
+    const navigate = useNavigate();
     const { setActiveMode } = useStore();
     const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -25,15 +27,15 @@ const DropdownMenu = () => {
         <>
             <input ref={fileRef} onChange={handleChange} multiple={false} type="file" accept=".json" hidden />
 
-            <Menu shadow="md">
+            <Menu shadow="md" radius="md" offset={10}>
                 <Menu.Target>
-                    <button className="flex items-center justify-center border-none cursor-pointer bg-transparent -mt-0.5">
-                        <Menu2 size={24} />
+                    <button className="group flex items-center bg-blue-50 size-10 shadow-md rounded-md justify-center border-none cursor-pointer">
+                        <Menu2 size={20} className="text-gray-700 group-hover:text-gray-900 transition-colors" />
                     </button>
                 </Menu.Target>
 
-                <Menu.Dropdown>
-                    <Menu.Label>Projekt</Menu.Label>
+                <Menu.Dropdown className="ml-3">
+                    {/* <Menu.Label>Projekt</Menu.Label> */}
                     <Menu.Item
                         leftSection={<DeviceFloppy size={16} />}
                         onClick={() => {
@@ -77,7 +79,12 @@ const DropdownMenu = () => {
 
                     <Menu.Divider />
 
-                    <Menu.Item leftSection={<List size={16} />} onClick={() => {}}>
+                    <Menu.Item
+                        leftSection={<List size={16} />}
+                        onClick={() => {
+                            navigate({ to: '/projects' });
+                        }}
+                    >
                         <span className="text-sm">Projekty</span>
                     </Menu.Item>
 

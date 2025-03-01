@@ -1,8 +1,5 @@
 import { publicRoute } from '@/common/lib/router/helpers';
-
-const Projects = () => {
-    return <div>Projects list</div>;
-};
+import Projects from '@/pages/Projects';
 
 export const Route = publicRoute({
     path: '/projects',

@@ -1,4 +1,4 @@
-import Homepage from '@/common/Homepage';
+import Homepage from '@/pages/Homepage';
 import { publicRoute } from '@/common/lib/router/helpers';
 // import { withAuth } from '@/common/lib/router/helpers';
 

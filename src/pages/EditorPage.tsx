@@ -1,18 +1,21 @@
+import { EditorRoot } from '@/2d/EditorRoot';
 import { useStore } from '@/stores/EditorStore';
 import { ViewMode } from '@/2d/editor/constants';
 import SceneRoot from '@/3d/SceneRoot';
-import AppNavbar from '@/common/components/AppNavbar';
 import AppSidebar from '@/common/components/AppSidebar';
-import { EditorRoot } from './EditorRoot';
+import EditorToolbar from '@/2d/components/Toolbar/EditorToolbar';
+import AppBottomBar from '@/common/components/AppBottomBar';
 
-export function EditorPage() {
+export default function EditorPage() {
     const { activeMode } = useStore();
 
     return (
         <>
-            <AppNavbar></AppNavbar>
+            <EditorToolbar />
 
             <AppSidebar></AppSidebar>
+
+            <AppBottomBar />
 
             <div
                 className={

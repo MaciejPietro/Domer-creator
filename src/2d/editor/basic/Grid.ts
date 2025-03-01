@@ -4,7 +4,7 @@ const GRID_ALPHA = 0.25;
 const GRID_ALPHA_M = 0.75;
 const GRID_SIZE = 10;
 const GRID_SIZE_M = 100;
-const GRID_COLOR = 0x222222;
+const GRID_COLOR = '#888';
 export class Grid extends Container {
     private gridGraphics: Graphics;
     private cmGrid: Graphics;

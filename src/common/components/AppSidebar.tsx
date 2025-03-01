@@ -13,8 +13,16 @@ const AppSidebar = () => {
     const { activeMode, setSnap, snap } = useStore();
 
     return (
+        <AppShell.Navbar className="bg-transparent">
+            <div className="absolute top-4 left-4">
+                <DropdownMenu />
+            </div>
+        </AppShell.Navbar>
+    );
+
+    return (
         <div className="absolute">
-            <AppShell.Navbar className="px-2 py-4 flex flex-col justify-between">
+            <AppShell.Navbar className="bg-transparent">
                 <div>
                     <DropdownMenu />
                 </div>
@@ -56,8 +64,6 @@ const AppSidebar = () => {
                             }}
                         /> */}
 
-                        <div className="h-px w-full bg-black/15"></div>
-
                         {/* <Group className="flex flex-col" align="center">
                             <Tooltip label={'Current floor'} position="right" withArrow>
                                 <div>{floor}</div>
@@ -89,8 +95,6 @@ const AppSidebar = () => {
                             />
                         </Group>
                         <div className="h-px w-full bg-black/15"></div> */}
-
-                        <HelpDialog />
                     </Group>
                 </AppShellSection>
             </AppShell.Navbar>

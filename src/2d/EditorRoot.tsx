@@ -8,6 +8,7 @@ import { extensions } from '@pixi/core';
 import { EventSystem } from '@pixi/events';
 import { InteractionManager } from '@pixi/interaction';
 import { Main } from './editor/Main';
+import useMount from '@/common/hooks/useMount';
 
 extensions.remove(InteractionManager);
 
@@ -17,11 +18,11 @@ export function EditorRoot() {
     const ref = useRef<HTMLDivElement>(null);
     const { setApp } = useStore();
 
-    useEffect(() => {
-        const app = new Application();
+    useMount(() => {
+        const newApp = new Application();
 
         (async () => {
-            await app.init({
+            await newApp.init({
                 view: document.getElementById('pixi-canvas') as HTMLCanvasElement,
                 resolution: window.devicePixelRatio || 1,
                 autoDensity: true,
@@ -30,29 +31,29 @@ export function EditorRoot() {
                 resizeTo: window,
             });
 
-            app.canvas.oncontextmenu = (e) => {
+            newApp.canvas.oncontextmenu = (e) => {
                 e.preventDefault();
             };
 
             const viewportSettings = {
-                screenWidth: app.screen.width,
-                screenHeight: app.screen.height,
+                screenWidth: newApp.screen.width,
+                screenHeight: newApp.screen.height,
                 worldWidth: 50 * METER,
                 worldHeight: 25 * METER,
-                events: app.renderer.events,
+                events: newApp.renderer.events,
                 eventMode: 'static',
             };
 
             main = new Main(viewportSettings);
 
-            ref.current!.appendChild(app.canvas);
-            app.start();
+            ref.current!.appendChild(newApp.canvas);
+            newApp.start();
 
-            app.stage.addChild(main);
+            newApp.stage.addChild(main);
 
-            setApp(app);
+            setApp(newApp);
         })();
-    }, []);
+    });
 
     return <div ref={ref} />;
 }

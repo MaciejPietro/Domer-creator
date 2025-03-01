@@ -10,7 +10,7 @@ export const WALL_NODE_THICKNESS = 0.15 * METER;
 
 export const LABEL_OFFSET = 10;
 
-export const COLOR_BACKGROUND = '#EBEBEB';
+export const COLOR_BACKGROUND = '#FFFFFF';
 
 export enum Modes {
     Idle,

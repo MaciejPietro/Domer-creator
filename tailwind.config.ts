@@ -1,11 +1,13 @@
 import type { Config } from 'tailwindcss';
-import { appConfig } from './src/config/app';
 
 const config: Config = {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx,vue}'],
     theme: {
         extend: {
             colors: {
+                purple: {
+                    300: '#F1F0FF',
+                },
                 blue: {
                     50: '#ebf5ff',
                     100: '#d0eaff',
