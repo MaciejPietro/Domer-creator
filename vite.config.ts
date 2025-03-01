@@ -1,7 +1,8 @@
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 
 export default defineConfig(({ mode }) => {
     // const env = loadEnv(mode, process.cwd());
@@ -18,25 +19,21 @@ export default defineConfig(({ mode }) => {
 
     return {
         base: '/',
-        plugins: [react(), svgr()],
+        plugins: [react(), TanStackRouterVite({ target: 'react', autoCodeSplitting: true }), , svgr()],
         server: {
-            port: 3000,
-            proxy: {
-                '/iframe-app': {
-                    target: 'http://localhost:3000',
-                    changeOrigin: true,
-                    rewrite: (path) => path.replace(/^\/iframe-app/, ''),
-                },
-            },
-            cors: true,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-            },
+            host: true,
+            // strictPort: true,
+            // cors: true,
         },
         resolve: {
             alias: {
                 '@': path.resolve(__dirname, './src'),
             },
+        },
+        test: {
+            environment: 'jsdom',
+            setupFiles: ['./vitest.setup.ts'],
+            css: true,
         },
         esbuild: {
             drop: ['console', 'debugger'],

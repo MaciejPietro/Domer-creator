@@ -4,6 +4,11 @@ import { useFurnitureStore } from './stores/FurnitureStore';
 import { AppShell, MantineProvider } from '@mantine/core';
 import { MantineEmotionProvider } from '@mantine/emotion';
 import { Notifications } from '@mantine/notifications';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from '@tanstack/react-router';
+import { router } from '@/common/lib/router/index';
+
+const queryClient = new QueryClient();
 
 function App() {
     const { getCategories } = useFurnitureStore();
@@ -16,10 +21,11 @@ function App() {
         <>
             <MantineProvider>
                 <MantineEmotionProvider>
-                    <Notifications />
-                    <AppShell>
-                        <PageLayout />
-                    </AppShell>
+                    <QueryClientProvider client={queryClient}>
+                        <Notifications />
+
+                        <RouterProvider router={router} context={{ auth: { isAuth: true } }} />
+                    </QueryClientProvider>
                 </MantineEmotionProvider>
             </MantineProvider>
         </>
