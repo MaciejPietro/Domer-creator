@@ -1,5 +1,4 @@
 import { Graphics, FederatedPointerEvent } from 'pixi.js';
-import { isMobile } from 'react-device-detect';
 import { Point } from '@/common/types/point';
 import { viewportX, viewportY } from '@/common/utils/coordinates';
 import { TransformLayer } from './TransformLayer';
@@ -64,9 +63,6 @@ export class Handle extends Graphics {
         // this.stroke({ texture: Texture.WHITE, width: 1, color: this.color });
         this.rect(0, 0, 10, 10).stroke({ width: 1, color: 0x1a1a1a });
 
-        if (isMobile) {
-            this.size = this.size * 2.5;
-        }
         if (this.type == HandleType.Rotate) {
             this.circle(0, 0, this.size / 1.5);
             this.pivot.set(this.size / 3, this.size / 3);

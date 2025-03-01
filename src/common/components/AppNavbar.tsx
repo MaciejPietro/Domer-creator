@@ -1,14 +1,13 @@
 import { AppShell, Group } from '@mantine/core';
-import ModeMenu from '../Sidebar/ModeMenu';
 import { DetailsControls } from '@/ui/DetailsControls/DetailsControls';
-import AddMenu from '../Navbar/AddMenu';
+import AddMenu from '@/2d/components/Toolbar/AddMenu';
 
 import { ViewMode } from '@/2d/editor/constants';
-import SelectMenu from '../Navbar/SelectMenu';
+import SelectMenu from '@/2d/components/Toolbar/SelectMenu';
 import { useStore } from '@/stores/EditorStore';
+import ModeMenu from './ModeMenu';
 
 const AppNavbar = () => {
-    const modeOptions = [];
     const { activeMode } = useStore();
 
     return (

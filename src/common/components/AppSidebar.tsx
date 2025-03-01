@@ -1,30 +1,16 @@
 import { AppShell, Group, AppShellSection } from '@mantine/core';
-import { useRef, useState } from 'react';
 import { GridDots, Table, TableOff } from 'tabler-icons-react';
 
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
-import { LoadAction } from '@/2d/editor/actions/LoadAction';
 import { ViewMode } from '@/2d/editor/constants';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { HelpDialog } from '@/ui/HelpDialog';
-import PlanMenu from '../Sidebar/PlanMenu';
-import DropdownMenu from '../Sidebar/DropdownMenu';
+import PlanMenu from '@/2d/components/Toolbar/PlanMenu';
+import DropdownMenu from './DropdownMenu';
 
 const AppSidebar = () => {
-    const { activeTool, setTool, activeMode, floor, setSnap, snap } = useStore();
-
-    const [active, setActive] = useState(0);
-
-    const fileRef = useRef<HTMLInputElement>();
-
-    const handleChange = async (e: any) => {
-        const resultText = await e.target.files.item(0).text();
-
-        const action = new LoadAction(resultText);
-
-        action.execute();
-    };
+    const { activeMode, setSnap, snap } = useStore();
 
     return (
         <div className="absolute">
@@ -103,21 +89,6 @@ const AppSidebar = () => {
                             />
                         </Group>
                         <div className="h-px w-full bg-black/15"></div> */}
-
-                        {/* <Group className="flex flex-col" align="center">
-                            <NavbarLink
-                                icon={DeviceFloppy}
-                                label="Save plan"
-                                onClick={() => {
-                                    const action = new SaveAction();
-
-                                    action.execute();
-                                }}
-                            />
-
-                            <NavbarLink onClick={() => fileRef.current?.click()} icon={Upload} label="Load plan" />
-                            <input ref={fileRef as any} onChange={handleChange} multiple={false} type="file" hidden />
-                        </Group> */}
 
                         <HelpDialog />
                     </Group>

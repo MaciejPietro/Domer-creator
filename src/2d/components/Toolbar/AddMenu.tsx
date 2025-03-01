@@ -1,46 +1,4 @@
-import {
-    AppShell,
-    Tooltip,
-    UnstyledButton,
-    Group,
-    Menu,
-    Divider,
-    Drawer,
-    Modal,
-    AppShellSection,
-    FloatingPosition,
-} from '@mantine/core';
-import { useRef, useState } from 'react';
-import { createStyles } from '@mantine/emotion';
-import {
-    Icon as TablerIcon,
-    Armchair,
-    BorderLeft,
-    BuildingWarehouse,
-    DeviceFloppy,
-    Upload,
-    Ruler2,
-    StairsUp,
-    StairsDown,
-    Eye,
-    Pencil,
-    Eraser,
-    Window,
-    Door,
-    Plus,
-    Help,
-    SquareX,
-    Dimensions,
-    Shape,
-    Shape3,
-    BrandWindows,
-    Table,
-    TableOff,
-    Tag,
-    LetterI,
-    BorderInner,
-    BorderHorizontal,
-} from 'tabler-icons-react';
+import { Armchair, BorderLeft, Window, Door, BorderInner, BorderHorizontal } from 'tabler-icons-react';
 
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
