@@ -153,15 +153,7 @@ const AddMenu = () => {
             active: activeTool === Tool.FurnitureAdd,
             position: 'bottom',
             disabled: true,
-            onClick: () => {
-                // setTool(Tool.FurnitureAdd);
-                // cleanNotifications();
-                // showNotification({
-                //     title: '🚪 Add door',
-                //     message: 'Click on wall to add door. Right click to change orientation',
-                //     color: 'blue',
-                // });
-            },
+            onClick: () => {},
         },
     ];
 
