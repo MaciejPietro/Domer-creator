@@ -1,5 +1,5 @@
-import AppSidebar from '@/common/components/AppSidebar';
-import ProjectTile from '@/projects/components/ProjectTile';
+import AppSidebar from '@/Common/components/app/AppSidebar';
+import ProjectTile from '@/Projects/components/ProjectTile';
 
 const Projects = () => {
     return (

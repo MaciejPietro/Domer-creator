@@ -19,7 +19,7 @@ import {
     ZoomIn,
     ArrowAutofitWidth,
 } from 'tabler-icons-react';
-import { Tool } from '../2d/editor/constants';
+import { Tool } from '../Editor2d/editor/constants';
 
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 interface IHelpBody {

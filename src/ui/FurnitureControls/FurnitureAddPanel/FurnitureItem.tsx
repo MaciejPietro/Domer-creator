@@ -1,5 +1,5 @@
 import { Card, Center, Image, Text } from '@mantine/core';
-import { AddFurnitureAction } from '../../../2d/editor/actions/AddFurnitureAction';
+import { AddFurnitureAction } from '../../../Editor2d/editor/actions/AddFurnitureAction';
 import { FurnitureData } from '../../../stores/FurnitureStore';
 
 interface IFurnitureData {

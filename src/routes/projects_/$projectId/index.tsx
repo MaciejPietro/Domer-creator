@@ -1,10 +1,10 @@
-import { publicRoute } from '@/common/lib/router/helpers';
+import { publicRoute } from '@/Common/lib/router/helpers';
 
 const Project = () => {
     return <div>Project</div>;
 };
 
 export const Route = publicRoute({
-    path: '/projects/$projectId',
+    path: '/Projects/$projectId',
     component: Project,
 });

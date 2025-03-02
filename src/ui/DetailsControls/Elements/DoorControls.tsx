@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, NumberInput, Select } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
-import { Wall } from '@/2d/editor/objects/Walls/Wall';
+import { Wall } from '@/Editor2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
-import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
+import { WallConfig, WallType, wallTypeConfig } from '@/Editor2d/editor/objects/Walls/config';
 import {
     DoorOrientation,
     doorOrientationConfig,
@@ -13,8 +13,8 @@ import {
     DoorTypeObject,
     doorWidthConfig,
     DoorWidthObject,
-} from '@/2d/editor/objects/Furnitures/Door/config';
-import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
+} from '@/Editor2d/editor/objects/Furnitures/Door/config';
+import { Door } from '@/Editor2d/editor/objects/Furnitures/Door/Door';
 
 const doorTypeOptions = Object.values(doorTypeConfig).map((door: DoorTypeObject) => ({
     label: door.label,

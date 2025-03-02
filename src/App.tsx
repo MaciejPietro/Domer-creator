@@ -1,17 +1,18 @@
 import { useEffect } from 'react';
 import { useFurnitureStore } from './stores/FurnitureStore';
 import { AppShell, MantineProvider } from '@mantine/core';
-import { MantineEmotionProvider } from '@mantine/emotion';
 import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider } from '@tanstack/react-router';
-import { router } from '@/common/lib/router/index';
-import AppSidebar from './common/components/AppSidebar';
+import { Outlet, RouterProvider } from '@tanstack/react-router';
+import { router } from '@/Common/lib/router/index';
+import useAuth from '@/Auth/hooks/useAuth';
+import { ModalsProvider } from '@mantine/modals';
 
 const queryClient = new QueryClient();
 
 function App() {
     const { getCategories } = useFurnitureStore();
+    const { isAuth, isPending } = useAuth();
 
     useEffect(() => {
         getCategories();
@@ -19,16 +20,24 @@ function App() {
 
     return (
         <>
-            <MantineProvider>
-                <MantineEmotionProvider>
-                    <QueryClientProvider client={queryClient}>
-                        <Notifications />
+            <QueryClientProvider client={queryClient}>
+                <MantineProvider>
+                    <Notifications />
+                    <ModalsProvider
+                        modalProps={{
+                            overlayProps: {
+                                backgroundOpacity: 0.55,
+                                blur: 3,
+                            },
+                            radius: 10,
+                        }}
+                    >
                         <AppShell>
-                            <RouterProvider router={router} context={{ auth: { isAuth: true } }} />
+                            <Outlet />
                         </AppShell>
-                    </QueryClientProvider>
-                </MantineEmotionProvider>
-            </MantineProvider>
+                    </ModalsProvider>
+                </MantineProvider>
+            </QueryClientProvider>
         </>
     );
 }

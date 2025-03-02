@@ -1,4 +1,4 @@
-import { main } from '@/2d/EditorRoot';
+import { main } from '@/Editor2d/EditorRoot';
 
 import { useStore } from '@/stores/EditorStore';
 

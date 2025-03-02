@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import { AddWallManager } from '../2d/editor/actions/AddWallManager';
-import { Tool, ViewMode } from '../2d/editor/constants';
-import { WallNode } from '@/2d/editor/objects/Walls/WallNode';
-import { Wall } from '@/2d/editor/objects/Walls/Wall';
-import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
-import { WindowElement } from '@/2d/editor/objects/Furnitures/Window/Window';
+import { AddWallManager } from '../Editor2d/editor/actions/AddWallManager';
+import { Tool, ViewMode } from '../Editor2d/editor/constants';
+import { WallNode } from '@/Editor2d/editor/objects/Walls/WallNode';
+import { Wall } from '@/Editor2d/editor/objects/Walls/Wall';
+import { Door } from '@/Editor2d/editor/objects/Furnitures/Door/Door';
+import { WindowElement } from '@/Editor2d/editor/objects/Furnitures/Window/Window';
 
 export enum ToolMode {
     FurnitureMode,

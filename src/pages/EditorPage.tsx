@@ -1,10 +1,10 @@
-import { EditorRoot } from '@/2d/EditorRoot';
+import { EditorRoot } from '@/Editor2d/EditorRoot';
 import { useStore } from '@/stores/EditorStore';
-import { ViewMode } from '@/2d/editor/constants';
-import SceneRoot from '@/3d/SceneRoot';
-import AppSidebar from '@/common/components/AppSidebar';
-import EditorToolbar from '@/2d/components/Toolbar/EditorToolbar';
-import AppBottomBar from '@/common/components/AppBottomBar';
+import { ViewMode } from '@/Editor2d/editor/constants';
+import SceneRoot from '@/Editor3d/SceneRoot';
+import EditorToolbar from '@/Editor2d/components/Toolbar/EditorToolbar';
+import AppBottomBar from '@/Common/components/app/AppBottomBar';
+import AppSidebar from '@/Common/components/app/AppSidebar';
 
 export default function EditorPage() {
     const { activeMode } = useStore();
@@ -13,7 +13,7 @@ export default function EditorPage() {
         <>
             <EditorToolbar />
 
-            <AppSidebar></AppSidebar>
+            <AppSidebar />
 
             <AppBottomBar />
 

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, NumberInput, Select, Slider } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
-import { Wall } from '@/2d/editor/objects/Walls/Wall';
+import { Wall } from '@/Editor2d/editor/objects/Walls/Wall';
 import { Trash, ArrowAutofitWidth, ArrowAutofitHeight, ArrowMoveUp } from 'tabler-icons-react';
-import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
+import { WallConfig, WallType, wallTypeConfig } from '@/Editor2d/editor/objects/Walls/config';
 
 import {
     DoorOrientation,
@@ -14,10 +14,10 @@ import {
     DoorTypeObject,
     doorWidthConfig,
     DoorWidthObject,
-} from '@/2d/editor/objects/Furnitures/Door/config';
-import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
-import { WindowType, windowTypeConfig, WindowTypeObject } from '@/2d/editor/objects/Furnitures/Window/config';
-import { WindowElement } from '@/2d/editor/objects/Furnitures/Window/Window';
+} from '@/Editor2d/editor/objects/Furnitures/Door/config';
+import { Door } from '@/Editor2d/editor/objects/Furnitures/Door/Door';
+import { WindowType, windowTypeConfig, WindowTypeObject } from '@/Editor2d/editor/objects/Furnitures/Window/config';
+import { WindowElement } from '@/Editor2d/editor/objects/Furnitures/Window/Window';
 import {
     MAX_WINDOW_BOTTOM,
     MAX_WINDOW_HEIGHT,
@@ -25,7 +25,7 @@ import {
     MIN_WINDOW_BOTTOM,
     MIN_WINDOW_HEIGHT,
     MIN_WINDOW_WIDTH,
-} from '@/2d/editor/objects/Furnitures/Window/constants';
+} from '@/Editor2d/editor/objects/Furnitures/Window/constants';
 
 const doorTypeOptions = Object.values(windowTypeConfig)
     .reverse()

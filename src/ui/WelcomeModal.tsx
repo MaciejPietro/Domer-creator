@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Modal, Button, Group, useMantineTheme, Center, Image, Menu, Stack } from '@mantine/core';
 import { Database, Plus, RotateClockwise } from 'tabler-icons-react';
-import { LoadAction } from '../2d/editor/actions/LoadAction';
+import { LoadAction } from '../Editor2d/editor/actions/LoadAction';
 import ArcadaLogo from '../res/logo.png';
-import { FloorPlan } from '../2d/editor/objects/FloorPlan';
+import { FloorPlan } from '../Editor2d/editor/objects/FloorPlan';
 import { showNotification } from '@mantine/notifications';
 import { createStyles } from '@mantine/emotion';
 

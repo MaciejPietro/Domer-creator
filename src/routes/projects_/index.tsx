@@ -1,4 +1,4 @@
-import { publicRoute } from '@/common/lib/router/helpers';
+import { publicRoute } from '@/Common/lib/router/helpers';
 import Projects from '@/pages/Projects';
 
 export const Route = publicRoute({

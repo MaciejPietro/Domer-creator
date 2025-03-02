@@ -8,6 +8,8 @@ import './index.css';
 
 import App from './App';
 import React from 'react';
+import { RouterProvider } from '@tanstack/react-router';
+import { router } from './Common/lib/router';
 
 const rootElement = document.querySelector('#root') as Element;
 
@@ -16,7 +18,19 @@ if (!rootElement.innerHTML) {
 
     root.render(
         <React.StrictMode>
-            <App />
+            <RouterProvider router={router} />
         </React.StrictMode>
     );
+}
+
+{
+    /* <ModalsProvider
+modalProps={{
+    overlayProps: {
+        backgroundOpacity: 0.55,
+        blur: 3,
+    },
+    radius: 10,
+}}
+> */
 }
