@@ -2,6 +2,7 @@ import { useForm } from '@tanstack/react-form';
 import { Link } from '@tanstack/react-router';
 
 import useRegister from '@/Auth/hooks/useRegister';
+import { ArrowLeft, CircleCheck, User } from 'tabler-icons-react';
 
 import FormPasswordInput from '@/Common/components/form/fields/FormPasswordInput';
 import FormError from '@/Common/components/form/FormError';
@@ -10,34 +11,47 @@ import AvatarIcon from '@/Auth/assets/icons/avatar.svg?react';
 import LockIcon from '@/Auth/assets/icons/lock.svg?react';
 
 import FormInput from '@/Common/components/form/fields/FormInput';
-import FormEmailInput from '@/Common/components/form/fields/FormEmailInput';
 import type { RegisterPayload } from '@/Auth/types';
 import Oauth2 from '../components/Oauth2';
 import PasswordRules from '../components/PasswordRules';
 import { modals } from '@mantine/modals';
 import LoginForm from './LoginForm';
 import { Button } from '@mantine/core';
+import { validateEmail, validatePassword, validatePasswordConfirmation, validateUsername } from '../helpers';
 
 export default function Register() {
-    const { mutateAsync, error, isPending } = useRegister();
+    const { isSuccess, mutateAsync, error, isPending } = useRegister();
 
     const form = useForm({
         defaultValues: {
-            username: '',
+            // username: '',
             email: '',
             password: '',
-            rememberMe: false,
+            passwordConfirmation: '',
         },
-        onSubmit: ({ value }) => {
+        validators: {
+            onBlur: ({ value }) => ({
+                fields: {
+                    // username: validateUsername(value.username),
+                    email: validateEmail(value.email),
+                    password: validatePassword(value.password),
+                    passwordConfirmation: validatePasswordConfirmation(value.password, value.passwordConfirmation),
+                },
+            }),
+        },
+        onSubmit: async ({ value }) => {
             const formData: RegisterPayload = {
-                username: value.username,
+                // username: value.username,
                 email: value.email,
                 password: value.password,
+                clientUri: `${window.location.origin}/auth/emailconfirm`,
             };
 
-            void mutateAsync(formData);
+            await mutateAsync(formData);
         },
     });
+
+    if (isSuccess) return <RegisterSuccess />;
 
     return (
         <div>
@@ -51,20 +65,20 @@ export default function Register() {
                     void form.handleSubmit();
                 }}
             >
-                <FormInput form={form} name="username" icon={<AvatarIcon />} label="Nazwa użytkownika" required />
+                {/* <FormInput form={form} name="username" icon={<AvatarIcon />} label="Nazwa użytkownika" /> */}
 
-                <FormEmailInput form={form} name="email" icon={<AvatarIcon />} label="E-mail" required />
+                <FormInput form={form} name="email" icon={<User />} label="Adres e-mail" />
 
                 <FormPasswordInput form={form} name="password" icon={<LockIcon />} label="Hasło" />
 
                 <FormPasswordInput form={form} name="passwordConfirmation" icon={<LockIcon />} label="Powtórz hasło" />
 
-                <div className="ml-auto w-max">
+                {/* <div className="ml-auto w-max">
                     <PasswordRules />
-                </div>
+                </div> */}
 
                 <div className="relative flex flex-col mt-8">
-                    <Button type="submit" className="min-w-full rounded-xl h-11 text-lg" loading={isPending}>
+                    <Button type="submit" className="min-w-full" size="md" loading={isPending}>
                         Zarejestruj się
                     </Button>
 
@@ -91,3 +105,31 @@ export default function Register() {
         </div>
     );
 }
+
+const RegisterSuccess = () => {
+    return (
+        <div>
+            <div className="flex flex-col items-center gap-2 pb-6">
+                <CircleCheck size={100} className="text-blue-600" />
+                <h1 className="text-4xl font-bold mb-0">Dziękujemy!</h1>
+                <p className="text-center mb-6 block">
+                    Sprawdź swoją skrzynkę pocztową, <br /> aby potwierdzić adres e-mail.
+                </p>
+
+                <Button
+                    className="rounded-xl"
+                    onClick={() => {
+                        modals.closeAll();
+                        modals.open({
+                            children: <LoginForm />,
+                        });
+                    }}
+                    size="md"
+                    leftSection={<ArrowLeft size={16} />}
+                >
+                    Zaloguj się
+                </Button>
+            </div>
+        </div>
+    );
+};

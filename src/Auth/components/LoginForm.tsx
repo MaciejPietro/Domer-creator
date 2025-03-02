@@ -1,33 +1,41 @@
 import { useForm } from '@tanstack/react-form';
-import { Link } from '@tanstack/react-router';
 
 import useLogin from '@/Auth/hooks/useLogin';
 
 import FormPasswordInput from '@/Common/components/form/fields/FormPasswordInput';
 import FormError from '@/Common/components/form/FormError';
 
-import AvatarIcon from '@/Auth/assets/icons/avatar.svg?react';
-import LockIcon from '@/Auth/assets/icons/lock.svg?react';
-
 import FormInput from '@/Common/components/form/fields/FormInput';
-import Checkboxes from '@/Common/components/inputs/Checkboxes';
 import Oauth2 from '../components/Oauth2';
 import { Button } from '@mantine/core';
 import { User, Lock } from 'tabler-icons-react';
 import RemindPasswordForm from './RemindPasswordForm';
 import { modals } from '@mantine/modals';
 import RegisterForm from './RegisterForm';
+import { isValidEmail, validateEmail } from '../helpers';
 
 export default function LoginForm() {
-    const { mutateAsync, error, isPending } = useLogin();
+    const { isSuccess, mutateAsync, error, isPending } = useLogin();
 
     const form = useForm({
         defaultValues: {
             email: '',
             password: '',
         },
+        validators: {
+            onBlur: ({ value }) => ({
+                fields: {
+                    email: validateEmail(value.email),
+                    password: !value.password ? 'Hasło jest wymagane' : undefined,
+                },
+            }),
+        },
         onSubmit: ({ value }) => mutateAsync(value),
     });
+
+    if (isSuccess) {
+        modals.closeAll();
+    }
 
     return (
         <div>
@@ -40,7 +48,7 @@ export default function LoginForm() {
                     void form.handleSubmit();
                 }}
             >
-                <FormInput form={form} name="email" icon={<User />} label="Adres e-mail" required />
+                <FormInput form={form} name="email" icon={<User />} label="Adres e-mail" />
 
                 <div>
                     <FormPasswordInput form={form} name="password" icon={<Lock />} label="Hasło" />
@@ -63,7 +71,7 @@ export default function LoginForm() {
                 </div>
 
                 <div className="relative flex flex-col mt-8">
-                    <Button type="submit" className="min-w-full rounded-xl h-11 text-lg" loading={isPending}>
+                    <Button type="submit" className="min-w-full" size="md" loading={isPending}>
                         Zaloguj się
                     </Button>
 

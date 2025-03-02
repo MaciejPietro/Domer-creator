@@ -12,26 +12,27 @@ type ComponentProps = {
 
 const FormPasswordInput = ({ form, name, label, icon }: ComponentProps) => {
     const [type, setType] = useState<'password' | 'text'>('password');
+
     return (
         <form.Field
             name={name}
-            validators={{
-                onSubmit: ({ value }: { value: string }) => {
-                    if (value?.length < 8) return 'Hasło musi mieć conajmniej 8 znaków';
+            // validators={{
+            //     onSubmit: ({ value }: { value: string }) => {
+            //         if (value?.length < 8) return 'Hasło musi mieć conajmniej 8 znaków';
 
-                    if (name === 'passwordConfirmation' && value !== form.getFieldValue('password'))
-                        return 'Hasła nie są takie same';
+            //         if (name === 'passwordConfirmation' && value !== form.getFieldValue('password'))
+            //             return 'Hasła nie są takie same';
 
-                    return undefined;
-                },
-            }}
-        >
-            {(field: any) => (
+            //         return undefined;
+            //     },
+            // }}
+            children={(field: any) => (
                 <div className="relative">
                     <Input
                         type={type}
                         value={field.state.value}
                         onChange={field.handleChange}
+                        onBlur={field.handleBlur}
                         name={name}
                         errors={field.state.meta.errors}
                         icon={icon}
@@ -51,7 +52,7 @@ const FormPasswordInput = ({ form, name, label, icon }: ComponentProps) => {
                     </button>
                 </div>
             )}
-        </form.Field>
+        />
     );
 };
 

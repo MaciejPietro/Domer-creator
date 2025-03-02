@@ -7,6 +7,7 @@ import { Outlet, RouterProvider } from '@tanstack/react-router';
 import { router } from '@/Common/lib/router/index';
 import useAuth from '@/Auth/hooks/useAuth';
 import { ModalsProvider } from '@mantine/modals';
+import { theme } from './Common/lib/mantine/theme';
 
 const queryClient = new QueryClient();
 
@@ -21,7 +22,7 @@ function App() {
     return (
         <>
             <QueryClientProvider client={queryClient}>
-                <MantineProvider>
+                <MantineProvider theme={theme}>
                     <Notifications />
                     <ModalsProvider
                         modalProps={{

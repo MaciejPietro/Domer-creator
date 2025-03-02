@@ -1,17 +1,6 @@
 import { create } from 'zustand';
 import UserService from '@/User/api/Service';
-
-export type User = {
-    id: number;
-    email: string;
-    username: string;
-    addresses: Array<{
-        street: string;
-        city: string;
-        zip: string;
-        countryCode: string;
-    }>;
-};
+import { User } from '@/User/types';
 
 interface AuthState {
     user: User | null;
@@ -34,19 +23,9 @@ const useAuthStore = create<AuthState>((set) => ({
     },
     checkAuth: async () => {
         try {
-            //   const response = await UserService.info();
-            //   const { contact, user } = response.data;
-            //   set(() => ({
-            //     isAuth: true,
-            //     isPending: false,
-            //     user: {
-            //       id: user.id,
-            //       // id: contact.id,
-            //       username: user.username,
-            //       email: contact.mainEmail,
-            //       addresses: contact.addresses,
-            //     },
-            //   }));
+            const response = await UserService.info();
+
+            set(() => ({ isAuth: true, isPending: false, user: response.data }));
         } catch (error) {
             set(() => ({ isAuth: false, isPending: false }));
         }

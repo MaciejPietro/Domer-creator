@@ -10,6 +10,7 @@ type ComponentProps = {
     disabled?: boolean;
     value?: string;
     onChange?: (value: string) => void;
+    onBlur?: () => void;
     type?: string;
     errors?: Array<string | ValidationError>;
     icon?: React.ReactNode;
@@ -26,6 +27,7 @@ const Input = forwardRef<HTMLInputElement, ComponentProps>(
             disabled = false,
             value = '',
             onChange,
+            onBlur,
             type = 'text',
             icon,
             errors,
@@ -54,6 +56,7 @@ const Input = forwardRef<HTMLInputElement, ComponentProps>(
                     }}
                     onBlur={() => {
                         setIsFocused(false);
+                        onBlur?.();
                     }}
                     onKeyDown={onKeyDown}
                     className={clsx(
