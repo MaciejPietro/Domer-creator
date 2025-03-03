@@ -11,13 +11,8 @@ import { theme } from './Common/lib/mantine/theme';
 
 const queryClient = new QueryClient();
 
-function App() {
-    const { getCategories } = useFurnitureStore();
+const App = () => {
     const { isAuth, isPending } = useAuth();
-
-    useEffect(() => {
-        getCategories();
-    }, []);
 
     return (
         <>
@@ -41,6 +36,6 @@ function App() {
             </QueryClientProvider>
         </>
     );
-}
+};
 
 export default App;

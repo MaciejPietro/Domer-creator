@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AccountImport } from './routes/account'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProjectsIndexImport } from './routes/projects_/index'
 import { Route as AuthResetpasswordImport } from './routes/auth/resetpassword'
@@ -18,6 +19,12 @@ import { Route as AuthEmailconfirmImport } from './routes/auth/emailconfirm'
 import { Route as ProjectsProjectIdIndexImport } from './routes/projects_/$projectId/index'
 
 // Create/Update Routes
+
+const AccountRoute = AccountImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -60,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/emailconfirm': {
       id: '/auth/emailconfirm'
       path: '/auth/emailconfirm'
@@ -95,6 +109,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/auth/emailconfirm': typeof AuthEmailconfirmRoute
   '/auth/resetpassword': typeof AuthResetpasswordRoute
   '/projects': typeof ProjectsIndexRoute
@@ -103,6 +118,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/auth/emailconfirm': typeof AuthEmailconfirmRoute
   '/auth/resetpassword': typeof AuthResetpasswordRoute
   '/projects': typeof ProjectsIndexRoute
@@ -112,6 +128,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/auth/emailconfirm': typeof AuthEmailconfirmRoute
   '/auth/resetpassword': typeof AuthResetpasswordRoute
   '/projects_/': typeof ProjectsIndexRoute
@@ -122,6 +139,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/auth/emailconfirm'
     | '/auth/resetpassword'
     | '/projects'
@@ -129,6 +147,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
     | '/auth/emailconfirm'
     | '/auth/resetpassword'
     | '/projects'
@@ -136,6 +155,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/account'
     | '/auth/emailconfirm'
     | '/auth/resetpassword'
     | '/projects_/'
@@ -145,6 +165,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
   AuthEmailconfirmRoute: typeof AuthEmailconfirmRoute
   AuthResetpasswordRoute: typeof AuthResetpasswordRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
@@ -153,6 +174,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
   AuthEmailconfirmRoute: AuthEmailconfirmRoute,
   AuthResetpasswordRoute: AuthResetpasswordRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
@@ -170,6 +192,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/account",
         "/auth/emailconfirm",
         "/auth/resetpassword",
         "/projects_/",
@@ -178,6 +201,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.ts"
+    },
+    "/account": {
+      "filePath": "account.ts"
     },
     "/auth/emailconfirm": {
       "filePath": "auth/emailconfirm.ts"

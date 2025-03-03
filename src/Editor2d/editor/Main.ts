@@ -194,9 +194,8 @@ const save = () => {
 };
 // setInterval(autosave, 60000)
 
-const setSnap = useStore.getState().setSnap;
-
 document.onkeydown = (e) => {
+    const setSnap = useStore.getState().setSnap;
     // if (e.code == 'KeyS' && e.ctrlKey) {
     //     e.preventDefault();
     //     save();

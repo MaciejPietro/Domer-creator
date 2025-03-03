@@ -4,8 +4,6 @@ import { Upload, Photo, X, Plus, FileUpload } from 'tabler-icons-react';
 import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { useStore } from '@/stores/EditorStore';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
-import { Main } from '@/Editor2d/editor/Main';
-import backgroundPattern from '../../assets/pattern.svg';
 import { Assets, Container, Sprite, Texture, TilingSprite } from 'pixi.js';
 import MeasurePlan from './MeasurePlan';
 

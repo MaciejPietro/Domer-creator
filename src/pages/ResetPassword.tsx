@@ -1,8 +1,8 @@
 import ResetPasswordForm from '@/Auth/components/ResetPasswordForm';
 import useMount from '@/Common/hooks/useMount';
-import EditorPage from '@/pages/EditorPage';
 import { modals } from '@mantine/modals';
 import { useNavigate } from '@tanstack/react-router';
+import Homepage from './Homepage';
 
 const ResetPassword = () => {
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ const ResetPassword = () => {
         });
     });
 
-    return <EditorPage />;
+    return <Homepage />;
 };
 
 export default ResetPassword;

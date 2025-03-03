@@ -6,10 +6,8 @@ import '@mantine/notifications/styles.css';
 
 import './index.css';
 
-import App from './App';
 import React from 'react';
-import { RouterProvider } from '@tanstack/react-router';
-import { router } from './Common/lib/router';
+import RouterInit from './Common/lib/router/RouterInit';
 
 const rootElement = document.querySelector('#root') as Element;
 
@@ -18,7 +16,7 @@ if (!rootElement.innerHTML) {
 
     root.render(
         <React.StrictMode>
-            <RouterProvider router={router} />
+            <RouterInit />
         </React.StrictMode>
     );
 }

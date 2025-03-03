@@ -19,7 +19,12 @@ const AuthMenuItems = () => {
                 <span className="text-sm">Projekty</span>
             </Menu.Item>
 
-            <Menu.Item leftSection={<User size={16} />} onClick={() => {}}>
+            <Menu.Item
+                leftSection={<User size={16} />}
+                onClick={() => {
+                    navigate({ to: '/account' });
+                }}
+            >
                 <span className="text-sm">Konto</span>
             </Menu.Item>
 

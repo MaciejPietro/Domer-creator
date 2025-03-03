@@ -1,13 +1,11 @@
 // import type { AuthState } from "@/Auth/hooks/useAuth";
 
 import App from '@/App';
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import { AuthState } from '@/Auth/hooks/useAuth';
+import { createRootRouteWithContext } from '@tanstack/react-router';
 
 interface MyRouterContext {
-    //   auth: Pick<AuthState, "isAuth">;
-    auth: {
-        isAuth: boolean;
-    };
+    auth: Pick<AuthState, 'isAuth'>;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
