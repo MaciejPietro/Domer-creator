@@ -7,8 +7,7 @@ import { ArrowLeft, CircleCheck, User } from 'tabler-icons-react';
 import FormPasswordInput from '@/Common/components/form/fields/FormPasswordInput';
 import FormError from '@/Common/components/form/FormError';
 
-import AvatarIcon from '@/Auth/assets/icons/avatar.svg?react';
-import LockIcon from '@/Auth/assets/icons/lock.svg?react';
+import { Lock } from 'tabler-icons-react';
 
 import FormInput from '@/Common/components/form/fields/FormInput';
 import type { RegisterPayload } from '@/Auth/types';
@@ -69,9 +68,9 @@ export default function Register() {
 
                 <FormInput form={form} name="email" icon={<User />} label="Adres e-mail" />
 
-                <FormPasswordInput form={form} name="password" icon={<LockIcon />} label="Hasło" />
+                <FormPasswordInput form={form} name="password" icon={<Lock />} label="Hasło" />
 
-                <FormPasswordInput form={form} name="passwordConfirmation" icon={<LockIcon />} label="Powtórz hasło" />
+                <FormPasswordInput form={form} name="passwordConfirmation" icon={<Lock />} label="Powtórz hasło" />
 
                 {/* <div className="ml-auto w-max">
                     <PasswordRules />
@@ -88,7 +87,7 @@ export default function Register() {
 
             <Oauth2 />
 
-            <p className="mt-2 text-center text-sm text-gray-500">
+            <p className="mt-8 text-center text-sm text-gray-500">
                 Masz konto?
                 <button
                     onClick={() => {
@@ -117,7 +116,6 @@ const RegisterSuccess = () => {
                 </p>
 
                 <Button
-                    className="rounded-xl"
                     onClick={() => {
                         modals.closeAll();
                         modals.open({

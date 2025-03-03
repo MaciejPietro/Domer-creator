@@ -13,6 +13,8 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProjectsIndexImport } from './routes/projects_/index'
+import { Route as AuthResetpasswordImport } from './routes/auth/resetpassword'
+import { Route as AuthEmailconfirmImport } from './routes/auth/emailconfirm'
 import { Route as ProjectsProjectIdIndexImport } from './routes/projects_/$projectId/index'
 
 // Create/Update Routes
@@ -26,6 +28,18 @@ const IndexRoute = IndexImport.update({
 const ProjectsIndexRoute = ProjectsIndexImport.update({
   id: '/projects_/',
   path: '/projects/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthResetpasswordRoute = AuthResetpasswordImport.update({
+  id: '/auth/resetpassword',
+  path: '/auth/resetpassword',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthEmailconfirmRoute = AuthEmailconfirmImport.update({
+  id: '/auth/emailconfirm',
+  path: '/auth/emailconfirm',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -44,6 +58,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/auth/emailconfirm': {
+      id: '/auth/emailconfirm'
+      path: '/auth/emailconfirm'
+      fullPath: '/auth/emailconfirm'
+      preLoaderRoute: typeof AuthEmailconfirmImport
+      parentRoute: typeof rootRoute
+    }
+    '/auth/resetpassword': {
+      id: '/auth/resetpassword'
+      path: '/auth/resetpassword'
+      fullPath: '/auth/resetpassword'
+      preLoaderRoute: typeof AuthResetpasswordImport
       parentRoute: typeof rootRoute
     }
     '/projects_/': {
@@ -67,12 +95,16 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth/emailconfirm': typeof AuthEmailconfirmRoute
+  '/auth/resetpassword': typeof AuthResetpasswordRoute
   '/projects': typeof ProjectsIndexRoute
   '/projects/$projectId': typeof ProjectsProjectIdIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth/emailconfirm': typeof AuthEmailconfirmRoute
+  '/auth/resetpassword': typeof AuthResetpasswordRoute
   '/projects': typeof ProjectsIndexRoute
   '/projects/$projectId': typeof ProjectsProjectIdIndexRoute
 }
@@ -80,27 +112,49 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/auth/emailconfirm': typeof AuthEmailconfirmRoute
+  '/auth/resetpassword': typeof AuthResetpasswordRoute
   '/projects_/': typeof ProjectsIndexRoute
   '/projects_/$projectId/': typeof ProjectsProjectIdIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/projects' | '/projects/$projectId'
+  fullPaths:
+    | '/'
+    | '/auth/emailconfirm'
+    | '/auth/resetpassword'
+    | '/projects'
+    | '/projects/$projectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/projects' | '/projects/$projectId'
-  id: '__root__' | '/' | '/projects_/' | '/projects_/$projectId/'
+  to:
+    | '/'
+    | '/auth/emailconfirm'
+    | '/auth/resetpassword'
+    | '/projects'
+    | '/projects/$projectId'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth/emailconfirm'
+    | '/auth/resetpassword'
+    | '/projects_/'
+    | '/projects_/$projectId/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthEmailconfirmRoute: typeof AuthEmailconfirmRoute
+  AuthResetpasswordRoute: typeof AuthResetpasswordRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
   ProjectsProjectIdIndexRoute: typeof ProjectsProjectIdIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthEmailconfirmRoute: AuthEmailconfirmRoute,
+  AuthResetpasswordRoute: AuthResetpasswordRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
   ProjectsProjectIdIndexRoute: ProjectsProjectIdIndexRoute,
 }
@@ -116,12 +170,20 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/auth/emailconfirm",
+        "/auth/resetpassword",
         "/projects_/",
         "/projects_/$projectId/"
       ]
     },
     "/": {
       "filePath": "index.ts"
+    },
+    "/auth/emailconfirm": {
+      "filePath": "auth/emailconfirm.ts"
+    },
+    "/auth/resetpassword": {
+      "filePath": "auth/resetpassword.ts"
     },
     "/projects_/": {
       "filePath": "projects_/index.tsx"

@@ -7,8 +7,14 @@ type ComponentProps = {
     className?: string;
 };
 
+const ErrorMessage = ({ children }: { children: string }) => {
+    return <div className="h-8 text-sm my-2  text-red-500 block ">{children}</div>;
+};
+
 const FormError = ({ error, className }: ComponentProps) => {
-    if (!error) return <div className='my-2 h-5' aria-hidden></div>;
+    if (!error) return null;
+
+    if (error.response?.data.title) return <ErrorMessage>{error.response.data.title}</ErrorMessage>;
 
     let errorMessage = error?.response?.data?.message || error?.response?.data?.error || error?.message;
 

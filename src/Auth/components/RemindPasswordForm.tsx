@@ -13,6 +13,7 @@ import { modals } from '@mantine/modals';
 import { ArrowLeft, CircleCheck, User } from 'tabler-icons-react';
 import { validateEmail } from '../helpers';
 import FormInput from '@/Common/components/form/fields/FormInput';
+import { RemindPasswordPayload } from '../types';
 
 export default function RemindPasswordForm() {
     const { mutateAsync, error, isPending, isSuccess } = useRemindPassword();
@@ -28,7 +29,13 @@ export default function RemindPasswordForm() {
                 },
             }),
         },
-        onSubmit: ({ value }) => void mutateAsync(value),
+        onSubmit: ({ value }) => {
+            const formData: RemindPasswordPayload = {
+                email: value.email,
+                clientUri: `${window.location.origin}/auth/resetpassword`,
+            };
+            void mutateAsync(formData);
+        },
     });
 
     if (isSuccess) {
@@ -62,7 +69,7 @@ export default function RemindPasswordForm() {
                 </div>
             </form>
 
-            <p className="mt-2 text-center text-sm text-gray-500">
+            <p className="mt-8 text-center text-sm text-gray-500">
                 Znasz swoje hasło?
                 <button
                     onClick={() => {

@@ -16,6 +16,7 @@ export type RegisterPayload = {
 
 export type RemindPasswordPayload = {
     email: string;
+    clientUri: string;
 };
 
 export type ApiResponse = any;
@@ -23,6 +24,7 @@ export type ApiResponse = any;
 export type ResetPasswordPayload = {
     password: string;
     token: string;
+    email: string;
 };
 
 export type ConfirmEmailPayload = {

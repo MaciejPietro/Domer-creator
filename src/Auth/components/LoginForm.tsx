@@ -81,7 +81,7 @@ export default function LoginForm() {
 
             <Oauth2 />
 
-            <p className="mt-2 text-center text-sm text-gray-500">
+            <p className="mt-8 text-center text-sm text-gray-500">
                 Nie masz konta?
                 <button
                     onClick={() => {
