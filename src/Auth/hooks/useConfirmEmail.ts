@@ -13,10 +13,9 @@ const useConfirmEmail = () => {
     const { checkAuth } = useAuthStore();
 
     return useMutation<LoginResponse, AxiosError<string, any>, ConfirmEmailPayload>({
-        mutationKey: ['auth', 'confirmEmail'],
         mutationFn: AuthService.confirmEmail,
         onSuccess: () => {
-            void checkAuth();
+            return true;
         },
     });
 };

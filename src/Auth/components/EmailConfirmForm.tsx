@@ -5,6 +5,7 @@ import { Button, Loader } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { useSearch } from '@tanstack/react-router';
 import clsx from 'clsx';
+import { useEffect } from 'react';
 import { ArrowLeft, CircleCheck } from 'tabler-icons-react';
 import useConfirmEmail from '../hooks/useConfirmEmail';
 
@@ -14,20 +15,32 @@ const EmailConfirmForm = () => {
         strict: true,
     });
 
-    const { mutateAsync, isPending, error, isSuccess } = useConfirmEmail();
+    const { mutate, isPending, isSuccess, isError } = useConfirmEmail();
 
-    useMount(() => {
-        void mutateAsync({ token: search.token, email: search.email });
-    });
+    useEffect(() => {
+        if (search.token && search.email) {
+            void mutate({ token: search.token, email: search.email });
+        }
+    }, []);
 
-    return isSuccess || isPending ? (
+    if (isError) {
+        return (
+            <div>
+                <p>Email nie został potwierdzony.</p>
+            </div>
+        );
+    }
+
+    console.log('xdxd', { isPending, isError, isSuccess });
+
+    return (
         <div className="relative">
-            {isPending && (
+            {isPending ? (
                 <div className="w-full flex flex-col gap-4 justify-center items-center h-full absolute top-0 left-1/2 -translate-x-1/2">
                     <Loader size={40} color="blue" />
                     <div className="text-center">Trwa potwierdzanie adresu e-mail...</div>
                 </div>
-            )}
+            ) : null}
             <div className={clsx(isPending && 'opacity-0 pointer-events-none')}>
                 <div className="flex flex-col items-center gap-2 pb-6">
                     <CircleCheck size={100} className="text-blue-600" />
@@ -45,10 +58,6 @@ const EmailConfirmForm = () => {
                     </Button>
                 </div>
             </div>
-        </div>
-    ) : (
-        <div>
-            <p>Email nie został potwierdzony.</p>
         </div>
     );
 };

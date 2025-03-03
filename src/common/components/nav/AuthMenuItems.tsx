@@ -3,10 +3,11 @@ import { User, Logout, List } from 'tabler-icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import AuthService from '@/Auth/api/Service';
 import useLogout from '@/Auth/hooks/useLogout';
+import { modals, useModals } from '@mantine/modals';
+import LogoutModal from '@/Auth/components/LogoutModal';
+
 const AuthMenuItems = () => {
     const navigate = useNavigate();
-    const { mutateAsync } = useLogout();
-
     return (
         <>
             <Menu.Item
@@ -25,7 +26,9 @@ const AuthMenuItems = () => {
             <Menu.Item
                 leftSection={<Logout size={16} className="text-red-400" />}
                 onClick={() => {
-                    mutateAsync();
+                    modals.open({
+                        children: <LogoutModal />,
+                    });
                 }}
             >
                 <span className="text-sm text-red-400">Wyloguj się</span>

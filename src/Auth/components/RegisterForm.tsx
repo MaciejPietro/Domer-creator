@@ -110,7 +110,7 @@ const RegisterSuccess = () => {
         <div>
             <div className="flex flex-col items-center gap-2 pb-6">
                 <CircleCheck size={100} className="text-blue-600" />
-                <h1 className="text-4xl font-bold mb-0">Dziękujemy!</h1>
+                <h2 className="text-4xl font-bold mb-0">Dziękujemy!</h2>
                 <p className="text-center mb-6 block">
                     Sprawdź swoją skrzynkę pocztową, <br /> aby potwierdzić adres e-mail.
                 </p>

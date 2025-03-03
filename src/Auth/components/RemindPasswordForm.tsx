@@ -92,9 +92,10 @@ const EmailSentSuccess = () => {
         <div>
             <div className="flex flex-col items-center gap-2 pb-6">
                 <CircleCheck size={100} className="text-blue-600" />
-                <h1 className="text-3xl font-bold mb-0">Wysłano link do zmiany hasła!</h1>
-                <p className="text-center mb-6 block">
-                    Sprawdź swoją skrzynkę pocztową, <br /> i kliknij w link wysłany na podany adres e-mail.
+                <h2 className="px-6 text-center text-2xl font-bold">Przypomnij hasło</h2>
+
+                <p className="text-gray-500 text-sm  mt-2 text-center">
+                    Link do zmiany hasła został wysłany na podany adres e-mail.
                 </p>
             </div>
         </div>
