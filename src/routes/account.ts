@@ -1,5 +1,5 @@
 import { authRoute } from '@/Common/lib/router/helpers';
-import Account from '@/pages/Account';
+import Account from '@/User/pages/Account';
 
 export const Route = authRoute({
     path: '/account',

@@ -1,22 +1,21 @@
 import FormInput from '@/Common/components/form/fields/FormInput';
 import FormPasswordInput from '@/Common/components/form/fields/FormPasswordInput';
-import FormError from '@/Common/components/form/FormError';
 import useUpdateUser from '@/hooks/useUpdateUser';
 import useUser from '@/User/hooks/useUser';
 import type { UpdateUserPayload } from '@/User/types';
+import { Button } from '@mantine/core';
+import { modals } from '@mantine/modals';
 import { useForm } from '@tanstack/react-form';
 import { useState } from 'react';
-import { Mail, Lock } from 'tabler-icons-react';
-import Main from '../Common/layouts/Main';
+import { Mail, Lock, ArrowLeft } from 'tabler-icons-react';
 
-const Account = () => {
+const UserDetailsModal = () => {
     const user = useUser();
-    const { mutateAsync, isPending, error } = useUpdateUser();
+    const { mutateAsync, isPending } = useUpdateUser();
     const [formKey, setFormKey] = useState(0);
 
     const form = useForm({
         defaultValues: {
-            email: user.email,
             currentPassword: '',
             password: '',
             repeatPassword: '',
@@ -25,10 +24,6 @@ const Account = () => {
             const formData: UpdateUserPayload = {
                 id: user.id.toString(),
             };
-
-            if (value.email !== user.email) {
-                formData.email = value.email;
-            }
 
             if (value.password && value.repeatPassword && value.currentPassword) {
                 formData.currentPassword = value.currentPassword;
@@ -42,28 +37,25 @@ const Account = () => {
     });
 
     return (
-        <Main>
-            <div className="px-8">
-                <h2 className="text-base font-semibold leading-7 text-gray-900">Ustawienia konta</h2>
-            </div>
+        <div>
+            <form
+                key={formKey}
+                className="flex flex-col gap-5 max-w-xl mt-6"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    void form.handleSubmit();
+                }}
+            >
+                <FormPasswordInput form={form} name="currentPassword" icon={<Lock />} label="Aktualne hasło" />
 
-            <div className="md:col-span-2 px-8 my-8">
-                <form
-                    key={formKey}
-                    className="flex flex-col gap-5 max-w-xl"
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        void form.handleSubmit();
-                    }}
-                >
-                    <FormInput form={form} name="email" icon={<Mail />} label="Email" />
+                <FormPasswordInput form={form} name="password" icon={<Lock />} label="Nowe hasło" />
 
-                    <FormPasswordInput form={form} name="password" icon={<Lock />} label="Hasło" />
+                <FormPasswordInput form={form} name="repeatPassword" icon={<Lock />} label="Powtórz hasło" />
 
-                    <div className="relative pb-10 flex flex-col mt-4">
-                        <div>
-                            {/* <form.Subscribe
+                <div className="relative flex flex-col">
+                    <div>
+                        {/* <form.Subscribe
                                 selector={(state) => {
                                     const hasDifferentEmail = state.values.email !== user.email;
 
@@ -80,22 +72,30 @@ const Account = () => {
                                     </Button>
                                 )}
                             /> */}
-                        </div>
-
-                        <FormError error={error} />
                     </div>
-                </form>
-            </div>
 
-            {/* <div className="p-8 border-t border-gray-300">
-        <ConfirmEmailField />
-      </div>
+                    {/* <FormError error={error} /> */}
+                </div>
 
-      <div className="p-8 border-t border-gray-300">
-        <DeleteAccount />
-      </div> */}
-        </Main>
+                <div className="mt-8 flex justify-between   ">
+                    <Button
+                        size="md"
+                        variant="subtle"
+                        color="gray"
+                        leftSection={<ArrowLeft size={16} />}
+                        onClick={() => {
+                            modals.closeAll();
+                        }}
+                    >
+                        Anuluj
+                    </Button>
+                    <Button size="md" loading={isPending}>
+                        Zmień hasło
+                    </Button>
+                </div>
+            </form>
+        </div>
     );
 };
 
-export default Account;
+export default UserDetailsModal;

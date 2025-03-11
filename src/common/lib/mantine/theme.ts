@@ -13,6 +13,14 @@ export const theme = createTheme({
                     };
                 }
 
+                if (props.size === 'sm') {
+                    return {
+                        root: {
+                            '--button-padding-x': '20px',
+                            '--button-radius': '12px',
+                        },
+                    };
+                }
                 return { root: {} };
             },
         }),
