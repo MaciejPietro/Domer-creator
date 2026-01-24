@@ -47,7 +47,8 @@ import { useStore } from '@/stores/EditorStore';
 
 import { Tool } from '@/2d/editor/constants';
 import { NavbarLink } from '@/ui/NavbarLink';
-import { WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
+import { DEFAULT_WALL_TYPE } from '@/2d/editor/objects/Walls/constants';
+
 
 const AddMenu = () => {
     const { helpMode, activeTool, setTool, activeToolSettings, setToolSettings } = useStore();
@@ -55,18 +56,15 @@ const AddMenu = () => {
     const addOptions = [
         {
             id: Tool.WallAdd,
-            icon: activeToolSettings.wallType
-                ? wallTypeConfig[activeToolSettings.wallType as keyof typeof wallTypeConfig].icon
-                : BorderLeft,
+            icon: BorderLeft,
             title: 'Rysuj ściany',
             active: activeTool === Tool.WallAdd,
             position: 'bottom-start',
             onClick: () => {
                 setTool(Tool.WallAdd);
+                setToolSettings({ ...activeToolSettings, wallType: DEFAULT_WALL_TYPE });
 
-                if (!activeToolSettings?.wallType) {
-                    setToolSettings({ ...activeToolSettings, wallType: WallType.Exterior });
-                }
+               
 
                 if (helpMode) {
                     cleanNotifications();
@@ -78,35 +76,6 @@ const AddMenu = () => {
                     });
                 }
             },
-            options: [
-                {
-                    icon: <BorderLeft />,
-                    title: 'Zewnętrzna',
-                    active: activeToolSettings.wallType === WallType.Exterior,
-                    onClick: () => {
-                        setTool(Tool.WallAdd);
-                        setToolSettings({ ...activeToolSettings, wallType: WallType.Exterior });
-                    },
-                },
-                {
-                    icon: <BorderHorizontal />,
-                    title: 'Nośna',
-                    active: activeToolSettings.wallType === WallType.LoadBearing,
-                    onClick: () => {
-                        setTool(Tool.WallAdd);
-                        setToolSettings({ ...activeToolSettings, wallType: WallType.LoadBearing });
-                    },
-                },
-                {
-                    icon: <BorderInner />,
-                    title: 'Działowa',
-                    active: activeToolSettings.wallType === WallType.Partition,
-                    onClick: () => {
-                        setTool(Tool.WallAdd);
-                        setToolSettings({ ...activeToolSettings, wallType: WallType.Partition });
-                    },
-                },
-            ],
         },
         {
             id: Tool.FurnitureAddDoor,
@@ -146,23 +115,6 @@ const AddMenu = () => {
                 }
             },
         },
-        {
-            id: Tool.FurnitureAddDoor,
-            icon: Armchair,
-            title: 'Wkrótce',
-            active: activeTool === Tool.FurnitureAdd,
-            position: 'bottom',
-            disabled: true,
-            onClick: () => {
-                // setTool(Tool.FurnitureAdd);
-                // cleanNotifications();
-                // showNotification({
-                //     title: '🚪 Add door',
-                //     message: 'Click on wall to add door. Right click to change orientation',
-                //     color: 'blue',
-                // });
-            },
-        },
     ];
 
     return (
@@ -174,9 +126,7 @@ const AddMenu = () => {
                     icon={icon}
                     onClick={opt.onClick}
                     position={opt.position as 'right' | 'left' | undefined}
-                    disabled={opt.disabled}
                     active={opt.active}
-                    options={opt.options}
                 ></NavbarLink>
             ))}
         </>

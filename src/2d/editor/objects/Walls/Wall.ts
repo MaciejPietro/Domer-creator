@@ -11,8 +11,8 @@ import { Tool, ViewMode } from '../../constants';
 import { WallNode } from './WallNode';
 import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
-import { WallType, wallTypeConfig } from './config';
 import { v4 as uuidv4 } from 'uuid';
+
 
 import { Door } from '../Furnitures/Door/Door';
 import { WindowElement } from '../Furnitures/Window/Window';
@@ -20,12 +20,14 @@ import { WindowElement } from '../Furnitures/Window/Window';
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
 import { BuildingElement, DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
 import {
+    DEFAULT_WALL_TYPE,
     MIN_WALL_LENGTH,
     WALL_ACTIVE_STROKE_COLOR,
     WALL_ACTIVE_Z_INDEX,
     WALL_FILL_COLOR,
     WALL_INACTIVE_Z_INDEX,
     WALL_STROKE_COLOR,
+    WALL_THICKNESS,
 } from './constants';
 import { WallNodeSequence } from './WallNodeSequence';
 import WallDebugContainer from './WallDebugContainer';
@@ -35,8 +37,8 @@ import WallTempFurniture from './WallTempFurniture';
 import { isDoor, isWindow } from '@/2d/helpers/objects';
 import { getDefaultSettings, normalizeAngle } from './helpers';
 import { showCannotDivideWallError } from './errors';
+import { WallType } from './types';
 
-export const DEFAULT_WALL_TYPE = WallType.Exterior;
 
 const DEBUG_MODE = false;
 
@@ -70,7 +72,7 @@ export class Wall extends Graphics {
     x2: number;
     y1: number;
     y2: number;
-    thickness: number;
+    thickness = WALL_THICKNESS;
     type = DEFAULT_WALL_TYPE;
 
     dragging: boolean = false;
@@ -147,7 +149,6 @@ export class Wall extends Graphics {
             this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
         }
 
-        this.thickness = thickness || wallTypeConfig[this.type].thickness;
 
         if (uuid) this.uuid = uuid;
 
@@ -307,7 +308,7 @@ export class Wall extends Graphics {
         if (this.type === newType) return;
 
         this.settings.type = newType;
-        this.settings.thickness = wallTypeConfig[newType].thickness;
+        this.settings.thickness = this.thickness;
 
         this.applySettings();
 

@@ -31,24 +31,15 @@ import {
     EyeOff,
 } from 'tabler-icons-react';
 
-import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
 
-import { Tool } from '@/2d/editor/constants';
-import { useFurnitureStore } from '@/stores/FurnitureStore';
 import AddPlan from '@/ui/PlanControls/AddPlan';
 import useTranslation from '@/hooks/useTranslation';
 
 const PlanMenu = () => {
     const t = useTranslation();
-    const { activeTool, plan } = useStore();
-
-    const [drawerOpened, setDrawerOpened] = useState(false);
+    const {  plan } = useStore();
     const [planOpened, setPlanOpened] = useState(false);
-    const [planVisibility, setPlanVisibility] = useState(!!plan?.visible);
-
-    const [modalOpened, setModalOpened] = useState(false);
-    const { getCategories } = useFurnitureStore();
 
     const options = [
         {
@@ -64,38 +55,15 @@ const PlanMenu = () => {
             disabled: !plan,
             onClick: () => {
                 plan.visible = !plan?.visible;
-                setPlanVisibility(!plan?.visible);
-
-                // setPlanOpened(true);
             },
         },
     ];
 
-    useEffect(() => {}, [plan?.visible]);
-
-    // @ts-expect-error find why
-    const activeToolIcon = options.find((opt) => opt.id === activeTool)?.icon;
-
-    const isEnabled = [Tool.Edit, Tool.WallAdd].includes(activeTool);
-
     return (
         <>
-            {/* <Drawer
-      opened={drawerOpened}
-      position='right'
-      onClose={() => {getCategories(); setDrawerOpened(false)}}
-      title="Dodaj meble"
-      padding="xl"
-      size="lg"
-      overlayOpacity={0}
-    >
-      <FurnitureAddPanel />
-    </Drawer> */}
-
             <Modal
                 opened={planOpened}
                 onClose={() => {
-                    getCategories();
                     setPlanOpened(false);
                 }}
                 title={t('Dodaj rzut')}
@@ -117,11 +85,6 @@ const PlanMenu = () => {
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                    {/* <Menu.Item icon={<Armchair size={18} />} onClick={() => {
-          setDrawerOpened(true)
-          setter(-1)
-        }}>Add furniture</Menu.Item> */}
-
                     {options.map((opt) => (
                         <Menu.Item key={opt.title} leftSection={opt.icon} onClick={opt.onClick} disabled={opt.disabled}>
                             {t(opt.title)}

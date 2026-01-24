@@ -34,9 +34,6 @@ import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
 
 import { Tool } from '@/2d/editor/constants';
-import { useFurnitureStore } from '@/stores/FurnitureStore';
-import AddPlan from '@/ui/PlanControls/AddPlan';
-import useTranslation from '@/hooks/useTranslation';
 import { NavbarLink } from '@/ui/NavbarLink';
 
 const AddMenu = () => {

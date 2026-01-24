@@ -3,7 +3,6 @@ import { ActionIcon, NumberInput, Select } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
-import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 import {
     DoorOrientation,
     doorOrientationConfig,

@@ -1,21 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { ActionIcon, NumberInput, Select, Slider } from '@mantine/core';
+import { useState, useEffect } from 'react';
+import { ActionIcon, Select, Slider } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
-import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash, ArrowAutofitWidth, ArrowAutofitHeight, ArrowMoveUp } from 'tabler-icons-react';
-import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 
-import {
-    DoorOrientation,
-    doorOrientationConfig,
-    DoorOrientationObject,
-    DoorType,
-    doorTypeConfig,
-    DoorTypeObject,
-    doorWidthConfig,
-    DoorWidthObject,
-} from '@/2d/editor/objects/Furnitures/Door/config';
-import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
 import { WindowType, windowTypeConfig, WindowTypeObject } from '@/2d/editor/objects/Furnitures/Window/config';
 import { WindowElement } from '@/2d/editor/objects/Furnitures/Window/Window';
 import {
@@ -127,15 +114,6 @@ const WindowControls = ({}: any) => {
     return (
         <div>
             <h2 className="text-base font-medium my-0 -mt-2">Okno</h2>
-
-            {/* <div className="mt-4">
-                <NumberInput
-                    label="Długość"
-                    description="Długość ściany (cm)"
-                    value={details.length}
-                    onChange={(value) => handleUpdate('length', +value)}
-                />
-            </div> */}
 
             <div className="mt-4 ">
                 <Select

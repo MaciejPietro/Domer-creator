@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { ActionIcon, NumberInput, Select } from '@mantine/core';
+import { useState, useEffect } from 'react';
+import { ActionIcon, NumberInput } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Trash } from 'tabler-icons-react';
-import { WallConfig, WallType, wallTypeConfig } from '@/2d/editor/objects/Walls/config';
 import { showCollisionError, showMinLengthError } from '@/2d/editor/objects/Walls/errors';
-import { MIN_WALL_LENGTH } from '@/2d/editor/objects/Walls/constants';
+import { DEFAULT_WALL_TYPE, MIN_WALL_LENGTH } from '@/2d/editor/objects/Walls/constants';
 
 const WallControls = ({ element }: { element: Wall }) => {
     const { setFocusedElement } = useStore();
 
     const [details, setDetails] = useState({
         length: parseFloat(element.length.toString()) || 0,
-        wallType: element.type || WallType.Exterior,
+        wallType: DEFAULT_WALL_TYPE,
     });
 
     const handleRemove = () => {
@@ -36,13 +35,13 @@ const WallControls = ({ element }: { element: Wall }) => {
     useEffect(() => {
         if (element) {
             const length = element.length || 0;
-            const wallType = element?.type || WallType.Exterior;
+            const wallType = DEFAULT_WALL_TYPE;
 
             setDetails((prevDetails) => ({ ...prevDetails, length, wallType }));
         }
     }, [element.length]);
 
-    const handleUpdate = (key: 'length' | 'depth', value: number) => {
+    const handleUpdate = (key: 'length' , value: number) => {
         const backupLength = element.length;
 
         if (key === 'length') {
@@ -59,21 +58,8 @@ const WallControls = ({ element }: { element: Wall }) => {
 
             setDetails((prevDetails) => ({ ...prevDetails, length: value || 0 }));
         }
-
-        if (key === 'depth') {
-            setDetails((prevDetails) => ({ ...prevDetails, depth: value || 0 }));
-        }
     };
 
-    const wallTypeOptions = Object.values(wallTypeConfig).map((wall: WallConfig) => ({
-        label: `${wall.label} (${wall.thickness}cm)`,
-        value: wall.type.toString(),
-    }));
-
-    const handleChangeWallType = (val: WallType) => {
-        element?.setType(val);
-        setDetails((prevDetails) => ({ ...prevDetails, wallType: val }));
-    };
 
     return (
         <div>
@@ -88,15 +74,6 @@ const WallControls = ({ element }: { element: Wall }) => {
                 />
             </div>
 
-            <div className="mt-4">
-                <Select
-                    label="Typ"
-                    description="Typ ściany"
-                    data={wallTypeOptions}
-                    value={details.wallType.toString()}
-                    onChange={(val) => val && handleChangeWallType(+val)}
-                />
-            </div>
 
             <div className="mt-4">
                 <p>Kąt: {element.angle}</p>
@@ -110,15 +87,6 @@ const WallControls = ({ element }: { element: Wall }) => {
                     <span className="text-xs text-gray-600">(delete)</span>
                 </div>
             </div>
-
-            {/* <div className="mt-4">
-                <NumberInput
-                    label="Grubość"
-                    description="Grubość ściany (cm)"
-                    value={details.depth}
-                    onChange={(value) => handleUpdate('depth', +value)}
-                />
-            </div> */}
         </div>
     );
 };

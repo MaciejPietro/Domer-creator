@@ -1,13 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, Group, NumberInput, Text, rem } from '@mantine/core';
-import { Upload, Photo, X, Plus, FileUpload } from 'tabler-icons-react';
-import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { useStore } from '@/stores/EditorStore';
-import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { Main } from '@/2d/editor/Main';
 
-import backgroundPattern from '../../assets/pattern.svg';
-import { Application, FederatedPointerEvent, Sprite, Texture, TilingSprite } from 'pixi.js';
+import { Application, FederatedPointerEvent } from 'pixi.js';
 
 import { Preview } from '@/2d/editor/actions/MeasureToolManager';
 import { METER } from '@/2d/editor/constants';

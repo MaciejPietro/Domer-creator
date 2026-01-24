@@ -3,8 +3,6 @@ import { euclideanDistance } from '../../../helpers/EuclideanDistance';
 import { Point } from '../../../helpers/Point';
 import { viewportX, viewportY } from '../../../helpers/ViewportCoordinates';
 import { Label } from '../objects/TransformControls/Label';
-import { Tool, WALL_THICKNESS } from '../constants';
-import { useStore } from '@/stores/EditorStore';
 
 type PreviewProps = {
     color?: number | string;
@@ -44,19 +42,6 @@ export class Preview {
         // TODO remove listener
         // document.addEventListener('keydown', this.onKeyDown.bind(this));
     }
-
-    // private onKeyDown(ev: KeyboardEvent) {
-    //     const setTool = useStore.getState().setTool;
-
-    //     if (ev.key === 'Escape') {
-    //         // setTool(Tool.Edit);
-    //         this.pointA;
-    //         this.sizeGraphic.clear();
-    //         this.sizeLabel.visible = false;
-
-    //         this.updatePreview();
-    //     }
-    // }
 
     public setA(value: Point | undefined) {
         this.isActive = true;

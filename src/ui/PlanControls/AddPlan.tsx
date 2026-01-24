@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { Button, Group, NumberInput, Text, rem } from '@mantine/core';
-import { Upload, Photo, X, Plus, FileUpload } from 'tabler-icons-react';
-import { Dropzone, DropzoneProps, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { Upload, Photo, X, FileUpload } from 'tabler-icons-react';
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { useStore } from '@/stores/EditorStore';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
-import { Main } from '@/2d/editor/Main';
-import backgroundPattern from '../../assets/pattern.svg';
-import { Assets, Container, Sprite, Texture, TilingSprite } from 'pixi.js';
+import { Assets, Sprite } from 'pixi.js';
 import MeasurePlan from './MeasurePlan';
 
 import { main } from '@/2d/EditorRoot';
@@ -14,7 +12,7 @@ import { main } from '@/2d/EditorRoot';
 export default function AddPlan({ onClose }: any) {
     const [acceptedFiles, setAcceptedFiles] = useState<File[]>([]);
     const [rejectedFiles, setRejectedFiles] = useState<File[]>([]);
-    const { setPlan, plan } = useStore();
+    const { setPlan } = useStore();
 
     const [lengths, setLengths] = useState<any>({
         real: 0,
@@ -32,9 +30,6 @@ export default function AddPlan({ onClose }: any) {
     };
 
     const uploadFile = () => {
-        // setPlan(acceptedFiles[0]);
-        const file = acceptedFiles[0];
-
         cleanNotifications();
         showNotification({
             title: '✏️ Dodawanie planu',

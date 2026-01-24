@@ -14,3 +14,6 @@ export const WALL_ACTIVE_Z_INDEX = 21;
 export const WALL_INACTIVE_Z_INDEX = 20;
 export const WALL_DASHED_LINE_Z_INDEX = 22;
 export const WALL_TEMP_FURNITURE_Z_INDEX = 25;
+
+export const WALL_THICKNESS = 40;
+export const DEFAULT_WALL_TYPE = 'exterior';

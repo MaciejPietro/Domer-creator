@@ -1,14 +1,9 @@
-import { useStore } from '@/stores/EditorStore';
-import { DEFAULT_WALL_TYPE } from './Wall';
-import { wallTypeConfig } from './config';
+import { DEFAULT_WALL_TYPE, WALL_THICKNESS } from './constants';
+import { WallType } from './types';
 
 export const getDefaultSettings = () => {
-    const state = useStore.getState();
-
-    const type = state.activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
-
-    // @ts-expect-error type store properly
-    const thickness = wallTypeConfig[type].thickness;
+    const type: WallType = DEFAULT_WALL_TYPE;
+    const thickness = WALL_THICKNESS;
 
     return {
         type,

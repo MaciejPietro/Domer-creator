@@ -8,7 +8,6 @@ import SelectMenu from '../Navbar/SelectMenu';
 import { useStore } from '@/stores/EditorStore';
 
 const AppNavbar = () => {
-    const modeOptions = [];
     const { activeMode } = useStore();
 
     return (

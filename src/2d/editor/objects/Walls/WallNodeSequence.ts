@@ -3,7 +3,6 @@ import { Container } from 'pixi.js';
 import { INodeSerializable } from '../../persistence/INodeSerializable';
 import { Wall, WallSettings } from './Wall';
 import { WallNode } from './WallNode';
-import { WallType } from './config';
 import { BuildingElement } from '../Furnitures/BuildingElement';
 
 export type NodeLinksWithWall = [
