@@ -7,13 +7,10 @@ import { useStore } from '@/stores/EditorStore';
 
 import { Tool } from '@/2d/editor/constants';
 import AddPlan from '@/ui/PlanControls/AddPlan';
-import useTranslation from '@/hooks/useTranslation';
 
 const AddMenu = () => {
-    const t = useTranslation();
     const { activeTool, setTool } = useStore();
     const [planOpened, setPlanOpened] = useState(false);
-
 
     const options = [
         {
@@ -33,22 +30,22 @@ const AddMenu = () => {
     ];
 
     return (
-            <Modal
-                opened={planOpened}
+        <Modal
+            opened={planOpened}
+            onClose={() => {
+                setPlanOpened(false);
+            }}
+            title="Dodaj rzut"
+            padding="xl"
+            size="lg"
+            centered
+        >
+            <AddPlan
                 onClose={() => {
                     setPlanOpened(false);
                 }}
-                title={t('Dodaj rzut')}
-                padding="xl"
-                size="lg"
-                centered
-            >
-                <AddPlan
-                    onClose={() => {
-                        setPlanOpened(false);
-                    }}
-                />
-            </Modal>
+            />
+        </Modal>
     );
 };
 

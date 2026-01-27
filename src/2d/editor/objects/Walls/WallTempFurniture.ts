@@ -34,8 +34,6 @@ class WallTempFurniture extends Container {
     public add() {
         if (!this.element) return;
 
-        console.log(this.element.isValid);
-
         if (!this.element.isValid) {
             const isDoor = this.element instanceof Door;
             notifications.clean();

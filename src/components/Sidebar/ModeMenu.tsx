@@ -4,7 +4,6 @@ import { Pencil, Badge3d } from 'tabler-icons-react';
 import { useStore } from '@/stores/EditorStore';
 import { ViewMode } from '@/2d/editor/constants';
 import { NavbarLink } from '@/ui/NavbarLink';
-import useTranslation from '@/hooks/useTranslation';
 
 const modes = [
     { icon: Pencil, label: 'Tryb edycji', mode: ViewMode.Edit },
@@ -12,8 +11,6 @@ const modes = [
 ];
 
 const ModeMenu = () => {
-    const t = useTranslation();
-
     const { activeMode, setActiveMode } = useStore();
     return (
         <>

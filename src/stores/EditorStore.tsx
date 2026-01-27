@@ -29,7 +29,6 @@ export interface EditorStore {
     setActiveMode: (mode: ViewMode) => void;
     setTool: (tool: Tool) => void;
     setToolSettings: (settings: any) => void;
-    setFloor: (floor: number) => void;
     setSnap: (snap: boolean) => void;
     setPlan: (snap: any) => void;
     setApp: (snap: any) => void;

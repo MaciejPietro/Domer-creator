@@ -21,49 +21,6 @@ const doorTypeOptions = Object.values(windowTypeConfig)
         value: window.type.toString(),
     }));
 
-const windowWidthOptions = [
-    { value: MIN_WINDOW_WIDTH, label: `${MIN_WINDOW_WIDTH}cm` },
-    {
-        value: MIN_WINDOW_WIDTH + (MAX_WINDOW_WIDTH - MIN_WINDOW_WIDTH) * 0.25,
-        label: `${Math.floor((MAX_WINDOW_WIDTH - MIN_WINDOW_WIDTH) * 0.25)}cm`,
-    },
-    {
-        value: MIN_WINDOW_WIDTH + (MAX_WINDOW_WIDTH - MIN_WINDOW_WIDTH) * 0.5,
-        label: `${Math.floor((MAX_WINDOW_WIDTH - MIN_WINDOW_WIDTH) * 0.5)}cm`,
-    },
-    {
-        value: MIN_WINDOW_WIDTH + (MAX_WINDOW_WIDTH - MIN_WINDOW_WIDTH) * 0.75,
-        label: `${Math.floor((MAX_WINDOW_WIDTH - MIN_WINDOW_WIDTH) * 0.75)}cm`,
-    },
-    { value: MAX_WINDOW_WIDTH, label: `${MAX_WINDOW_WIDTH}cm` },
-];
-
-const windowHeightOptions = [
-    { value: 0, label: `${MIN_WINDOW_HEIGHT}cm` },
-    {
-        value: MIN_WINDOW_HEIGHT + (MAX_WINDOW_HEIGHT - MIN_WINDOW_HEIGHT) * 0.33,
-        label: `${Math.floor((MAX_WINDOW_HEIGHT - MIN_WINDOW_HEIGHT) * 0.33)}cm`,
-    },
-    {
-        value: MIN_WINDOW_HEIGHT + (MAX_WINDOW_HEIGHT - MIN_WINDOW_HEIGHT) * 0.66,
-        label: `${Math.floor((MAX_WINDOW_HEIGHT - MIN_WINDOW_HEIGHT) * 0.66)}cm`,
-    },
-    { value: MAX_WINDOW_HEIGHT, label: `${MAX_WINDOW_HEIGHT}cm` },
-];
-
-const windowBottomOptions = [
-    { value: 0, label: `${MIN_WINDOW_BOTTOM}cm` },
-    {
-        value: MIN_WINDOW_BOTTOM + (MAX_WINDOW_BOTTOM - MIN_WINDOW_BOTTOM) * 0.33,
-        label: `${Math.floor((MAX_WINDOW_BOTTOM - MIN_WINDOW_BOTTOM) * 0.33)}cm`,
-    },
-    {
-        value: MIN_WINDOW_BOTTOM + (MAX_WINDOW_BOTTOM - MIN_WINDOW_BOTTOM) * 0.66,
-        label: `${Math.floor((MAX_WINDOW_BOTTOM - MIN_WINDOW_BOTTOM) * 0.66)}cm`,
-    },
-    { value: MAX_WINDOW_BOTTOM, label: `${MAX_WINDOW_BOTTOM}cm` },
-];
-
 const WindowControls = ({}: any) => {
     const { focusedElement, setFocusedElement } = useStore();
 
@@ -127,6 +84,7 @@ const WindowControls = ({}: any) => {
             <div className="mt-4">
                 <label className="flex items-center gap-2 text-sm font-semibold">
                     <ArrowAutofitWidth size={20} /> Szerokość
+                    <span className="font-normal text-gray-600">({element.length}cm)</span>
                 </label>
                 <div className="mt-2 pl-1 pr-3">
                     <Slider
@@ -137,17 +95,17 @@ const WindowControls = ({}: any) => {
                         step={5}
                         min={MIN_WINDOW_WIDTH}
                         max={MAX_WINDOW_WIDTH}
-                        marks={windowWidthOptions}
                         value={element.length}
                         onChange={(value) => handleUpdate('length', +value)}
                     />
                 </div>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-4">
                 <label className="flex items-center gap-2 text-sm font-semibold">
                     <ArrowAutofitHeight size={20} />
                     Wysokość
+                    <span className="font-normal text-gray-600">({element.height}cm)</span>
                 </label>
                 <div className="mt-2 pl-1 pr-3">
                     <Slider
@@ -158,16 +116,16 @@ const WindowControls = ({}: any) => {
                         step={5}
                         min={MIN_WINDOW_HEIGHT}
                         max={MAX_WINDOW_HEIGHT}
-                        marks={windowHeightOptions}
                         value={element.height}
                         onChange={(value) => handleUpdate('height', +value)}
                     />
                 </div>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-4">
                 <label className="flex items-center gap-2 text-sm font-semibold">
-                    <ArrowMoveUp size={20} /> Odległość od ziemi
+                    <ArrowMoveUp size={20} /> Odległość od ziemi{' '}
+                    <span className="font-normal text-gray-600">({element.bottom}cm)</span>
                 </label>
                 <div className="mt-2 pl-1 pr-3">
                     <Slider
@@ -178,7 +136,6 @@ const WindowControls = ({}: any) => {
                         step={5}
                         min={MIN_WINDOW_BOTTOM}
                         max={MAX_WINDOW_BOTTOM}
-                        marks={windowBottomOptions}
                         value={element.bottom}
                         onChange={(value) => handleUpdate('bottom', +value)}
                     />

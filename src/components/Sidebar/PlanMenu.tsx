@@ -34,11 +34,9 @@ import {
 import { useStore } from '@/stores/EditorStore';
 
 import AddPlan from '@/ui/PlanControls/AddPlan';
-import useTranslation from '@/hooks/useTranslation';
 
 const PlanMenu = () => {
-    const t = useTranslation();
-    const {  plan } = useStore();
+    const { plan } = useStore();
     const [planOpened, setPlanOpened] = useState(false);
 
     const options = [
@@ -66,7 +64,7 @@ const PlanMenu = () => {
                 onClose={() => {
                     setPlanOpened(false);
                 }}
-                title={t('Dodaj rzut')}
+                title="Dodaj rzut"
                 size="xl"
                 centered
             >
@@ -87,7 +85,7 @@ const PlanMenu = () => {
                 <Menu.Dropdown>
                     {options.map((opt) => (
                         <Menu.Item key={opt.title} leftSection={opt.icon} onClick={opt.onClick} disabled={opt.disabled}>
-                            {t(opt.title)}
+                            {opt.title}
                         </Menu.Item>
                     ))}
                 </Menu.Dropdown>

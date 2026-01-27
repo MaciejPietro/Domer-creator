@@ -17,3 +17,7 @@ export const WALL_TEMP_FURNITURE_Z_INDEX = 25;
 
 export const WALL_THICKNESS = 40;
 export const DEFAULT_WALL_TYPE = 'exterior';
+
+// Corner calculation constants
+export const INTERSECTION_LINE_EXTENSION = 100;
+export const CORNER_ANGLE_THRESHOLD = 25;

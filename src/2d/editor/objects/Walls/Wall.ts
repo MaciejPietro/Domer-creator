@@ -13,14 +13,15 @@ import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { v4 as uuidv4 } from 'uuid';
 
-
 import { Door } from '../Furnitures/Door/Door';
 import { WindowElement } from '../Furnitures/Window/Window';
 
 import { getClosestPointOnLine } from '@/2d/helpers/geometry';
 import { BuildingElement, DISTANCE_FROM_WALL } from '../Furnitures/BuildingElement';
 import {
+    CORNER_ANGLE_THRESHOLD,
     DEFAULT_WALL_TYPE,
+    INTERSECTION_LINE_EXTENSION,
     MIN_WALL_LENGTH,
     WALL_ACTIVE_STROKE_COLOR,
     WALL_ACTIVE_Z_INDEX,
@@ -30,7 +31,6 @@ import {
     WALL_THICKNESS,
 } from './constants';
 import { WallNodeSequence } from './WallNodeSequence';
-import WallDebugContainer from './WallDebugContainer';
 import WallMeasuresContainer from './WallMeasuresContainer';
 import WallDashedLineContainer from './WallDashedLineContainer';
 import WallTempFurniture from './WallTempFurniture';
@@ -38,9 +38,6 @@ import { isDoor, isWindow } from '@/2d/helpers/objects';
 import { getDefaultSettings, normalizeAngle } from './helpers';
 import { showCannotDivideWallError } from './errors';
 import { WallType } from './types';
-
-
-const DEBUG_MODE = false;
 
 export type WallSettings = {
     uuid?: string;
@@ -57,7 +54,6 @@ export class Wall extends Graphics {
 
     graphic: Graphics;
 
-    debugContainer: WallDebugContainer | null = null;
     measuresContainer: WallMeasuresContainer | null = null;
     dashedLineContainer: WallDashedLineContainer | null = null;
     tempFurniture: WallTempFurniture | null = null;
@@ -103,8 +99,6 @@ export class Wall extends Graphics {
             d: this.pointD,
         };
 
-        this.applySettings();
-
         this.measuresContainer = new WallMeasuresContainer(points);
         this.dashedLineContainer = new WallDashedLineContainer(this.thickness);
         this.tempFurniture = new WallTempFurniture(this);
@@ -112,11 +106,6 @@ export class Wall extends Graphics {
         this.addChild(this.measuresContainer);
         this.addChild(this.dashedLineContainer);
         this.addChild(this.tempFurniture);
-
-        if (DEBUG_MODE) {
-            this.debugContainer = new WallDebugContainer(points);
-            this.addChild(this.debugContainer);
-        }
 
         this.graphic = new Graphics();
 
@@ -134,25 +123,6 @@ export class Wall extends Graphics {
         this.on('pointerout', this.onMouseOut);
 
         this.zIndex = WALL_INACTIVE_Z_INDEX;
-    }
-
-    private applySettings() {
-        const { type, uuid, thickness } = this.settings || {};
-
-        if (type !== undefined) {
-            this.type = type;
-        } else {
-            const state = useStore.getState();
-
-            const activeToolSettings = state.activeToolSettings;
-
-            this.type = activeToolSettings?.wallType || DEFAULT_WALL_TYPE;
-        }
-
-
-        if (uuid) this.uuid = uuid;
-
-        this.pivot.set(0, this.thickness * 0.5);
     }
 
     public updateCorners() {
@@ -185,123 +155,97 @@ export class Wall extends Graphics {
     private calcCornersPositions() {
         if (!this.parent) return;
 
-        const parent = this.parent as WallNodeSequence;
+        this.resetCornerDefaults();
+        this.adjustLeftCorners();
+        this.adjustRightCorners();
+    }
 
-        const thickness = this.thickness;
-        const length = this.length;
-
+    private resetCornerDefaults() {
         this.pointA.x = 0;
         this.pointA.y = this.thickness;
 
-        this.pointB.x = length;
+        this.pointB.x = this.length;
         this.pointB.y = this.thickness;
 
-        this.pointC.x = length;
+        this.pointC.x = this.length;
         this.pointC.y = 0;
 
         this.pointD.x = 0;
         this.pointD.y = 0;
+    }
 
-        const wallAngle = this.angle;
+    private calcIntersectionX(neighborWall: Wall, thisY: number, neighborY: number): number {
+        const point1 = this.toGlobal({ x: -INTERSECTION_LINE_EXTENSION, y: thisY });
+        const point2 = this.toGlobal({ x: this.length + INTERSECTION_LINE_EXTENSION, y: thisY });
+        const point3 = neighborWall.toGlobal({ x: -INTERSECTION_LINE_EXTENSION, y: neighborY });
+        const point4 = neighborWall.toGlobal({ x: neighborWall.length + INTERSECTION_LINE_EXTENSION, y: neighborY });
 
+        return this.toLocal(lineIntersection(point1, point2, point3, point4)).x;
+    }
+
+    private isProperAngle(neighborAngle: number): boolean {
+        const angleDifference = Math.abs(neighborAngle - this.angle);
+        return Math.abs(180 - angleDifference) > CORNER_ANGLE_THRESHOLD;
+    }
+
+    private adjustLeftCorners() {
+        const parent = this.parent as WallNodeSequence;
         const leftNodeId = this.leftNode.getId();
+
+        // Adjust pointA (bottom-left, clockwise neighbor)
+        const clockwiseNeighbor = parent.findFirstNeighbor(this, leftNodeId, true);
+        if (clockwiseNeighbor && areAnglesDifferent(clockwiseNeighbor.angle, this.angle)) {
+            const neighborY = this.leftNode === clockwiseNeighbor.leftNode ? 0 : clockwiseNeighbor.thickness;
+            const x = this.calcIntersectionX(clockwiseNeighbor, this.thickness, neighborY);
+            const clampedX = Math.min(x, this.length);
+
+            if (clampedX > 0 || this.isProperAngle(clockwiseNeighbor.angle)) {
+                this.pointA.x = clampedX;
+            }
+        }
+
+        // Adjust pointD (top-left, counter-clockwise neighbor)
+        const counterClockwiseNeighbor = parent.findFirstNeighbor(this, leftNodeId, false);
+        if (counterClockwiseNeighbor && areAnglesDifferent(counterClockwiseNeighbor.angle, this.angle)) {
+            const neighborY =
+                this.leftNode === counterClockwiseNeighbor.leftNode ? counterClockwiseNeighbor.thickness : 0;
+            const x = this.calcIntersectionX(counterClockwiseNeighbor, 0, neighborY);
+            const clampedX = Math.min(x, this.length);
+
+            if (clampedX > 0 || this.isProperAngle(counterClockwiseNeighbor.angle)) {
+                this.pointD.x = clampedX;
+            }
+        }
+    }
+
+    private adjustRightCorners() {
+        const parent = this.parent as WallNodeSequence;
         const rightNodeId = this.rightNode.getId();
 
-        const corners = [
-            {
-                point: 'pointA',
-                nodeId: leftNodeId,
-                isClockwise: true,
-                y1: thickness,
-                getYPos: (cornerWall: Wall) => (this.leftNode === cornerWall.leftNode ? 0 : cornerWall.thickness),
-            },
-            {
-                point: 'pointD',
-                nodeId: leftNodeId,
-                isClockwise: false,
-                y1: 0,
-                getYPos: (cornerWall: Wall) => (this.leftNode === cornerWall.leftNode ? cornerWall.thickness : 0),
-            },
-            {
-                point: 'pointC',
-                nodeId: rightNodeId,
-                isClockwise: true,
-                y1: 0,
-                getYPos: (cornerWall: Wall) => (this.rightNode === cornerWall.rightNode ? cornerWall.thickness : 0),
-            },
-            {
-                point: 'pointB',
-                nodeId: rightNodeId,
-                isClockwise: false,
-                y1: thickness,
-                getYPos: (cornerWall: Wall) => (this.rightNode === cornerWall.rightNode ? 0 : cornerWall.thickness),
-            },
-        ];
+        // Adjust pointC (top-right, clockwise neighbor)
+        const clockwiseNeighbor = parent.findFirstNeighbor(this, rightNodeId, true);
+        if (clockwiseNeighbor && areAnglesDifferent(clockwiseNeighbor.angle, this.angle)) {
+            const neighborY = this.rightNode === clockwiseNeighbor.rightNode ? clockwiseNeighbor.thickness : 0;
+            const x = this.calcIntersectionX(clockwiseNeighbor, 0, neighborY);
+            const clampedX = Math.max(0, x);
 
-        corners.forEach(({ point, nodeId, isClockwise, y1, getYPos }) => {
-            const cornerWall = parent.findFirstNeighbor(this, nodeId, isClockwise);
-
-            if (cornerWall) {
-                const cornerAngle = cornerWall.angle;
-
-                if (!areAnglesDifferent(cornerAngle, wallAngle)) {
-                    return;
-                }
-
-                const yPos = getYPos(cornerWall);
-                const x1 = -100;
-                const x2 = length + 100;
-                const x3 = -100;
-                const x4 = cornerWall.length + 100;
-
-                const point1 = this.toGlobal({ x: x1, y: y1 });
-                const point2 = this.toGlobal({ x: x2, y: y1 });
-                const point3 = cornerWall.toGlobal({ x: x3, y: yPos });
-                const point4 = cornerWall.toGlobal({ x: x4, y: yPos });
-
-                const { x } = this.toLocal(lineIntersection(point1, point2, point3, point4));
-
-                const clampedX = Math.min(x, this.length);
-                const clampedXRight = Math.max(0, x);
-
-                const wholeAngleDifference = Math.abs(cornerAngle - wallAngle);
-
-                const properAngle = Math.abs(180 - wholeAngleDifference) > 25;
-
-                switch (point) {
-                    case 'pointA':
-                        if (clampedX > 0 || properAngle) {
-                            this.pointA.x = clampedX;
-                            this.pointA.y = this.thickness;
-                        }
-                        break;
-
-                    case 'pointB':
-                        if (clampedXRight < this.length || properAngle) {
-                            this.pointB.x = clampedXRight;
-                            this.pointB.y = this.thickness;
-                        }
-
-                        break;
-
-                    case 'pointC':
-                        if (clampedXRight < this.length || properAngle) {
-                            this.pointC.x = clampedXRight;
-                            this.pointC.y = 0;
-                        }
-
-                        break;
-
-                    case 'pointD':
-                        if (clampedX > 0 || properAngle) {
-                            this.pointD.x = clampedX;
-                            this.pointD.y = 0;
-                        }
-
-                        break;
-                }
+            if (clampedX < this.length || this.isProperAngle(clockwiseNeighbor.angle)) {
+                this.pointC.x = clampedX;
             }
-        });
+        }
+
+        // Adjust pointB (bottom-right, counter-clockwise neighbor)
+        const counterClockwiseNeighbor = parent.findFirstNeighbor(this, rightNodeId, false);
+        if (counterClockwiseNeighbor && areAnglesDifferent(counterClockwiseNeighbor.angle, this.angle)) {
+            const neighborY =
+                this.rightNode === counterClockwiseNeighbor.rightNode ? 0 : counterClockwiseNeighbor.thickness;
+            const x = this.calcIntersectionX(counterClockwiseNeighbor, this.thickness, neighborY);
+            const clampedX = Math.max(0, x);
+
+            if (clampedX < this.length || this.isProperAngle(counterClockwiseNeighbor.angle)) {
+                this.pointB.x = clampedX;
+            }
+        }
     }
 
     public setType(newType: WallType) {
@@ -309,8 +253,6 @@ export class Wall extends Graphics {
 
         this.settings.type = newType;
         this.settings.thickness = this.thickness;
-
-        this.applySettings();
 
         this.drawWall();
         this.updateChildren();
@@ -357,23 +299,17 @@ export class Wall extends Graphics {
         const theta = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
         this.angle = theta < 0 ? 360 + theta : theta;
 
-        // Batch position updates
         this.position.set(x1, y1);
-        // this.leftNode.angle = this.angle;
-        // this.rightNode.angle = this.angle;
 
         this.calcCornersPositions();
         this.updateCorners();
 
         if (this.focused) {
-            this.debugContainer?.update();
             this.measuresContainer?.update({ thickness: this.thickness, angle: this.angle });
         }
     }
 
     public blur() {
-        console.log('xdxd blur');
-
         this.focused = false;
         this.leftNode.setVisibility(false);
         this.rightNode.setVisibility(false);
