@@ -48,6 +48,7 @@ export enum Tool {
     Measure,
     FurnitureAddWindow,
     FurnitureAddDoor,
+    PlotAdd,
 }
 
 export enum ViewMode {

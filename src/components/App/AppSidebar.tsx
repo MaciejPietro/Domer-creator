@@ -1,5 +1,4 @@
 import { AppShell, Group, AppShellSection } from '@mantine/core';
-import { useRef, useState } from 'react';
 import { GridDots, Table, TableOff } from 'tabler-icons-react';
 
 import { cleanNotifications, showNotification } from '@mantine/notifications';
@@ -7,6 +6,7 @@ import { useStore } from '@/stores/EditorStore';
 import { ViewMode } from '@/2d/editor/constants';
 import { NavbarLink } from '@/ui/NavbarLink';
 import PlanMenu from '../Sidebar/PlanMenu';
+import PlotMenu from '../Sidebar/PlotMenu';
 import DropdownMenu from '../Sidebar/DropdownMenu';
 
 const AppSidebar = () => {
@@ -23,6 +23,7 @@ const AppSidebar = () => {
                         {activeMode === ViewMode.Edit && (
                             <>
                                 <PlanMenu />
+                                <PlotMenu />
                                 <NavbarLink
                                     icon={GridDots}
                                     label="Przyciągaj do siatki"

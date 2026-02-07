@@ -168,4 +168,8 @@ export class FloorPlan extends Container {
     public getFurniture() {
         return this.floors[this.currentFloor].getFurniture();
     }
+
+    public getPlot() {
+        return this.floors[this.currentFloor].getPlot();
+    }
 }

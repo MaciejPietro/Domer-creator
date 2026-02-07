@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { AddWallManager } from '../2d/editor/actions/AddWallManager';
+import { AddPlotManager } from '../2d/editor/actions/AddPlotManager';
 import { Tool, ViewMode } from '../2d/editor/constants';
 import { WallNode } from '@/2d/editor/objects/Walls/WallNode';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
@@ -91,6 +92,7 @@ export const useStore = create<EditorStore>((set, getState) => ({
             };
         });
         AddWallManager.Instance.resetTools();
+        AddPlotManager.Instance.resetTools();
     },
     setToolSettings: (settings: any) => {
         set(() => ({

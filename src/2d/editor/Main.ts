@@ -6,6 +6,8 @@ import { TransformLayer } from './objects/TransformControls/TransformLayer';
 import { useStore } from '../../stores/EditorStore';
 import { AddNodeAction } from './actions/AddNodeAction';
 import { AddWallManager } from './actions/AddWallManager';
+import { AddPlotManager } from './actions/AddPlotManager';
+import { AddPlotNodeAction } from './actions/AddPlotNodeAction';
 import { viewportX, viewportY } from '../../helpers/ViewportCoordinates';
 import { Tool, ViewMode } from './constants';
 import { Pointer } from './Pointer';
@@ -15,7 +17,7 @@ import 'pixi.js/events';
 import { LoadAction } from './actions/LoadAction';
 import { Grid } from './basic/Grid';
 // import plan from './plan.json';
-import plan from './plan-simple.json';
+import plan from './plan-empty.json';
 import { WallNodeSequence } from './objects/Walls/WallNodeSequence';
 
 export class Main extends Viewport {
@@ -24,6 +26,7 @@ export class Main extends Viewport {
     public static app: Application;
     transformLayer: TransformLayer;
     addWallManager: AddWallManager;
+    addPlotManager: AddPlotManager;
     grid: Grid;
     public pointer: Pointer;
     public preview: Preview;
@@ -70,6 +73,11 @@ export class Main extends Viewport {
 
         this.addChild(wallManagerReference);
 
+        this.addPlotManager = AddPlotManager.Instance;
+        const plotManagerReference = this.addPlotManager.preview.getReference();
+
+        this.addChild(plotManagerReference);
+
         this.pointer = new Pointer();
 
         this.addChild(this.pointer);
@@ -109,11 +117,13 @@ export class Main extends Viewport {
 
     private updatePreview(ev: FederatedPointerEvent) {
         this.addWallManager.updatePreview(ev);
+        this.addPlotManager.updatePreview(ev);
         this.preview.updatePreview(ev);
         this.pointer.update(ev);
 
         switch (useStore.getState().activeTool) {
             case Tool.WallAdd:
+            case Tool.PlotAdd:
                 this.pointer.alpha = 1;
                 break;
 
@@ -157,6 +167,11 @@ export class Main extends Viewport {
                 const action = new AddNodeAction(undefined, point);
 
                 action.execute();
+                break;
+            case Tool.PlotAdd:
+                const plotAction = new AddPlotNodeAction(point);
+
+                plotAction.execute();
                 break;
             case Tool.Edit:
                 // if (!isMobile) {

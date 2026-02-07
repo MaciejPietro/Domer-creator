@@ -8,17 +8,21 @@ import { Wall } from './Walls/Wall';
 import { WallNodeSequence } from './Walls/WallNodeSequence';
 import { Door } from './Furnitures/Door/Door';
 import { WindowElement } from './Furnitures/Window/Window';
+import { Plot, PlotSerializable } from './Plot/Plot';
 
 type Furniture = WindowElement | Door;
 
 export class Floor extends Container {
     public furnitureArray: Map<string, Furniture>;
     private wallNodeSequence: WallNodeSequence;
+    private plot: Plot;
     constructor(floorData?: FloorSerializable, previousFloor?: Floor) {
         super();
 
         this.furnitureArray = new Map<string, Furniture>();
         this.wallNodeSequence = new WallNodeSequence();
+        this.plot = new Plot();
+        this.addChild(this.plot);
         this.addChild(this.wallNodeSequence);
         // this.wallNodeSequence.zIndex = 1002;
         this.sortableChildren = true;
@@ -152,11 +156,16 @@ export class Floor extends Container {
             this.removeFurniture(id);
         }
         this.wallNodeSequence.reset();
+        this.plot.reset();
         this.furnitureArray = new Map();
     }
 
     public getWallNodeSequence() {
         return this.wallNodeSequence;
+    }
+
+    public getPlot() {
+        return this.plot;
     }
 
     // public clearScreen() {
