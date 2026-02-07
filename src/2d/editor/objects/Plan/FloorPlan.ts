@@ -1,14 +1,14 @@
 import { Container } from 'pixi.js';
-import { Wall } from './Walls/Wall';
-import { Floor } from './Floor';
-import { Serializer } from '../persistence/Serializer';
-import { FloorPlanSerializable } from '../persistence/FloorPlanSerializable';
-import { Action } from '../actions/Action';
-import { useStore } from '../../../stores/EditorStore';
-import { Point } from '../../../helpers/Point';
+import { Wall } from '../Walls/Wall';
+import { Floor } from '../Floor';
+import { Serializer } from '../../persistence/Serializer';
+import { FloorPlanSerializable } from '../../persistence/FloorPlanSerializable';
+import { Action } from '../../actions/Action';
+import { useStore } from '../../../../stores/EditorStore';
+import { Point } from '../../../../helpers/Point';
 import { showNotification } from '@mantine/notifications';
-import { Door } from './Furnitures/Door/Door';
-import { WindowElement } from './Furnitures/Window/Window';
+import { Door } from '../Furnitures/Door/Door';
+import { WindowElement } from '../Furnitures/Window/Window';
 
 export class FloorPlan extends Container {
     private static instance: FloorPlan;

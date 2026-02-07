@@ -1,5 +1,5 @@
 import { Point } from '../../../helpers/Point';
-import { FloorPlan } from '../objects/FloorPlan';
+import { FloorPlan } from '../objects/Plan/FloorPlan';
 import { Wall } from '../objects/Walls/Wall';
 import { Action } from './Action';
 import { Door } from '../objects/Furnitures/Door/Door';

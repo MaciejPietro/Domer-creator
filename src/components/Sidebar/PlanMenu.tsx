@@ -28,23 +28,37 @@ import {
     Table,
     TableOff,
     Tag,
+    Replace,
+    ArrowLeftSquare,
     EyeOff,
 } from 'tabler-icons-react';
 
 import { useStore } from '@/stores/EditorStore';
+import { Tool } from '@/2d/editor/constants';
 
 import AddPlan from '@/ui/PlanControls/AddPlan';
 
 const PlanMenu = () => {
-    const { plan } = useStore();
+    const { plan, setTool, setFocusedElement } = useStore();
     const [planOpened, setPlanOpened] = useState(false);
 
     const options = [
         {
-            icon: <Plus size={18} />,
-            title: 'Dodaj rzut',
+            icon: plan ? <Replace size={18} /> : <Plus size={18} />,
+            title: plan ? 'Zmien rzut' : 'Dodaj rzut',
             onClick: () => {
                 setPlanOpened(true);
+            },
+        },
+        {
+            icon: <ArrowLeftSquare size={18} />,
+            title: 'Przesuń rzut',
+            disabled: !plan,
+            onClick: () => {
+                if (!plan) return;
+                setTool(Tool.Edit);
+                plan.focus();
+                setFocusedElement(plan);
             },
         },
         {
@@ -52,7 +66,8 @@ const PlanMenu = () => {
             title: `${plan?.visible ? 'Ukryj' : 'Pokaż'} rzut`,
             disabled: !plan,
             onClick: () => {
-                plan.visible = !plan?.visible;
+                if (!plan) return;
+                plan.visible = !plan.visible;
             },
         },
     ];

@@ -4,7 +4,7 @@ import { useStore } from '../../../../stores/EditorStore';
 import { AddWallManager } from '../../actions/AddWallManager';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';
 import { INodeSerializable } from '../../persistence/INodeSerializable';
-import { FloorPlan } from '../FloorPlan';
+import { FloorPlan } from '../Plan/FloorPlan';
 import { snap } from '../../../../helpers/ViewportCoordinates';
 import { Wall } from './Wall';
 import { main } from '@/2d/EditorRoot';
@@ -205,9 +205,7 @@ export class WallNode extends Container {
         const connectedWalls = this.getConnectedWalls();
 
         // Check length using current node positions (not cached wall.length)
-        const invalidLengthWall = connectedWalls.find(
-            (wall) => this.calcWallLength(wall) < MIN_WALL_LENGTH
-        );
+        const invalidLengthWall = connectedWalls.find((wall) => this.calcWallLength(wall) < MIN_WALL_LENGTH);
 
         if (invalidLengthWall) {
             this.x = this.prevPosition.x;

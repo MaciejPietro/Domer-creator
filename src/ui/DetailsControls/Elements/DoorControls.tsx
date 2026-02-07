@@ -42,7 +42,9 @@ const DoorControls = ({}: any) => {
     });
 
     const handleRemove = () => {
-        focusedElement?.delete();
+        if (focusedElement && 'delete' in focusedElement) {
+            focusedElement.delete();
+        }
         setFocusedElement(null);
     };
 

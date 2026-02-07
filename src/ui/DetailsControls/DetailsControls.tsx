@@ -7,6 +7,8 @@ import DoorControls from './Elements/DoorControls';
 import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
 import { WindowElement } from '@/2d/editor/objects/Furnitures/Window/Window';
 import WindowControls from './Elements/WindowControls';
+import PlanControls from './Elements/PlanControls';
+import { PlanSprite } from '@/2d/editor/objects/Plan/PlanSprite';
 
 
 export function DetailsControls() {
@@ -35,6 +37,7 @@ export function DetailsControls() {
             {focusedElement instanceof Wall ? <WallControls element={focusedElement} /> : null}
             {focusedElement instanceof Door ? <DoorControls /> : null}
             {focusedElement instanceof WindowElement ? <WindowControls /> : null}
+            {focusedElement instanceof PlanSprite ? <PlanControls element={focusedElement} /> : null}
         </Dialog>
 );
 }

@@ -1,4 +1,4 @@
-import { FloorPlan } from '../objects/FloorPlan';
+import { FloorPlan } from '../objects/Plan/FloorPlan';
 import { Action } from './Action';
 
 export class SaveInProjectAction implements Action {

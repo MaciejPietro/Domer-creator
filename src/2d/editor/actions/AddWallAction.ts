@@ -1,4 +1,4 @@
-import { FloorPlan } from '../objects/FloorPlan';
+import { FloorPlan } from '../objects/Plan/FloorPlan';
 import { WallNode } from '../objects/Walls/WallNode';
 import { Action } from './Action';
 

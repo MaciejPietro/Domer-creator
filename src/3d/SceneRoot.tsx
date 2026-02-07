@@ -5,7 +5,7 @@ import { FlyControls, KeyboardControls, OrbitControls, PivotControls } from '@re
 import { Geometry, Base, Subtraction, Addition } from '@react-three/csg';
 import { Environment } from '@/3d/Enviroment';
 import { DoubleSide } from 'three';
-import { FloorPlan } from '@/2d/editor/objects/FloorPlan';
+import { FloorPlan } from '@/2d/editor/objects/Plan/FloorPlan';
 import { HomePlus } from 'tabler-icons-react';
 import { Button } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';

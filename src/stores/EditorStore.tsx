@@ -5,6 +5,7 @@ import { WallNode } from '@/2d/editor/objects/Walls/WallNode';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
 import { WindowElement } from '@/2d/editor/objects/Furnitures/Window/Window';
+import { PlanSprite } from '@/2d/editor/objects/Plan/PlanSprite';
 
 export enum ToolMode {
     FurnitureMode,
@@ -12,7 +13,7 @@ export enum ToolMode {
     ViewMode,
 }
 
-export type FocusedElement = null | WallNode | Wall | Door | WindowElement;
+export type FocusedElement = null | WallNode | Wall | Door | WindowElement | PlanSprite;
 
 export interface EditorStore {
     // mode: ToolMode;
@@ -22,7 +23,7 @@ export interface EditorStore {
     activeToolSettings: any;
     helpMode: boolean;
     snap: boolean;
-    plan: any;
+    plan: PlanSprite | null;
     app: any;
     focusedElement: FocusedElement;
     setHelpMode: (isActive: boolean) => void;
@@ -30,8 +31,8 @@ export interface EditorStore {
     setTool: (tool: Tool) => void;
     setToolSettings: (settings: any) => void;
     setSnap: (snap: boolean) => void;
-    setPlan: (snap: any) => void;
-    setApp: (snap: any) => void;
+    setPlan: (plan: PlanSprite | null) => void;
+    setApp: (app: any) => void;
     setFocusedElement: (element: FocusedElement) => void;
     refreshFocusedElement: () => void;
 }
@@ -77,6 +78,10 @@ export const useStore = create<EditorStore>((set, getState) => ({
     setTool: (tool: Tool) => {
         set((state) => {
             if (state.focusedElement instanceof Wall) {
+                state.focusedElement.blur();
+            }
+
+            if (state.focusedElement instanceof PlanSprite) {
                 state.focusedElement.blur();
             }
 

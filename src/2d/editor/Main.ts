@@ -1,7 +1,7 @@
 import { IViewportOptions, PluginManager, Viewport } from 'pixi-viewport';
 
 import { Application, Container, FederatedPointerEvent, Point } from 'pixi.js';
-import { FloorPlan } from './objects/FloorPlan';
+import { FloorPlan } from './objects/Plan/FloorPlan';
 import { TransformLayer } from './objects/TransformControls/TransformLayer';
 import { useStore } from '../../stores/EditorStore';
 import { AddNodeAction } from './actions/AddNodeAction';

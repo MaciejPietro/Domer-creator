@@ -4,15 +4,21 @@ import { Upload, Photo, X, FileUpload } from 'tabler-icons-react';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { useStore } from '@/stores/EditorStore';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
-import { Assets, Sprite } from 'pixi.js';
+import { Assets } from 'pixi.js';
 import MeasurePlan from './MeasurePlan';
+import { PlanSprite } from '@/2d/editor/objects/Plan/PlanSprite';
+import { Tool } from '@/2d/editor/constants';
 
 import { main } from '@/2d/EditorRoot';
 
-export default function AddPlan({ onClose }: any) {
+interface AddPlanProps {
+    onClose: () => void;
+}
+
+export default function AddPlan({ onClose }: AddPlanProps) {
     const [acceptedFiles, setAcceptedFiles] = useState<File[]>([]);
     const [rejectedFiles, setRejectedFiles] = useState<File[]>([]);
-    const { setPlan } = useStore();
+    const { plan, setPlan, setTool, setFocusedElement } = useStore();
 
     const [lengths, setLengths] = useState<any>({
         real: 0,
@@ -42,10 +48,6 @@ export default function AddPlan({ onClose }: any) {
         reader.onload = async (e: any) => {
             const imageSrc = e.target.result;
 
-            const image = new Image();
-
-            image.src = imageSrc;
-
             // TODO take it from CanvasHTML div
             const width = 729;
 
@@ -53,23 +55,30 @@ export default function AddPlan({ onClose }: any) {
 
             const texture = await Assets.load(imageSrc);
 
-            const sprite = new Sprite(texture);
+            const planSprite = new PlanSprite(texture);
 
-            const sizeScale = sprite.width / width;
+            const natW = planSprite.spriteRef.width;
+            const natH = planSprite.spriteRef.height;
+            planSprite.setScaleParams(lengths.real, lengths.plan, natW, natH);
 
-            sprite.width = (sprite.width * scale) / sizeScale;
-            sprite.height = (sprite.height * scale) / sizeScale;
+            const sizeScale = natW / width;
 
-            sprite.x = main.center.x - sprite.width / 2;
-            sprite.y = main.center.y - sprite.height / 2;
+            planSprite.setDimensions(
+                (natW * scale) / sizeScale,
+                (natH * scale) / sizeScale
+            );
+
+            planSprite.x = main.center.x - planSprite.width / 2;
+            planSprite.y = main.center.y - planSprite.height / 2;
 
             main.removeChildAt(0);
+            main.addChildAt(planSprite, 0);
 
-            main.addChildAt(sprite, 0);
+            setPlan(planSprite);
 
-            setPlan(sprite);
-
-            return;
+            setTool(Tool.Edit);
+            planSprite.focus();
+            setFocusedElement(planSprite);
         };
 
         reader.readAsDataURL(acceptedFiles[0]);
@@ -146,12 +155,12 @@ export default function AddPlan({ onClose }: any) {
                     </div>
 
                     <Button
-                        // disabled={!acceptedFiles.length || !lengths.real || !lengths.plan}
+                        disabled={!acceptedFiles.length || !lengths.real || !lengths.plan}
                         onClick={uploadFile}
                         className="mt-6"
                         leftSection={<FileUpload size={20} />}
                     >
-                        Akceptuj plan
+                        {plan ? 'Zamień plan' : 'Akceptuj plan'}
                     </Button>
                 </div>
             </div>
