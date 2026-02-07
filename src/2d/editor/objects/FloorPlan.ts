@@ -1,5 +1,4 @@
 import { Container } from 'pixi.js';
-import { FurnitureData } from '../../../stores/FurnitureStore';
 import { Wall } from './Walls/Wall';
 import { Floor } from './Floor';
 import { Serializer } from '../persistence/Serializer';
@@ -18,7 +17,6 @@ export class FloorPlan extends Container {
     private visibleLabels = true;
     private serializer: Serializer;
     public furnitureId = 0; // TODO uuid?
-    public windowFurniture: FurnitureData;
     public actions: Action[];
 
     public currentFloor = 0;
@@ -142,10 +140,6 @@ export class FloorPlan extends Container {
 
     public removeFurniture(uuid: string) {
         this.floors[this.currentFloor].removeFurniture(uuid);
-    }
-
-    public getObject(id: number) {
-        return this.floors[this.currentFloor].getObject(id);
     }
 
     public redrawWalls() {

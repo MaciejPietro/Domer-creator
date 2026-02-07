@@ -175,14 +175,23 @@ export class WallNode extends Container {
                     this.setToStartDragPosition();
                 }
 
-                const connectedWalls = this.getConnectedWalls(wall);
+                // TODO do I need this?
+                // const connectedWalls = this.getConnectedWallsOld(wall);
 
-                if (connectedWalls.length === 0) return;
+                // if (connectedWalls.length === 0) return;
             });
         }
     }
 
-    private getConnectedWalls(currentWall: Wall): Wall[] {
+    private getConnectedWalls() {
+        return this.parent.children.filter((child) => {
+            if (!isWall(child)) return;
+
+            return child.leftNode === this || child.rightNode === this;
+        }) as Wall[];
+    }
+
+    private getConnectedWallsOld(currentWall: Wall): Wall[] {
         return this.parent.children.filter((child) => {
             if (!isWall(child)) return;
             if (child === currentWall) return;
@@ -196,27 +205,34 @@ export class WallNode extends Container {
         }) as Wall[];
     }
 
-    private calculateAngleBetweenWalls(wall1: Wall, wall2: Wall): number | undefined {
-        const angle1 = wall1.angle;
-        const angle2 = wall2.angle;
-        const angleDifference = Math.abs(angle1 - angle2);
-
-        if (wall1.rightNode === wall2.rightNode) {
-            return angleDifference;
-        }
-
-        if (wall1.leftNode === wall2.rightNode) {
-            return Math.abs(180 - angleDifference);
-        }
-
-        if (wall1.rightNode === wall2.leftNode) {
-            return Math.abs(180 - angleDifference);
-        }
-
-        if (wall1.leftNode === wall2.leftNode) {
-            return angleDifference;
-        }
+    public redrawConnectedWalls() {
+        this.getConnectedWalls().forEach((wall) => {
+            wall.drawWall();
+        });
     }
+
+    // TODO do I need this?
+    // private calculateAngleBetweenWalls(wall1: Wall, wall2: Wall): number | undefined {
+    //     const angle1 = wall1.angle;
+    //     const angle2 = wall2.angle;
+    //     const angleDifference = Math.abs(angle1 - angle2);
+
+    //     if (wall1.rightNode === wall2.rightNode) {
+    //         return angleDifference;
+    //     }
+
+    //     if (wall1.leftNode === wall2.rightNode) {
+    //         return Math.abs(180 - angleDifference);
+    //     }
+
+    //     if (wall1.rightNode === wall2.leftNode) {
+    //         return Math.abs(180 - angleDifference);
+    //     }
+
+    //     if (wall1.leftNode === wall2.leftNode) {
+    //         return angleDifference;
+    //     }
+    // }
 
     private onMouseMove(ev: FederatedPointerEvent) {
         this.checkIfCanDragFurther();

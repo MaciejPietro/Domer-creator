@@ -469,10 +469,9 @@ export class Wall extends Graphics {
     }
 
     public delete() {
-        const action = new DeleteWallAction(this);
-
-        action.execute();
-
+        new DeleteWallAction(this).execute();
+        console.log('xdxd', this.rightNode.redrawConnectedWalls());
+        console.log('xdxd', this.leftNode.redrawConnectedWalls());
         new DeleteWallNodeAction(this.leftNode.getId()).execute();
         new DeleteWallNodeAction(this.rightNode.getId()).execute();
     }

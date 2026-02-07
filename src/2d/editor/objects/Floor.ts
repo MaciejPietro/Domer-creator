@@ -317,10 +317,6 @@ export class Floor extends Container {
         }
     }
 
-    public getObject(id: number) {
-        // return this.furnitureArray.get(id);
-    }
-
     public redrawWalls() {
         this.wallNodeSequence.drawWalls();
     }
