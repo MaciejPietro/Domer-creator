@@ -1,3 +1,5 @@
+import { WallType } from './types';
+
 export const WALL_FILL_COLOR = '#919191';
 
 export const WALL_HOVER_FILL_COLOR = '#8c8b8b';
@@ -16,7 +18,7 @@ export const WALL_DASHED_LINE_Z_INDEX = 22;
 export const WALL_TEMP_FURNITURE_Z_INDEX = 25;
 
 export const WALL_THICKNESS = 40;
-export const DEFAULT_WALL_TYPE = 'exterior';
+export const DEFAULT_WALL_TYPE: WallType = 'exterior';
 
 // Corner calculation constants
 export const INTERSECTION_LINE_EXTENSION = 100;

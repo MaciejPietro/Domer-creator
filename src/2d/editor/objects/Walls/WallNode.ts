@@ -12,6 +12,7 @@ import { Point } from '@/helpers/Point';
 import { BuildingElement } from '../Furnitures/BuildingElement';
 import { showCollisionError, showMinLengthError } from './errors';
 import { isWall } from '@/2d/helpers/objects';
+import { MIN_WALL_LENGTH } from './constants';
 
 export class WallNode extends Container {
     public dragging: boolean;
@@ -21,7 +22,6 @@ export class WallNode extends Container {
 
     private size = 10;
     public prevPosition = { x: 0, y: 0 };
-    private startDragPosition = { x: 0, y: 0 };
     private isMouseOver = false;
     background: any;
 
@@ -141,7 +141,6 @@ export class WallNode extends Container {
 
     private onMouseDown(ev: FederatedPointerEvent) {
         ev.stopPropagation();
-        this.startDragPosition = { x: this.x, y: this.y };
 
         // if (!this.isEditMode()) return;
 
@@ -160,29 +159,6 @@ export class WallNode extends Container {
         }
     }
 
-    private checkIfCanDragFurther() {
-        const parentWalls = this.parent.children.filter((child) => child instanceof Wall);
-
-        if (parentWalls.length) {
-            parentWalls.forEach((wall) => {
-                if (!wall.isValidLength()) {
-                    showMinLengthError();
-                    this.setToStartDragPosition();
-                }
-
-                if (wall.isColliding()) {
-                    showCollisionError();
-                    this.setToStartDragPosition();
-                }
-
-                // TODO do I need this?
-                // const connectedWalls = this.getConnectedWallsOld(wall);
-
-                // if (connectedWalls.length === 0) return;
-            });
-        }
-    }
-
     private getConnectedWalls() {
         return this.parent.children.filter((child) => {
             if (!isWall(child)) return;
@@ -191,18 +167,10 @@ export class WallNode extends Container {
         }) as Wall[];
     }
 
-    private getConnectedWallsOld(currentWall: Wall): Wall[] {
-        return this.parent.children.filter((child) => {
-            if (!isWall(child)) return;
-            if (child === currentWall) return;
-
-            return (
-                child.leftNode === currentWall.leftNode ||
-                child.leftNode === currentWall.rightNode ||
-                child.rightNode === currentWall.leftNode ||
-                child.rightNode === currentWall.rightNode
-            );
-        }) as Wall[];
+    private calcWallLength(wall: Wall): number {
+        const dx = wall.rightNode.x - wall.leftNode.x;
+        const dy = wall.rightNode.y - wall.leftNode.y;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     public redrawConnectedWalls() {
@@ -211,32 +179,7 @@ export class WallNode extends Container {
         });
     }
 
-    // TODO do I need this?
-    // private calculateAngleBetweenWalls(wall1: Wall, wall2: Wall): number | undefined {
-    //     const angle1 = wall1.angle;
-    //     const angle2 = wall2.angle;
-    //     const angleDifference = Math.abs(angle1 - angle2);
-
-    //     if (wall1.rightNode === wall2.rightNode) {
-    //         return angleDifference;
-    //     }
-
-    //     if (wall1.leftNode === wall2.rightNode) {
-    //         return Math.abs(180 - angleDifference);
-    //     }
-
-    //     if (wall1.rightNode === wall2.leftNode) {
-    //         return Math.abs(180 - angleDifference);
-    //     }
-
-    //     if (wall1.leftNode === wall2.leftNode) {
-    //         return angleDifference;
-    //     }
-    // }
-
     private onMouseMove(ev: FederatedPointerEvent) {
-        this.checkIfCanDragFurther();
-
         if (!this.dragging) {
             return;
         }
@@ -255,21 +198,38 @@ export class WallNode extends Container {
             y = snap(y);
         }
 
+        // Temporarily set position to check validity
         this.x = x;
         this.y = y;
 
-        // TODO make this redraw only the walls that are affected
+        const connectedWalls = this.getConnectedWalls();
+
+        // Check length using current node positions (not cached wall.length)
+        const invalidLengthWall = connectedWalls.find(
+            (wall) => this.calcWallLength(wall) < MIN_WALL_LENGTH
+        );
+
+        if (invalidLengthWall) {
+            this.x = this.prevPosition.x;
+            this.y = this.prevPosition.y;
+            showMinLengthError();
+            return;
+        }
+
+        // Redraw walls to update their geometry before checking collisions
         FloorPlan.Instance.redrawWalls();
-    }
 
-    private setToStartDragPosition() {
-        this.dragging = false;
+        // Check collisions after redraw (needs updated wall.length)
+        const collidingWall = connectedWalls.find((wall) => wall.isColliding());
 
-        setTimeout(() => {
-            this.x = this.startDragPosition.x;
-            this.y = this.startDragPosition.y;
+        if (collidingWall) {
+            // Revert position and redraw again
+            this.x = this.prevPosition.x;
+            this.y = this.prevPosition.y;
             FloorPlan.Instance.redrawWalls();
-        }, 500);
+            showCollisionError();
+            return;
+        }
     }
 
     public setToPrevPosition() {
