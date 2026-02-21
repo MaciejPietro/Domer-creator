@@ -50,26 +50,30 @@ const PlanMenu = () => {
                 setPlanOpened(true);
             },
         },
-        {
-            icon: <ArrowLeftSquare size={18} />,
-            title: 'Przesuń rzut',
-            disabled: !plan,
-            onClick: () => {
-                if (!plan) return;
-                setTool(Tool.Edit);
-                plan.focus();
-                setFocusedElement(plan);
-            },
-        },
-        {
-            icon: plan?.visible ? <EyeOff size={18} /> : <Eye size={18} />,
-            title: `${plan?.visible ? 'Ukryj' : 'Pokaż'} rzut`,
-            disabled: !plan,
-            onClick: () => {
-                if (!plan) return;
-                plan.visible = !plan.visible;
-            },
-        },
+        plan
+            ? {
+                  icon: <ArrowLeftSquare size={18} />,
+                  title: 'Przesuń rzut',
+                  disabled: !plan,
+                  onClick: () => {
+                      if (!plan) return;
+                      setTool(Tool.Edit);
+                      plan.focus();
+                      setFocusedElement(plan);
+                  },
+              }
+            : null,
+        plan
+            ? {
+                  icon: plan?.visible ? <EyeOff size={18} /> : <Eye size={18} />,
+                  title: `${plan?.visible ? 'Ukryj' : 'Pokaż'} rzut`,
+                  disabled: !plan,
+                  onClick: () => {
+                      if (!plan) return;
+                      plan.visible = !plan.visible;
+                  },
+              }
+            : null,
     ];
 
     return (
@@ -98,11 +102,18 @@ const PlanMenu = () => {
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                    {options.map((opt) => (
-                        <Menu.Item key={opt.title} leftSection={opt.icon} onClick={opt.onClick} disabled={opt.disabled}>
-                            {opt.title}
-                        </Menu.Item>
-                    ))}
+                    {options
+                        .filter((opt) => opt !== null)
+                        .map((opt) => (
+                            <Menu.Item
+                                key={opt.title}
+                                leftSection={opt.icon}
+                                onClick={opt.onClick}
+                                disabled={opt.disabled}
+                            >
+                                {opt.title}
+                            </Menu.Item>
+                        ))}
                 </Menu.Dropdown>
             </Menu>
         </>

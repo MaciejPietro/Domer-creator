@@ -1,5 +1,7 @@
 import { Floor } from '../objects/Floor';
+import { Plot } from '../objects/Plot/Plot';
 import { FloorPlanSerializable } from './FloorPlanSerializable';
+import { PlotPlanSerializable } from './PlotPlanSerializable';
 
 export class Serializer {
     public serialize(floors: Floor[], furnitureId: number) {
@@ -42,5 +44,11 @@ export class Serializer {
         }
 
         return floorPlanSerializable.floors[0];
+    }
+
+    public serializePlot(plot: Plot): PlotPlanSerializable {
+        const plotPlanSerializable = new PlotPlanSerializable();
+        plotPlanSerializable.plot = plot.serialize();
+        return plotPlanSerializable;
     }
 }

@@ -3,7 +3,7 @@ import { Polygon, Pencil, Eraser, Eye, EyeOff } from 'tabler-icons-react';
 
 import { useStore } from '@/stores/EditorStore';
 import { Tool } from '@/2d/editor/constants';
-import { FloorPlan } from '@/2d/editor/objects/Plan/FloorPlan';
+import { PlotPlan } from '@/2d/editor/objects/Plan/PlotPlan';
 import { useState } from 'react';
 
 const PlotMenu = () => {
@@ -13,7 +13,7 @@ const PlotMenu = () => {
     const isPlotToolActive = activeTool === Tool.PlotAdd;
 
     const togglePlotVisibility = () => {
-        const plot = FloorPlan.Instance.getPlot();
+        const plot = PlotPlan.Instance.getPlot();
         if (plot) {
             plot.visible = !plot.visible;
             setPlotVisible(plot.visible);
@@ -21,7 +21,7 @@ const PlotMenu = () => {
     };
 
     const clearPlot = () => {
-        const plot = FloorPlan.Instance.getPlot();
+        const plot = PlotPlan.Instance.getPlot();
         if (plot) {
             plot.reset();
         }

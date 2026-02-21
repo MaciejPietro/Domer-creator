@@ -2,6 +2,7 @@ import { Container, Graphics } from 'pixi.js';
 import { PlotNode } from './PlotNode';
 import { PlotEdge } from './PlotEdge';
 import { PLOT_FILL_COLOR, PLOT_FILL_ALPHA, PLOT_Z_INDEX } from './constants';
+import { PlotEdgeId } from './types';
 
 export interface PlotNodeSerializable {
     id: number;
@@ -16,7 +17,7 @@ export interface PlotSerializable {
 
 export class Plot extends Container {
     private nodes: Map<number, PlotNode> = new Map();
-    private edges: PlotEdge[] = [];
+    private edges: Map<PlotEdgeId, PlotEdge> = new Map();
     private nodeLinks: Map<number, number[]> = new Map();
     private static nodeId = 0;
     private fillGraphics: Graphics;
@@ -62,7 +63,7 @@ export class Plot extends Container {
         if (!node) return;
 
         // Remove all edges connected to this node
-        const edgesToRemove = this.edges.filter(
+        const edgesToRemove = [...this.edges.values()].filter(
             (edge) => edge.leftNode.getId() === nodeId || edge.rightNode.getId() === nodeId
         );
 
@@ -83,7 +84,7 @@ export class Plot extends Container {
         if (leftNodeId === rightNodeId) return;
 
         // Check if edge already exists
-        const existingEdge = this.edges.find(
+        const existingEdge = [...this.edges.values()].find(
             (edge) =>
                 (edge.leftNode.getId() === leftNodeId && edge.rightNode.getId() === rightNodeId) ||
                 (edge.leftNode.getId() === rightNodeId && edge.rightNode.getId() === leftNodeId)
@@ -97,7 +98,7 @@ export class Plot extends Container {
         if (!leftNode || !rightNode) return;
 
         const edge = new PlotEdge(leftNode, rightNode);
-        this.edges.push(edge);
+        this.edges.set(edge.id, edge);
         this.addChild(edge);
 
         // Update links
@@ -113,16 +114,17 @@ export class Plot extends Container {
         return edge;
     }
 
-    public removeEdge(leftNodeId: number, rightNodeId: number) {
-        const edgeIndex = this.edges.findIndex(
-            (edge) =>
-                (edge.leftNode.getId() === leftNodeId && edge.rightNode.getId() === rightNodeId) ||
-                (edge.leftNode.getId() === rightNodeId && edge.rightNode.getId() === leftNodeId)
-        );
+    public findEdge(id: PlotEdgeId) {
+        return this.edges.get(id);
+    }
 
-        if (edgeIndex === -1) return;
+    public removeEdge(id: PlotEdgeId) {
+        const edge = this.findEdge(id);
+        if (!edge) return;
 
-        const edge = this.edges[edgeIndex];
+        const leftNodeId = edge.leftNode.getId();
+        const rightNodeId = edge.rightNode.getId();
+
         this.removeEdgeObject(edge);
 
         // Update links
@@ -142,16 +144,20 @@ export class Plot extends Container {
     }
 
     private removeEdgeObject(edge: PlotEdge) {
-        const index = this.edges.indexOf(edge);
-        if (index !== -1) {
-            this.edges.splice(index, 1);
-        }
+        this.edges.delete(edge.id);
+        edge.removeOrphanedNodes();
         this.removeChild(edge);
         edge.destroy();
     }
 
+    public getConnectedEdges(nodeId: number) {
+        return [...this.edges.values()].filter((edge) => {
+            return edge.leftNode.getId() === nodeId || edge.rightNode.getId() === nodeId;
+        });
+    }
+
     public drawEdges() {
-        for (const edge of this.edges) {
+        for (const edge of this.edges.values()) {
             edge.draw();
         }
         this.drawFill();
@@ -227,11 +233,11 @@ export class Plot extends Container {
         }
         this.nodes.clear();
 
-        for (const edge of this.edges) {
+        for (const edge of this.edges.values()) {
             this.removeChild(edge);
             edge.destroy();
         }
-        this.edges = [];
+        this.edges.clear();
 
         this.nodeLinks.clear();
         this.fillGraphics.clear();
@@ -262,7 +268,7 @@ export class Plot extends Container {
         }
 
         const edges: Array<{ leftNodeId: number; rightNodeId: number }> = [];
-        for (const edge of this.edges) {
+        for (const edge of this.edges.values()) {
             edges.push(edge.serialize());
         }
 

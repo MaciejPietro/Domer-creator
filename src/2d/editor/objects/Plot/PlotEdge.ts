@@ -3,14 +3,20 @@ import { useStore } from '../../../../stores/EditorStore';
 import { Tool, ViewMode } from '../../constants';
 import { PlotNode } from './PlotNode';
 import { PLOT_EDGE_COLOR, PLOT_EDGE_ACTIVE_COLOR, PLOT_EDGE_WIDTH } from './constants';
+import { Plot } from './Plot';
+import { PlotEdgeId } from './types';
+import { v4 as uuidv4 } from 'uuid';
+import { DeletePlotEdgeAction } from '../../actions/DeletePlotEdgeAction';
 
 export class PlotEdge extends Graphics {
+    id: PlotEdgeId;
     public leftNode: PlotNode;
     public rightNode: PlotNode;
     private focused = false;
 
     constructor(leftNode: PlotNode, rightNode: PlotNode) {
         super();
+        this.id = uuidv4() as unknown as PlotEdgeId;
         this.leftNode = leftNode;
         this.rightNode = rightNode;
 
@@ -52,7 +58,8 @@ export class PlotEdge extends Graphics {
 
         switch (state.activeTool) {
             case Tool.Remove:
-                this.delete();
+                const action = new DeletePlotEdgeAction(this.id);
+                action.execute();
                 break;
             case Tool.Edit:
                 // Could add node in middle of edge
@@ -60,10 +67,17 @@ export class PlotEdge extends Graphics {
         }
     }
 
-    public delete() {
-        const plot = this.parent as any;
-        if (plot && plot.removeEdge) {
-            plot.removeEdge(this.leftNode.getId(), this.rightNode.getId());
+    public removeOrphanedNodes() {
+        const plot = this.parent as Plot;
+        if (!plot) return;
+
+        const isLeftNodeOrphan = plot.getConnectedEdges(this.leftNode.getId()).length === 0;
+        if (isLeftNodeOrphan) {
+            this.leftNode.delete();
+        }
+        const isRightNodeOrphan = plot.getConnectedEdges(this.rightNode.getId()).length === 0;
+        if (isRightNodeOrphan) {
+            this.rightNode.delete();
         }
     }
 

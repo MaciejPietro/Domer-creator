@@ -2,6 +2,7 @@ import { IViewportOptions, PluginManager, Viewport } from 'pixi-viewport';
 
 import { Application, Container, FederatedPointerEvent, Point } from 'pixi.js';
 import { FloorPlan } from './objects/Plan/FloorPlan';
+import { PlotPlan } from './objects/Plan/PlotPlan';
 import { TransformLayer } from './objects/TransformControls/TransformLayer';
 import { useStore } from '../../stores/EditorStore';
 import { AddNodeAction } from './actions/AddNodeAction';
@@ -22,6 +23,7 @@ import { WallNodeSequence } from './objects/Walls/WallNodeSequence';
 
 export class Main extends Viewport {
     private floorPlan: FloorPlan;
+    private plotPlan: PlotPlan;
     public static viewportPluginManager: PluginManager;
     public static app: Application;
     transformLayer: TransformLayer;
@@ -64,6 +66,9 @@ export class Main extends Viewport {
 
         this.floorPlan = FloorPlan.Instance;
         this.addChild(this.floorPlan);
+
+        this.plotPlan = PlotPlan.Instance;
+        this.addChild(this.plotPlan);
 
         this.transformLayer = TransformLayer.Instance;
         this.addChild(this.transformLayer);

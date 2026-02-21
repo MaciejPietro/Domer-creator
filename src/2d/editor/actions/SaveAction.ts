@@ -1,5 +1,6 @@
 import saveAs from 'file-saver';
 import { FloorPlan } from '../objects/Plan/FloorPlan';
+import { PlotPlan } from '../objects/Plan/PlotPlan';
 import { Action } from './Action';
 
 export class SaveAction implements Action {
@@ -9,7 +10,13 @@ export class SaveAction implements Action {
     }
 
     public execute() {
-        const data = this.receiver.save();
+        const floorData = this.receiver.save();
+        const plotData = PlotPlan.Instance.save();
+
+        const data = {
+            ...floorData,
+            plot: plotData.plot,
+        };
 
         const jsonData = JSON.stringify(data, null, 2);
 

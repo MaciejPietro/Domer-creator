@@ -2,7 +2,7 @@ import { FederatedPointerEvent } from 'pixi.js';
 import { euclideanDistance } from '../../../helpers/EuclideanDistance';
 import { Point } from '../../../helpers/Point';
 import { METER } from '../constants';
-import { FloorPlan } from '../objects/Plan/FloorPlan';
+import { PlotPlan } from '../objects/Plan/PlotPlan';
 import { PlotNode } from '../objects/Plot/PlotNode';
 import { Preview } from './MeasureToolManager';
 import { PLOT_EDGE_COLOR } from '../objects/Plot/constants';
@@ -19,7 +19,7 @@ export class AddPlotManager {
     }
 
     public checkStep(coords: Point) {
-        const plot = FloorPlan.Instance.getPlot();
+        const plot = PlotPlan.Instance.getPlot();
         if (!plot) return true;
 
         if (this.previousNode == undefined) {
@@ -49,7 +49,7 @@ export class AddPlotManager {
         }
 
         // Add edge between previous node and current node
-        const plot = FloorPlan.Instance.getPlot();
+        const plot = PlotPlan.Instance.getPlot();
         if (plot) {
             plot.addEdge(this.previousNode.getId(), node.getId());
         }

@@ -1,5 +1,5 @@
 import { Point } from '../../../helpers/Point';
-import { FloorPlan } from '../objects/Plan/FloorPlan';
+import { PlotPlan } from '../objects/Plan/PlotPlan';
 import { AddPlotManager } from './AddPlotManager';
 
 export class AddPlotNodeAction {
@@ -16,7 +16,7 @@ export class AddPlotNodeAction {
             return;
         }
 
-        const plot = FloorPlan.Instance.getPlot();
+        const plot = PlotPlan.Instance.getPlot();
         if (!plot) return;
 
         const newNode = plot.addNode(this.coords.x, this.coords.y);

@@ -6,10 +6,12 @@ import { main } from '@/2d/EditorRoot';
 import { Point } from '@/helpers/Point';
 import { PLOT_NODE_COLOR, PLOT_NODE_ACTIVE_COLOR, PLOT_NODE_SIZE } from './constants';
 import { AddPlotManager } from '../../actions/AddPlotManager';
+import { PlotNodeId } from './types';
+import { DeletePlotNodeAction } from '../../actions/DeletePlotNodeAction';
 
 export class PlotNode extends Container {
     public dragging: boolean = false;
-    private id: number;
+    private id: PlotNodeId;
     private dot = new Graphics();
     mouseStartPoint: Point;
 
@@ -19,7 +21,7 @@ export class PlotNode extends Container {
     constructor(x: number, y: number, nodeId: number) {
         super();
         this.eventMode = 'static';
-        this.id = nodeId;
+        this.id = nodeId as PlotNodeId;
 
         this.setStyles({});
 
@@ -111,7 +113,8 @@ export class PlotNode extends Container {
                 this.mouseStartPoint.y = ev.global.y;
                 break;
             case Tool.Remove:
-                this.delete();
+                const action = new DeletePlotNodeAction(this.id);
+                action.execute();
                 break;
             case Tool.PlotAdd:
                 AddPlotManager.Instance.step(this);
