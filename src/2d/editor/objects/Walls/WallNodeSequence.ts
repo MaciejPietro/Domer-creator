@@ -230,14 +230,6 @@ export class WallNodeSequence extends Container {
         return connectedWalls;
     }
 
-    public getWallByUuid(uuid: string) {
-        return this.walls.find((wall) => wall.uuid === uuid);
-    }
-
-    public findAllNeighbors(currentWallUuid: string, nodeId: number) {
-        return this.getWallsByNodesIds([nodeId]).filter((wall) => wall.uuid !== currentWallUuid);
-    }
-
     public findFirstNeighbor(currentWall: Wall, nodeId: number, clockwise: boolean = true) {
         const walls = this.getWallsByNodesIds([nodeId]);
         const currentWallUuid = currentWall.uuid;

@@ -22,7 +22,6 @@ import {
     CORNER_ANGLE_THRESHOLD,
     DEFAULT_WALL_TYPE,
     INTERSECTION_LINE_EXTENSION,
-    MIN_WALL_LENGTH,
     WALL_ACTIVE_STROKE_COLOR,
     WALL_ACTIVE_Z_INDEX,
     WALL_FILL_COLOR,
@@ -268,8 +267,6 @@ export class Wall extends Graphics {
         }
     }
 
-    public handleInvalidLength() {}
-
     public isColliding() {
         const spots = this.getOccupiedSpots(false);
 
@@ -280,10 +277,6 @@ export class Wall extends Graphics {
                 spot.start > this.length - DISTANCE_FROM_WALL ||
                 spot.end > this.length - DISTANCE_FROM_WALL
         );
-    }
-
-    public isValidLength() {
-        return this.length >= MIN_WALL_LENGTH;
     }
 
     public drawWall() {

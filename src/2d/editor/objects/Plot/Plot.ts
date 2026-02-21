@@ -274,8 +274,4 @@ export class Plot extends Container {
 
         return { nodes, edges };
     }
-
-    public isEmpty() {
-        return this.nodes.size === 0;
-    }
 }
