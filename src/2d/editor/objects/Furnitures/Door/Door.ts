@@ -9,6 +9,7 @@ import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 import { IDoorSerializable } from './IDoorSerializable';
 import { DOOR_ACTIVE_COLOR, DOOR_COLOR, DOOR_INVALID_COLOR, DOOR_WIDTH } from './constants';
 import { showCannotChangeWidthError } from './errors';
+import { COLOR_BACKGROUND } from '@/2d/constants/appConstants';
 
 export type FurnitureOrientation = number; // 0 <-> 359
 
@@ -124,7 +125,7 @@ export class Door extends BuildingElement {
         // WALL GAP
         this.baseLine
             .rect(-1, -wallParentThickness + offset, this.length + 2, wallParentThickness)
-            .fill({ color: DOOR_COLOR });
+            .fill({ color: COLOR_BACKGROUND });
 
         // THICK LINE
         this.baseLine.rect(-1, -9, x + this.length + 2, 10).fill({ color });

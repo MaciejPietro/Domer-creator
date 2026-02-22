@@ -6,6 +6,7 @@ export class Label extends Container {
     text: Text;
     textStyle: TextStyle = new TextStyle({ fontFamily: 'Arial', fontSize: 16, fill: 0x000000, align: 'center' });
     textBkg: Sprite = new Sprite(Texture.WHITE);
+    private baseScale = 1;
     constructor(sizeInPixels?: number) {
         super();
 
@@ -36,6 +37,12 @@ export class Label extends Container {
     public updatePos(pos: Point, sizeInPixels: number) {
         this.position.set(pos.x, pos.y);
         this.update(sizeInPixels);
+    }
+
+    public setZoomScale(zoomScale: number) {
+        // Inverse zoom scaling - when zoomed out, labels get bigger
+        this.baseScale = 1 / zoomScale;
+        this.scale.set(this.baseScale, this.baseScale);
     }
 
     private toMeter(size: number) {

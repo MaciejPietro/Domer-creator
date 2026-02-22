@@ -198,11 +198,20 @@ export class Main extends Viewport {
     }
 
     private onZoomed() {
+        const { setZoom } = useStore.getState();
+        setZoom(this.scale.x);
+
         if (this.scale.x <= 0.5) {
             this.grid.hideCm();
         } else {
             this.grid.showCm();
         }
+
+        // Update zoom-dependent scaling for labels
+        this.preview.setZoomScale(this.scale.x);
+        this.transformLayer.setZoomScale(this.scale.x);
+        this.addWallManager.preview.setZoomScale(this.scale.x);
+        this.addPlotManager.preview.setZoomScale(this.scale.x);
     }
 }
 

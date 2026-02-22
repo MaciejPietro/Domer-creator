@@ -116,4 +116,8 @@ export class Preview {
     public getReference() {
         return this.preview;
     }
+
+    public setZoomScale(zoomScale: number) {
+        this.sizeLabel.setZoomScale(zoomScale);
+    }
 }

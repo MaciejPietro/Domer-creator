@@ -16,6 +16,7 @@ import {
     WINDOW_WIDTH,
 } from './constants';
 import { showCannotChangeWidthError } from './errors';
+import { COLOR_BACKGROUND } from '@/2d/constants/appConstants';
 
 // bg-blue-500 from tailwind.config.js
 
@@ -118,7 +119,7 @@ export class WindowElement extends BuildingElement {
         // WALL GAP
         this.baseLine
             .rect(0, -wallParentThickness / 2, x + this.length, wallParentThickness)
-            .fill({ color: WINDOW_COLOR });
+            .fill({ color: COLOR_BACKGROUND });
 
         // DASHED LINE
         const cutWidth = 5;

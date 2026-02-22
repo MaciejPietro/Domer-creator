@@ -24,8 +24,21 @@ export class Pointer extends Container {
         let worldY = viewportY(ev.global.y);
 
         if (useStore.getState().snap) {
-            worldX = Math.trunc(worldX - (worldX % 10));
-            worldY = Math.trunc(worldY - (worldY % 10));
+            const zoom = useStore.getState().zoom;
+            let snapFactor = 10;
+
+            if (zoom >= 2) {
+                snapFactor = 10;
+            } else if (zoom >= 1) {
+                snapFactor = 20;
+            } else if (zoom >= 0.5) {
+                snapFactor = 50;
+            } else {
+                snapFactor = 100;
+            }
+
+            worldX = Math.trunc(worldX - (worldX % snapFactor));
+            worldY = Math.trunc(worldY - (worldY % snapFactor));
         }
 
         this.position.set(worldX, worldY);

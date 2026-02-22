@@ -24,6 +24,7 @@ export interface EditorStore {
     activeToolSettings: any;
     helpMode: boolean;
     snap: boolean;
+    zoom: number;
     plan: PlanSprite | null;
     app: any;
     focusedElement: FocusedElement;
@@ -32,6 +33,7 @@ export interface EditorStore {
     setTool: (tool: Tool) => void;
     setToolSettings: (settings: any) => void;
     setSnap: (snap: boolean) => void;
+    setZoom: (zoom: number) => void;
     setPlan: (plan: PlanSprite | null) => void;
     setApp: (app: any) => void;
     setFocusedElement: (element: FocusedElement) => void;
@@ -46,6 +48,7 @@ export const useStore = create<EditorStore>((set, getState) => ({
     helpMode: false,
     floor: 0,
     snap: false,
+    zoom: 1,
     plan: null,
     app: null,
     focusedElement: null,
@@ -102,6 +105,11 @@ export const useStore = create<EditorStore>((set, getState) => ({
     setSnap: (snap: boolean) => {
         set(() => ({
             snap: snap,
+        }));
+    },
+    setZoom: (zoom: number) => {
+        set(() => ({
+            zoom,
         }));
     },
     setPlan: (plan: any) => {

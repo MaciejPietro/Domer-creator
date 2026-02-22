@@ -187,4 +187,9 @@ export class TransformLayer extends Container {
         this.labels[LabelAxis.Vertical].updatePos(this.points[Coord.Vertical], this.target.height);
         this.labels[LabelAxis.Vertical].angle = 360 - this.target.angle;
     }
+
+    public setZoomScale(zoomScale: number) {
+        this.labels[LabelAxis.Horizontal].setZoomScale(zoomScale);
+        this.labels[LabelAxis.Vertical].setZoomScale(zoomScale);
+    }
 }

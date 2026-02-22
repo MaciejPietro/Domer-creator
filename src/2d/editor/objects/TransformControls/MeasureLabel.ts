@@ -19,6 +19,7 @@ export class MeasureLabel extends Container {
     lineGraphic: Graphics;
     lineAGraphic: Graphics;
     lineBGraphic: Graphics;
+    private baseScale = 1;
 
     constructor(length?: number) {
         super();
@@ -80,6 +81,12 @@ export class MeasureLabel extends Container {
 
     public hide() {
         this.visible = false;
+    }
+
+    public setZoomScale(zoomScale: number) {
+        // Inverse zoom scaling - when zoomed out, labels get bigger
+        this.baseScale = 1 / zoomScale;
+        this.scale.set(this.baseScale, this.baseScale);
     }
 
     private updateText(length: number, angle: number, position: { x: number; y: number }) {

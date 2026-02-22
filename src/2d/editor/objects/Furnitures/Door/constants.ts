@@ -7,4 +7,4 @@ export const DOOR_INVALID_COLOR = '#732424';
 
 export const DOOR_WIDTH = 80;
 
-export const DOOR_COLOR = COLOR_BACKGROUND;
+export const DOOR_COLOR = '#545454';
