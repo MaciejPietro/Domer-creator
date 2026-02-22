@@ -1,24 +1,18 @@
 import { Container, Graphics } from 'pixi.js';
 
-const GRID_ALPHA = 0.25;
-const GRID_ALPHA_M = 0.75;
-const GRID_SIZE = 10;
-const GRID_SIZE_M = 100;
-const GRID_COLOR = 0x222222;
+const CM_GRID_ALPHA = 0.25;
+const M_GRID_ALPHA = 0.75;
+const CM_GRID_SIZE = 10;
+const M_GRID_SIZE = 100;
+const CM_GRID_COLOR = 0x222222;
+const M_GRID_COLOR = 0x111111;
+
 export class Grid extends Container {
-    private gridGraphics: Graphics;
     private cmGrid: Graphics;
     private mGrid: Graphics;
-    private worldWidth: number;
-    private worldHeight: number;
-
-    private mAlpha = GRID_ALPHA_M;
-    private cmAlpha = GRID_ALPHA;
 
     constructor(worldWidth: number, worldHeight: number) {
         super();
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
 
         this.cmGrid = new Graphics();
         this.mGrid = new Graphics();
@@ -26,61 +20,28 @@ export class Grid extends Container {
         this.addChild(this.cmGrid);
         this.addChild(this.mGrid);
 
-        this.drawCmGrid();
-        this.drawMGrid();
+        this.drawGrid(this.cmGrid, worldWidth, worldHeight, CM_GRID_SIZE, 0.2, CM_GRID_COLOR, CM_GRID_ALPHA);
+        this.drawGrid(this.mGrid, worldWidth, worldHeight, M_GRID_SIZE, 1, M_GRID_COLOR, M_GRID_ALPHA);
     }
 
-    private drawCmGrid() {
-        // Draw centimeter grid
-        for (let x = 0; x <= this.worldWidth; x += GRID_SIZE) {
-            this.cmGrid.moveTo(x, 0);
-            this.cmGrid.lineTo(x, this.worldHeight);
-            this.cmGrid.stroke({ width: 0.5, color: GRID_COLOR, alpha: GRID_ALPHA });
+    private drawGrid(g: Graphics, w: number, h: number, step: number, strokeWidth: number, color: number, alpha: number) {
+        for (let x = 0; x <= w; x += step) {
+            g.moveTo(x, 0);
+            g.lineTo(x, h);
+            g.stroke({ width: strokeWidth, color, alpha });
         }
-
-        for (let y = 0; y <= this.worldHeight; y += GRID_SIZE) {
-            this.cmGrid.moveTo(0, y);
-            this.cmGrid.lineTo(this.worldWidth, y);
-            this.cmGrid.stroke({ width: 0.5, color: GRID_COLOR, alpha: GRID_ALPHA });
-        }
-    }
-
-    private drawMGrid(isBold = false) {
-        this.mGrid.clear();
-
-        // Draw meter grid
-        for (let x = 0; x <= this.worldWidth; x += GRID_SIZE_M) {
-            this.mGrid.moveTo(x, 0);
-            this.mGrid.lineTo(x, this.worldHeight);
-            this.mGrid.stroke({ width: isBold ? 2 : 0.6, color: GRID_COLOR, alpha: GRID_ALPHA_M });
-        }
-
-        for (let y = 0; y <= this.worldHeight; y += GRID_SIZE_M) {
-            this.mGrid.moveTo(0, y);
-            this.mGrid.lineTo(this.worldWidth, y);
-            this.mGrid.stroke({ width: isBold ? 1.5 : 0.6, color: GRID_COLOR, alpha: GRID_ALPHA_M });
+        for (let y = 0; y <= h; y += step) {
+            g.moveTo(0, y);
+            g.lineTo(w, y);
+            g.stroke({ width: strokeWidth, color, alpha });
         }
     }
 
     public hideCm() {
-        this.cmGrid.alpha = 0;
-        this.mGrid.alpha = 1;
-        this.drawMGrid(true);
+        this.cmGrid.visible = false;
     }
 
     public showCm() {
-        this.cmGrid.alpha = 1;
-        this.drawMGrid(false);
-    }
-
-    public update(worldWidth: number, worldHeight: number) {
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
-
-        this.cmGrid.clear();
-        this.mGrid.clear();
-
-        this.drawCmGrid();
-        this.drawMGrid();
+        this.cmGrid.visible = true;
     }
 }

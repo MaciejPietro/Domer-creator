@@ -1,11 +1,11 @@
 import { FederatedPointerEvent } from 'pixi.js';
 import { euclideanDistance } from '../../../helpers/EuclideanDistance';
 import { Point } from '../../../helpers/Point';
-import { METER } from '../constants';
 import { PlotPlan } from '../objects/Plan/PlotPlan';
 import { PlotNode } from '../objects/Plot/PlotNode';
 import { Preview } from './MeasureToolManager';
 import { PLOT_EDGE_COLOR } from '../objects/Plot/constants';
+import { METER } from '@/2d/constants/mathConstants';
 
 export class AddPlotManager {
     private static instance: AddPlotManager;

@@ -1,5 +1,5 @@
 import { Graphics, FederatedPointerEvent, Container } from 'pixi.js';
-import { Tool, ViewMode } from '../../constants';
+import { Tool, ViewMode } from '../../enums';
 import { useStore } from '../../../../stores/EditorStore';
 import { snap } from '../../../../helpers/ViewportCoordinates';
 import { main } from '@/2d/EditorRoot';

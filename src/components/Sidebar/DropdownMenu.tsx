@@ -2,7 +2,7 @@ import { LoadAction } from '@/2d/editor/actions/LoadAction';
 import { ResetAction } from '@/2d/editor/actions/ResetAction';
 import { SaveAction } from '@/2d/editor/actions/SaveAction';
 import { SaveInProjectAction } from '@/2d/editor/actions/SaveInProjectAction';
-import { ViewMode } from '@/2d/editor/constants';
+import { ViewMode } from '@/2d/editor/enums';
 import { useStore } from '@/stores/EditorStore';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { Menu, Group } from '@mantine/core';

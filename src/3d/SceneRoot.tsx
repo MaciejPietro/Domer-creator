@@ -9,7 +9,7 @@ import { FloorPlan } from '@/2d/editor/objects/Plan/FloorPlan';
 import { HomePlus } from 'tabler-icons-react';
 import { Button } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
-import { ViewMode } from '@/2d/editor/constants';
+import { ViewMode } from '@/2d/editor/enums';
 import House from './House';
 import { calculateCenterPoint } from './utils/helpers';
 

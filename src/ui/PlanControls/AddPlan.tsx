@@ -7,7 +7,7 @@ import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { Assets } from 'pixi.js';
 import MeasurePlan from './MeasurePlan';
 import { PlanSprite } from '@/2d/editor/objects/Plan/PlanSprite';
-import { Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 
 import { main } from '@/2d/EditorRoot';
 
@@ -63,10 +63,7 @@ export default function AddPlan({ onClose }: AddPlanProps) {
 
             const sizeScale = natW / width;
 
-            planSprite.setDimensions(
-                (natW * scale) / sizeScale,
-                (natH * scale) / sizeScale
-            );
+            planSprite.setDimensions((natW * scale) / sizeScale, (natH * scale) / sizeScale);
 
             planSprite.x = main.center.x - planSprite.width / 2;
             planSprite.y = main.center.y - planSprite.height / 2;

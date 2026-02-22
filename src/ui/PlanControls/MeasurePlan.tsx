@@ -4,8 +4,8 @@ import { Main } from '@/2d/editor/Main';
 import { Application, FederatedPointerEvent } from 'pixi.js';
 
 import { Preview } from '@/2d/editor/actions/MeasureToolManager';
-import { METER } from '@/2d/editor/constants';
 import { IViewportOptions, PluginManager, Viewport } from 'pixi-viewport';
+import { METER } from '@/2d/constants/mathConstants';
 
 export default function MeasurePlan({ fileUrl, lengths, setLengths }: any) {
     const ref = useRef<HTMLDivElement>(null);

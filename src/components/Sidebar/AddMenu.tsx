@@ -5,7 +5,7 @@ import { BorderLeft } from 'tabler-icons-react';
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
 
-import { Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 import AddPlan from '@/ui/PlanControls/AddPlan';
 
 const AddMenu = () => {

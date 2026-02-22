@@ -2,7 +2,7 @@ import { Menu, UnstyledButton } from '@mantine/core';
 import { Polygon, Pencil, Eraser, Eye, EyeOff } from 'tabler-icons-react';
 
 import { useStore } from '@/stores/EditorStore';
-import { Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 import { PlotPlan } from '@/2d/editor/objects/Plan/PlotPlan';
 import { useState } from 'react';
 

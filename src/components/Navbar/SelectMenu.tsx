@@ -33,7 +33,7 @@ import {
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
 
-import { Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 import { NavbarLink } from '@/ui/NavbarLink';
 
 const AddMenu = () => {

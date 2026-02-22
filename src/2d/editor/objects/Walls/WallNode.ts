@@ -1,5 +1,5 @@
 import { Graphics, FederatedPointerEvent, Container } from 'pixi.js';
-import { Tool, ViewMode } from '../../constants';
+import { Tool, ViewMode } from '../../enums';
 import { useStore } from '../../../../stores/EditorStore';
 import { AddWallManager } from '../../actions/AddWallManager';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';

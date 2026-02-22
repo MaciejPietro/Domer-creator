@@ -1,8 +1,6 @@
 import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
 import { viewportX, viewportY } from '../../helpers/ViewportCoordinates';
 import { useStore } from '../../stores/EditorStore';
-import grabIcon from '../../assets/move-icon.svg';
-import { SVG } from 'pixi-svg';
 
 export class Pointer extends Container {
     private dot: Graphics;
@@ -14,7 +12,6 @@ export class Pointer extends Container {
         this.eventMode = 'none';
 
         this.dot = new Graphics().circle(0, 0, 0).fill(0xf);
-        // this.dot = new Graphics().circle(0, 0, 3).fill(0xf);
         this.addChild(this.dot);
 
         this.hand = new Graphics();
@@ -23,8 +20,6 @@ export class Pointer extends Container {
     }
 
     public update(ev: FederatedPointerEvent) {
-        // this.hand.alpha = 0;
-
         let worldX = viewportX(ev.global.x);
         let worldY = viewportY(ev.global.y);
 
@@ -34,15 +29,5 @@ export class Pointer extends Container {
         }
 
         this.position.set(worldX, worldY);
-    }
-
-    public setCursor(cursor: 'grab' | 'default') {
-        //     if (cursor === 'default') {
-        //         this.dot.alpha = 1;
-        //         this.hand.alpha = 0;
-        //     } else {
-        //         this.dot.alpha = 0;
-        //         this.hand.alpha = 1;
-        //     }
     }
 }

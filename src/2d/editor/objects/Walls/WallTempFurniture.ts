@@ -1,5 +1,5 @@
 import { Container } from 'pixi.js';
-import { Tool } from '../../constants';
+import { Tool } from '../../enums';
 import { WindowElement } from '../Furnitures/Window/Window';
 import { Door } from '../Furnitures/Door/Door';
 import { Wall } from './Wall';

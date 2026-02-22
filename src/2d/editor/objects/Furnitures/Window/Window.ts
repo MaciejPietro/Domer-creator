@@ -1,19 +1,23 @@
 import { Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
-import { COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 import { useStore } from '@/stores/EditorStore';
 import { WindowType } from './config';
 import { notifications } from '@mantine/notifications';
 import { Wall } from '../../Walls/Wall';
 import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 import { IWindowSerializable } from './IWindowSerializable';
-import { WINDOW_ACTIVE_COLOR, WINDOW_COLOR, WINDOW_INVALID_COLOR, WINDOW_Z_INDEX } from './constants';
+import {
+    WINDOW_ACTIVE_COLOR,
+    WINDOW_BOTTOM,
+    WINDOW_COLOR,
+    WINDOW_HEIGHT,
+    WINDOW_INVALID_COLOR,
+    WINDOW_WIDTH,
+} from './constants';
 import { showCannotChangeWidthError } from './errors';
 
 // bg-blue-500 from tailwind.config.js
-const WINDOW_WIDTH = 80;
-const WINDOW_HEIGHT = 140;
-const WINDOW_BOTTOM = 90;
 
 type WindowProps = {
     length?: number;
@@ -114,7 +118,7 @@ export class WindowElement extends BuildingElement {
         // WALL GAP
         this.baseLine
             .rect(0, -wallParentThickness / 2, x + this.length, wallParentThickness)
-            .fill({ color: COLOR_BACKGROUND });
+            .fill({ color: WINDOW_COLOR });
 
         // DASHED LINE
         const cutWidth = 5;

@@ -3,7 +3,7 @@ import { isMobile } from 'react-device-detect';
 import { Point } from '../../../../helpers/Point';
 import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { TransformLayer } from './TransformLayer';
-import { WALL_THICKNESS } from '../../constants';
+import { WALL_THICKNESS } from '../Walls/constants';
 
 type Furniture = any;
 

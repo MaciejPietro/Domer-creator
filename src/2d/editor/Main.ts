@@ -10,7 +10,7 @@ import { AddWallManager } from './actions/AddWallManager';
 import { AddPlotManager } from './actions/AddPlotManager';
 import { AddPlotNodeAction } from './actions/AddPlotNodeAction';
 import { viewportX, viewportY } from '../../helpers/ViewportCoordinates';
-import { Tool, ViewMode } from './constants';
+import { Tool, ViewMode } from './enums';
 import { Pointer } from './Pointer';
 import { Preview } from './actions/MeasureToolManager';
 
@@ -198,9 +198,7 @@ export class Main extends Viewport {
     }
 
     private onZoomed() {
-        const currentZoom = this.scale.x;
-
-        if (currentZoom <= 0.5) {
+        if (this.scale.x <= 0.5) {
             this.grid.hideCm();
         } else {
             this.grid.showCm();

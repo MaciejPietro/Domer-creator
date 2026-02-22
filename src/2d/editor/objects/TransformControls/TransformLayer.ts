@@ -2,9 +2,11 @@ import { Container, Graphics } from 'pixi.js';
 import { Point } from '../../../../helpers/Point';
 import { viewportX, viewportY } from '../../../../helpers/ViewportCoordinates';
 import { useStore } from '../../../../stores/EditorStore';
-import { Coord, LabelAxis, LABEL_OFFSET, Tool } from '../../constants';
+import { Coord, LabelAxis, Tool } from '../../enums';
 import { Handle, HandleType } from './Handle';
 import { Label } from './Label';
+
+const LABEL_OFFSET = 10;
 
 type Furniture = any;
 

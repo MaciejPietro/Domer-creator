@@ -5,7 +5,7 @@ import ArcadaLogo from '../../res/logo.png';
 import AppSidebar from '@/components/App/AppSidebar';
 import AppNavbar from '@/components/App/AppNavbar';
 import { useStore } from '@/stores/EditorStore';
-import { ViewMode } from '@/2d/editor/constants';
+import { ViewMode } from '@/2d/editor/enums';
 import SceneRoot from '@/3d/SceneRoot';
 
 export function PageLayout() {

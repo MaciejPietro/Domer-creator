@@ -1,3 +1,4 @@
+import { METER } from '@/2d/constants/mathConstants';
 import { WallType } from './types';
 
 export const WALL_FILL_COLOR = '#919191';
@@ -19,3 +20,10 @@ export const DEFAULT_WALL_TYPE: WallType = 'exterior';
 // Corner calculation constants
 export const INTERSECTION_LINE_EXTENSION = 100;
 export const CORNER_ANGLE_THRESHOLD = 25;
+
+export const WALL_INSULATION_THICKNESS = 0.2 * METER;
+export const WALL_BLOCK_THICKNESS = 0.2 * METER;
+
+export const INTERIOR_WALL_THICKNESS = 0.16 * METER;
+
+export const WALL_NODE_THICKNESS = 0.15 * METER;

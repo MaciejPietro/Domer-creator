@@ -1,18 +1,14 @@
 import { Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
-import { COLOR_BACKGROUND, Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 import { useStore } from '@/stores/EditorStore';
 import { DoorOrientation, DoorType } from './config';
 import { notifications } from '@mantine/notifications';
 import { Wall } from '../../Walls/Wall';
 import { BuildingElement, BuildingElementProps } from '../BuildingElement';
 import { IDoorSerializable } from './IDoorSerializable';
-import { DOOR_ACTIVE_COLOR, DOOR_COLOR, DOOR_INVALID_COLOR } from './constants';
+import { DOOR_ACTIVE_COLOR, DOOR_COLOR, DOOR_INVALID_COLOR, DOOR_WIDTH } from './constants';
 import { showCannotChangeWidthError } from './errors';
-
-// bg-blue-500 from tailwind.config.js
-const COLOR = '#1C7ED6';
-const DOOR_WIDTH = 80;
 
 export type FurnitureOrientation = number; // 0 <-> 359
 
@@ -128,7 +124,7 @@ export class Door extends BuildingElement {
         // WALL GAP
         this.baseLine
             .rect(-1, -wallParentThickness + offset, this.length + 2, wallParentThickness)
-            .fill({ color: COLOR_BACKGROUND });
+            .fill({ color: DOOR_COLOR });
 
         // THICK LINE
         this.baseLine.rect(-1, -9, x + this.length + 2, 10).fill({ color });

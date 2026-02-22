@@ -1,13 +1,11 @@
 import { useRef, useEffect } from 'react';
-import { Application, Container } from 'pixi.js';
+import { Application } from 'pixi.js';
 
-import { IViewportOptions, Viewport } from 'pixi-viewport';
 import { useStore } from '../stores/EditorStore';
-import { COLOR_BACKGROUND, METER } from '@/2d/editor/constants';
 import { extensions } from '@pixi/core';
-import { EventSystem } from '@pixi/events';
 import { InteractionManager } from '@pixi/interaction';
 import { Main } from './editor/Main';
+import { COLOR_BACKGROUND, WORLD_HEIGHT, WORLD_WIDTH } from './constants/appConstants';
 
 extensions.remove(InteractionManager);
 
@@ -37,8 +35,8 @@ export function EditorRoot() {
             const viewportSettings = {
                 screenWidth: app.screen.width,
                 screenHeight: app.screen.height,
-                worldWidth: 50 * METER,
-                worldHeight: 80 * METER,
+                worldWidth: WORLD_WIDTH,
+                worldHeight: WORLD_HEIGHT,
                 events: app.renderer.events,
                 eventMode: 'static',
             };

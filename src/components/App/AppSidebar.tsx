@@ -3,7 +3,7 @@ import { GridDots, Table, TableOff } from 'tabler-icons-react';
 
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
-import { ViewMode } from '@/2d/editor/constants';
+import { ViewMode } from '@/2d/editor/enums';
 import { NavbarLink } from '@/ui/NavbarLink';
 import PlanMenu from '../Sidebar/PlanMenu';
 import PlotMenu from '../Sidebar/PlotMenu';

@@ -1,6 +1,6 @@
 import { Container, FederatedPointerEvent, Graphics, Sprite, Texture } from 'pixi.js';
 import { useStore } from '@/stores/EditorStore';
-import { Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 
 const FOCUS_BORDER_COLOR = '#1C7ED6';
 const FOCUS_BORDER_WIDTH = 3;

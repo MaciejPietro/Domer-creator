@@ -1,10 +1,8 @@
-import { Container, Graphics, Sprite, Text, TextStyle, Texture } from 'pixi.js';
-import { Point } from '../../../../helpers/Point';
-import { METER } from '../../constants';
+import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { useStore } from '@/stores/EditorStore';
 import { Wall } from '../Walls/Wall';
+import { METER } from '@/2d/constants/mathConstants';
 
-// bg-blue-500 from tailwind.config.js
 const LINE_STYLE = { width: 1, color: '#1C7ED6' };
 
 export class MeasureLabel extends Container {

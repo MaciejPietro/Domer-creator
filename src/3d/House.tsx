@@ -10,7 +10,7 @@ import { FloorPlan } from '@/2d/editor/objects/Plan/FloorPlan';
 import { HomePlus } from 'tabler-icons-react';
 import { Button } from '@mantine/core';
 import { useStore } from '@/stores/EditorStore';
-import { ViewMode } from '@/2d/editor/constants';
+import { ViewMode } from '@/2d/editor/enums';
 import Door from './elements/Door/Door';
 import Window from './elements/Window/Window';
 

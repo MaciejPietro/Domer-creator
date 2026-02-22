@@ -45,10 +45,9 @@ import {
 import { cleanNotifications, showNotification } from '@mantine/notifications';
 import { useStore } from '@/stores/EditorStore';
 
-import { Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 import { NavbarLink } from '@/ui/NavbarLink';
 import { DEFAULT_WALL_TYPE } from '@/2d/editor/objects/Walls/constants';
-
 
 const AddMenu = () => {
     const { helpMode, activeTool, setTool, activeToolSettings, setToolSettings } = useStore();
@@ -63,8 +62,6 @@ const AddMenu = () => {
             onClick: () => {
                 setTool(Tool.WallAdd);
                 setToolSettings({ ...activeToolSettings, wallType: DEFAULT_WALL_TYPE });
-
-               
 
                 if (helpMode) {
                     cleanNotifications();

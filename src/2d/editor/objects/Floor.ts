@@ -2,12 +2,12 @@ import { Container } from 'pixi.js';
 import { euclideanDistance } from '@/helpers/EuclideanDistance';
 import { Point } from '@/helpers/Point';
 
-import { METER } from '../constants';
 import { FloorSerializable } from '../persistence/FloorSerializable';
 import { Wall } from './Walls/Wall';
 import { WallNodeSequence } from './Walls/WallNodeSequence';
 import { Door } from './Furnitures/Door/Door';
 import { WindowElement } from './Furnitures/Window/Window';
+import { METER } from '@/2d/constants/mathConstants';
 
 type Furniture = WindowElement | Door;
 
@@ -158,7 +158,6 @@ export class Floor extends Container {
     public getWallNodeSequence() {
         return this.wallNodeSequence;
     }
-
 
     // public clearScreen() {
     //     for (const child of this.children) {

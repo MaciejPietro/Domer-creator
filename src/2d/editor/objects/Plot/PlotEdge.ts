@@ -1,6 +1,6 @@
 import { Graphics, FederatedPointerEvent } from 'pixi.js';
 import { useStore } from '../../../../stores/EditorStore';
-import { Tool, ViewMode } from '../../constants';
+import { Tool, ViewMode } from '../../enums';
 import { PlotNode } from './PlotNode';
 import { PLOT_EDGE_COLOR, PLOT_EDGE_ACTIVE_COLOR, PLOT_EDGE_WIDTH } from './constants';
 import { Plot } from './Plot';

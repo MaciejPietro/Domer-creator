@@ -1,17 +1,3 @@
-// how many pixels is a meter
-export const METER = 100;
-export const WALL_INSULATION_THICKNESS = 0.2 * METER;
-export const WALL_BLOCK_THICKNESS = 0.2 * METER;
-
-export const WALL_THICKNESS = WALL_INSULATION_THICKNESS + WALL_BLOCK_THICKNESS;
-export const INTERIOR_WALL_THICKNESS = 0.16 * METER;
-
-export const WALL_NODE_THICKNESS = 0.15 * METER;
-
-export const LABEL_OFFSET = 10;
-
-export const COLOR_BACKGROUND = '#EBEBEB';
-
 export enum Modes {
     Idle,
     Dragging,

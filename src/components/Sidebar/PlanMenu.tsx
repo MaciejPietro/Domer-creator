@@ -34,7 +34,7 @@ import {
 } from 'tabler-icons-react';
 
 import { useStore } from '@/stores/EditorStore';
-import { Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 
 import AddPlan from '@/ui/PlanControls/AddPlan';
 

@@ -3,7 +3,7 @@ import ModeMenu from '../Sidebar/ModeMenu';
 import { DetailsControls } from '@/ui/DetailsControls/DetailsControls';
 import AddMenu from '../Navbar/AddMenu';
 
-import { ViewMode } from '@/2d/editor/constants';
+import { ViewMode } from '@/2d/editor/enums';
 import SelectMenu from '../Navbar/SelectMenu';
 import { useStore } from '@/stores/EditorStore';
 

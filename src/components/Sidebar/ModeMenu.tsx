@@ -2,7 +2,7 @@ import { Group, AppShellSection } from '@mantine/core';
 import { Pencil, Badge3d } from 'tabler-icons-react';
 
 import { useStore } from '@/stores/EditorStore';
-import { ViewMode } from '@/2d/editor/constants';
+import { ViewMode } from '@/2d/editor/enums';
 import { NavbarLink } from '@/ui/NavbarLink';
 
 const modes = [

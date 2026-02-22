@@ -1,6 +1,6 @@
 import { Container, FederatedPointerEvent, Graphics } from 'pixi.js';
 import { Point } from '@/helpers/Point';
-import { Tool } from '@/2d/editor/constants';
+import { Tool } from '@/2d/editor/enums';
 import { useStore } from '@/stores/EditorStore';
 import { DeleteFurnitureAction } from '@/2d/editor/actions/DeleteFurnitureAction';
 import { v4 as uuidv4 } from 'uuid';

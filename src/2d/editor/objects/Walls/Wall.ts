@@ -7,7 +7,7 @@ import { snap, viewportX, viewportY } from '../../../../helpers/ViewportCoordina
 import { useStore } from '../../../../stores/EditorStore';
 import { AddNodeAction } from '../../actions/AddNodeAction';
 import { DeleteWallAction } from '../../actions/DeleteWallAction';
-import { Tool, ViewMode } from '../../constants';
+import { Tool, ViewMode } from '../../enums';
 import { WallNode } from './WallNode';
 import { main } from '@/2d/EditorRoot';
 import { DeleteWallNodeAction } from '../../actions/DeleteWallNodeAction';

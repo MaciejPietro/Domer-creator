@@ -1,12 +1,12 @@
 import { FederatedPointerEvent } from 'pixi.js';
 import { euclideanDistance } from '../../../helpers/EuclideanDistance';
 import { Point } from '../../../helpers/Point';
-import { METER } from '../constants';
 import { FloorPlan } from '../objects/Plan/FloorPlan';
 import { TransformLayer } from '../objects/TransformControls/TransformLayer';
 import { WallNode } from '../objects/Walls/WallNode';
 import { AddWallAction } from './AddWallAction';
 import { Preview } from './MeasureToolManager';
+import { METER } from '@/2d/constants/mathConstants';
 
 // tracks current action data
 export class AddWallManager {

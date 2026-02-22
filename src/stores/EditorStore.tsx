@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { AddWallManager } from '../2d/editor/actions/AddWallManager';
 import { AddPlotManager } from '../2d/editor/actions/AddPlotManager';
-import { Tool, ViewMode } from '../2d/editor/constants';
+import { Tool, ViewMode } from '../2d/editor/enums';
 import { WallNode } from '@/2d/editor/objects/Walls/WallNode';
 import { Wall } from '@/2d/editor/objects/Walls/Wall';
 import { Door } from '@/2d/editor/objects/Furnitures/Door/Door';
